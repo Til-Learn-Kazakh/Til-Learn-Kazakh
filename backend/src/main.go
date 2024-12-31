@@ -4,8 +4,11 @@ import (
 	"log"
 	"os"
 
+	"diploma/src/database"
 	"diploma/src/middlewares"
 	"diploma/src/modules/auth"
+	"diploma/src/modules/lesson"
+	"diploma/src/services"
 
 	"github.com/gin-contrib/cors"
 
@@ -32,6 +35,16 @@ func main() {
 
 	authController := auth.NewAuthController(auth.NewAuthService())
 
+	imageService := services.NewImageService() // src/public будет базовым путем
+
+	lessonService := lesson.LessonService{
+		Collection:   database.GetCollection(database.Client, "Lessons"), // Подключение к коллекции "Lessons"
+		ImageService: imageService,                                       // Передаем корректный экземпляр ImageService
+	}
+
+	lessonController := lesson.LessonController{
+		Service: &lessonService,
+	}
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.10:19000"},
@@ -46,6 +59,7 @@ func main() {
 
 	auth.AuthRoutes(apiRoutes, authController)
 	apiRoutes.Use(middlewares.Authentication())
+	lesson.LessonRoutes(apiRoutes, &lessonController)
 
 	log.Fatal(router.Run(":" + port))
 }

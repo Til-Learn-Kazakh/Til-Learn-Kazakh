@@ -10,6 +10,7 @@ import (
 	"diploma/src/database"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -91,12 +92,16 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 
 	// Создание нового пользователя
 	newUser := User{
-		FirstName: dto.FirstName,
-		LastName:  dto.LastName,
-		Email:     dto.Email,
-		Password:  hashedPassword,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		FirstName:        dto.FirstName,
+		LastName:         dto.LastName,
+		Email:            dto.Email,
+		Password:         hashedPassword,
+		Hearts:           3,
+		Crystals:         0,
+		Streak:           0,
+		LessonsCompleted: []primitive.ObjectID{},
+		CreatedAt:        time.Now(),
+		UpdatedAt:        time.Now(),
 	}
 
 	_, err = s.UserCollection.InsertOne(ctx, newUser)
