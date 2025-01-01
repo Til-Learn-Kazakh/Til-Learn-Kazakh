@@ -37,7 +37,7 @@ run: ## Run the application locally
 
 # Build binary
 build: ## Build the binary
-	@go build backend ./src
+	@go build -o backend ./src
 
 # Clean up
 clean: ## Clean up generated files
