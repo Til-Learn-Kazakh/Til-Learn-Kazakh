@@ -1,0 +1,86 @@
+name: Backend CI
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  build-and-lint:
+    name: Format, Lint, and Build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. Set up Go
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.3'
+
+      # 3. Ensure dependencies are tidy
+      - name: Ensure dependencies are tidy
+        run: |
+          go mod tidy
+
+      # 3.1 Cache Go modules
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+        # 4. Check formatting
+      - name: Check formatting
+        run: |
+          gofmt -l .
+
+      # 5. Install golangci-lint
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.53.3
+
+      # 6. Format code
+      - name: Format code
+        run: |
+          make fmt
+
+      # 7. Run linter
+      - name: Run linter
+        run: |
+          make lint
+
+        # 8. Build project
+      - name: Build project
+        run: |
+          make build
+
+      # 9. Scan for secrets
+      - name: Scan for secrets
+        uses: zricethezav/gitleaks-action@v2
+
+      # 10. Security check
+      - name: Run GoSec
+        run: |
+          go install github.com/securego/gosec/v2/cmd/gosec@latest
+          gosec ./...
+
+        # 11. Check outdated dependencies
+      - name: Check outdated dependencies
+        run: |
+          go install github.com/psampaz/go-mod-outdated@latest
+          go list -u -m -json all | go-mod-outdated -update

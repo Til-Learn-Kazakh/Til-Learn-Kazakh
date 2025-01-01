@@ -14,7 +14,7 @@ const { NotificationsProvider } = createNotifications()
 const queryClient = new QueryClient() // Создаем QueryClient здесь
 
 const Main: React.FC = () => {
-	const [isAuthenticated] = useState(false) // Управление авторизацией
+	const [isAuthenticated] = useState(true) // Управление авторизацией
 
 	const navigationRef = useRef<NavigationContainerRef<{}>>(null)
 

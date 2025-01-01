@@ -21,3 +21,15 @@ lint: ## Run golangci-lint
 check: fmt lint test ## Run all checks: fmt, lint, and test
 	@echo "All checks passed!"
 
+
+# Run locally
+run: ## Run the application locally
+	@go run src/main.go
+
+# Build binary
+build: ## Build the binary
+	@go build backend ./src
+
+# Clean up
+clean: ## Clean up generated files
+	@rm -rf backend
