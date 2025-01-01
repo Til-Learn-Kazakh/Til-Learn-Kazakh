@@ -40,7 +40,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('backend/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
 
@@ -52,7 +52,7 @@ jobs:
       # 5. Install golangci-lint
       - name: Install golangci-lint
         run: |
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.53.3
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest
 
       # 6. Format code
       - name: Format code
@@ -60,6 +60,10 @@ jobs:
           make fmt
 
       # 7. Run linter
+      - name: Run golangci-lint with verbose output
+        run: golangci-lint run --verbose
+
+      # 7.1 Run linter
       - name: Run linter
         run: |
           make lint
