@@ -12,9 +12,18 @@ help: ## Show this help
 fmt: ## Format code with gofmt
 	@gofmt -l -w .
 
+# Check linter
+lint-check: ## Check code using golangci-lint (no output if clean)
+	@$(LINTER) run --quiet
+
 # Run linter
 lint: ## Run golangci-lint
 	@$(LINTER) run
+
+
+# Fix linter issues
+lint-fix: ## Run golangci-lint with auto-fix
+	@$(LINTER) run --fix
 
 
 # Check everything

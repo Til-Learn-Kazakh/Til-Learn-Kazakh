@@ -1,47 +1,43 @@
-
-
 linters:
   disable-all: true
   # This list of linters is not a recommendation (same thing for all this configuration file).
   # We intentionally use a limited set of linters.
   # See the comment on top of this file.
   enable:
-    - bodyclose
-    - copyloopvar
-    - depguard
-    - dogsled
-    - dupl
-    - errcheck
-    - errorlint
-    - funlen
-    - gocheckcompilerdirectives
-    - gochecknoinits
-    - gochecknoinits
-    - goconst
-    - gocritic
-    - gocyclo
-    - godox
-    - gofmt
-    - goimports
-    - goprintffuncname
-    - gosec
-    - gosimple
-    - govet
-    - intrange
-    - ineffassign
-    - lll
-    - misspell
-    - nakedret
-    - noctx
-    - nolintlint
-    - revive
-    - staticcheck
-    - testifylint
-    - unconvert
-    - unparam
-    - unused
-    - whitespace
-
+      - bodyclose
+      - copyloopvar
+      - depguard
+      - dogsled
+      - dupl
+      - errcheck
+      - errorlint
+      - funlen
+      - gocheckcompilerdirectives
+      - gochecknoinits
+      - goconst
+      - gocritic
+      - gocyclo
+      - godox
+      - gofmt
+      - goimports
+      - goprintffuncname
+      - gosec
+      - gosimple
+      - govet
+      - intrange
+      - ineffassign
+      - lll
+      - misspell
+      - nakedret
+      - noctx
+      - nolintlint
+      - revive
+      - staticcheck
+      - testifylint
+      - unconvert
+      - unparam
+      - unused
+      - whitespace
 
 linters-settings:
   depguard:
@@ -49,15 +45,15 @@ linters-settings:
       logger:
         deny:
           # logging is allowed only by logutils.Log,
-          - pkg: "github.com/sirupsen/logrus"
+          - pkg: 'github.com/sirupsen/logrus'
             desc: logging is allowed only by logutils.Log.
-          - pkg: "github.com/pkg/errors"
+          - pkg: 'github.com/pkg/errors'
             desc: Should be replaced by standard lib errors package.
-          - pkg: "github.com/instana/testify"
+          - pkg: 'github.com/instana/testify'
             desc: It's a fork of github.com/stretchr/testify.
         files:
           # logrus is allowed to use only in logutils package.
-          - "!**/pkg/logutils/**.go"
+          - '!**/pkg/logutils/**.go'
   dupl:
     threshold: 100
   funlen:
@@ -121,7 +117,7 @@ linters-settings:
   misspell:
     locale: US
     ignore-words:
-      - "importas" # linter name
+      - 'importas' # linter name
   nolintlint:
     allow-unused: false # report any unused nolint directives
     require-explanation: true # require an explanation for nolint directives
@@ -149,41 +145,41 @@ issues:
     # Deprecated configuration options.
     - path: pkg/commands/run.go
       linters: [staticcheck]
-      text: "SA1019: c.cfg.Run.ShowStats is deprecated: use Output.ShowStats instead."
+      text: 'SA1019: c.cfg.Run.ShowStats is deprecated: use Output.ShowStats instead.'
 
     # Deprecated linter options.
     - path: pkg/golinters/errcheck/errcheck.go
       linters: [staticcheck]
-      text: "SA1019: errCfg.Exclude is deprecated: use ExcludeFunctions instead"
+      text: 'SA1019: errCfg.Exclude is deprecated: use ExcludeFunctions instead'
     - path: pkg/golinters/errcheck/errcheck.go
       linters: [staticcheck]
-      text: "SA1019: errCfg.Ignore is deprecated: use ExcludeFunctions instead"
+      text: 'SA1019: errCfg.Ignore is deprecated: use ExcludeFunctions instead'
     - path: pkg/golinters/govet/govet.go
       linters: [staticcheck]
-      text: "SA1019: cfg.CheckShadowing is deprecated: the linter should be enabled inside Enable."
+      text: 'SA1019: cfg.CheckShadowing is deprecated: the linter should be enabled inside Enable.'
     - path: pkg/golinters/godot/godot.go
       linters: [staticcheck]
-      text: "SA1019: settings.CheckAll is deprecated: use Scope instead"
+      text: 'SA1019: settings.CheckAll is deprecated: use Scope instead'
     - path: pkg/golinters/gci/gci.go
       linters: [staticcheck]
-      text: "SA1019: settings.LocalPrefixes is deprecated: use Sections instead."
+      text: 'SA1019: settings.LocalPrefixes is deprecated: use Sections instead.'
     - path: pkg/golinters/mnd/mnd.go
       linters: [staticcheck]
-      text: "SA1019: settings.Settings is deprecated: use root level settings instead."
+      text: 'SA1019: settings.Settings is deprecated: use root level settings instead.'
     - path: pkg/golinters/mnd/mnd.go
       linters: [staticcheck]
-      text: "SA1019: config.GoMndSettings is deprecated: use MndSettings."
+      text: 'SA1019: config.GoMndSettings is deprecated: use MndSettings.'
 
     # Related to `run.go`, it cannot be removed.
     - path: pkg/golinters/gofumpt/gofumpt.go
       linters: [staticcheck]
-      text: "SA1019: settings.LangVersion is deprecated: use the global `run.go` instead."
+      text: 'SA1019: settings.LangVersion is deprecated: use the global `run.go` instead.'
     - path: pkg/golinters/internal/staticcheck_common.go
       linters: [staticcheck]
-      text: "SA1019: settings.GoVersion is deprecated: use the global `run.go` instead."
+      text: 'SA1019: settings.GoVersion is deprecated: use the global `run.go` instead.'
     - path: pkg/lint/lintersdb/manager.go
       linters: [staticcheck]
-      text: "SA1019: (.+).(GoVersion|LangVersion) is deprecated: use the global `run.go` instead."
+      text: 'SA1019: (.+).(GoVersion|LangVersion) is deprecated: use the global `run.go` instead.'
 
     # Based on existing code, the modifications should be limited to make maintenance easier.
     - path: pkg/golinters/unused/unused.go
@@ -193,17 +189,17 @@ issues:
     # Related to file sizes.
     - path: pkg/goanalysis/runner_loadingpackage.go
       linters: [gosec]
-      text: "G115: integer overflow conversion uintptr -> int"
+      text: 'G115: integer overflow conversion uintptr -> int'
 
     # Related to PID.
     - path: test/bench/bench_test.go
       linters: [gosec]
-      text: "G115: integer overflow conversion int -> int32"
+      text: 'G115: integer overflow conversion int -> int32'
 
     # Related to the result of computation but divided multiple times by 1024.
     - path: test/bench/bench_test.go
       linters: [gosec]
-      text: "G115: integer overflow conversion uint64 -> int"
+      text: 'G115: integer overflow conversion uint64 -> int'
 
   exclude-dirs:
     - test/testdata_etc # test files

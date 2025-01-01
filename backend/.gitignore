@@ -6,7 +6,6 @@
 *.tmp
 
 # Кэш и временные файлы
-go.sum
 go.work.sum
 vendor/
 
