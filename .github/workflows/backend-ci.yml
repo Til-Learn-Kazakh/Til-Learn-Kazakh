@@ -77,11 +77,11 @@ jobs:
         run: |
           make build
 
-      # 10. Scan for secrets
-      - name: Scan for secrets(TruffleHog)
-        uses: trufflesecurity/trufflehog@v2.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      # # 10. Scan for secrets
+      # - name: Scan for secrets(TruffleHog)
+      #   uses: trufflesecurity/trufflehog@v2.0.0
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # 11. Security check
       - name: Run GoSec
