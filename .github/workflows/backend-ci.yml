@@ -35,7 +35,11 @@ jobs:
         run: |
           go mod tidy
 
-      # 3.1 Cache Go modules
+      # 4. Check go.sum
+      - name: Check go.sum
+        run: cat go.sum
+
+      # 4.1 Cache Go modules
       - name: Cache Go modules
         uses: actions/cache@v3
         with:
@@ -44,46 +48,48 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-        # 4. Check formatting
+        # 5. Check formatting
       - name: Check formatting
         run: |
           gofmt -l .
 
-      # 5. Install golangci-lint
+      # 6. Install golangci-lint
       - name: Install golangci-lint
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin latest
 
-      # 6. Format code
+      # 7. Format code
       - name: Format code
         run: |
           make fmt
 
-      # 7. Run linter
+      # 8. Run linter
       - name: Run golangci-lint with verbose output
         run: golangci-lint run --verbose
 
-      # 7.1 Run linter
+      # 8.1 Run linter
       - name: Run linter
         run: |
           make lint
 
-        # 8. Build project
+        # 9. Build project
       - name: Build project
         run: |
           make build
 
-      # 9. Scan for secrets
-      - name: Scan for secrets
-        uses: zricethezav/gitleaks-action@v2
+      # 10. Scan for secrets
+      - name: Scan for secrets(TruffleHog)
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      # 10. Security check
+      # 11. Security check
       - name: Run GoSec
         run: |
           go install github.com/securego/gosec/v2/cmd/gosec@latest
           gosec ./...
 
-        # 11. Check outdated dependencies
+        # 12. Check outdated dependencies
       - name: Check outdated dependencies
         run: |
           go install github.com/psampaz/go-mod-outdated@latest
