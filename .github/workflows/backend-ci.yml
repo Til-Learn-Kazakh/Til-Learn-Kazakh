@@ -79,7 +79,7 @@ jobs:
 
       # 10. Scan for secrets
       - name: Scan for secrets(TruffleHog)
-        uses: trufflesecurity/trufflehog@v3
+        uses: trufflesecurity/trufflehog@v2.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
