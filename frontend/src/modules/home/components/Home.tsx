@@ -1,201 +1,123 @@
-import React, { useState } from 'react'
-import { Dimensions, Image, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ProgressBar } from 'react-native-paper'
 
-// Ширина экрана (нужна для горизонтальной прокрутки "pagingEnabled")
-const { width } = Dimensions.get('window')
-
-// Примерные данные о двух уровнях
-const levelsData = [
-	{
-		id: 1,
-		levelName: 'Level 1',
-		dotsCompleted: 1,
-		lessons: [
-			{
-				id: 'lesson1',
-				progress: '15/15',
-				title: 'Animals',
-				sub: 'View',
-				color: '#89CEF9',
-				imageUri: 'https://cdn-icons-png.flaticon.com/512/3929/3929816.png',
-			},
-			{
-				id: 'lesson2',
-				progress: '9/15',
-				title: 'In the City',
-				sub: 'Next',
-				color: '#6EEB83',
-				imageUri: 'https://cdn-icons-png.flaticon.com/512/4861/4861811.png',
-			},
-			{
-				id: 'lesson3',
-				progress: '6/15',
-				title: 'Alphabet',
-				sub: 'Next',
-				color: '#FFDD75',
-				imageUri: 'https://cdn-icons-png.flaticon.com/512/2199/2199947.png',
-			},
-			{
-				id: 'lesson4',
-				progress: '0/15',
-				title: 'Nature',
-				sub: 'Start',
-				color: '#FFB4A2',
-				imageUri: 'https://cdn-icons-png.flaticon.com/512/1995/1995325.png',
-			},
-		],
-	},
-	{
-		id: 2,
-		levelName: 'Level 2',
-		dotsCompleted: 2,
-		lessons: [
-			{
-				id: 'lesson1',
-				progress: '10/15',
-				title: 'Food',
-				sub: 'Next',
-				color: '#FFB4A2',
-				imageUri: 'https://cdn-icons-png.flaticon.com/512/2909/2909765.png',
-			},
-			{
-				id: 'lesson2',
-				progress: '3/15',
-				title: 'Family',
-				sub: 'View',
-				color: '#89CEF9',
-				imageUri: 'https://cdn-icons-png.flaticon.com/512/1988/1988970.png',
-			},
-		],
-	},
-]
+import { icons } from '../../../core/constants'
 
 const Home = () => {
-	// Примерные данные для верхней панели:
-	const hearts = 3 // Сердечки
-	const crystals = 471 // Кристаллы
-	const streak = 38 // Стрик (огонёк)
-
-	// Текущее смещение при горизонтальной прокрутке (для индикатора, если нужно)
-	const [currentPage, setCurrentPage] = useState(0)
-
-	// Функция, срабатывающая при «перелистывании» горизонтального скролла
-	const handleScroll = event => {
-		const offsetX = event.nativeEvent.contentOffset.x
-		const pageIndex = Math.round(offsetX / width)
-		setCurrentPage(pageIndex)
-	}
+	const sections = [
+		{
+			title: 'Section 1, Unit 1',
+			description: 'Английский для выживания',
+			lessons: [
+				{
+					title: 'Урок 1',
+					progress: 0.8,
+					descriptionRu: 'Приветствие и знакомство',
+					descriptionKz: 'Сәлемдесу және танысу',
+				},
+				{
+					title: 'Урок 2',
+					progress: 0.5,
+					descriptionRu: 'Введение в грамматику',
+					descriptionKz: 'Грамматикаға кіріспе',
+				},
+			],
+		},
+		{
+			title: 'Section 1, Unit 2',
+			description: 'Разговорная грамматика',
+			lessons: [
+				{
+					title: 'Урок 3',
+					progress: 0.6,
+					descriptionRu: 'Использование глаголов',
+					descriptionKz: 'Етістіктерді қолдану',
+				},
+				{
+					title: 'Урок 4',
+					progress: 0.4,
+					descriptionRu: 'Построение вопросов',
+					descriptionKz: 'Сұрақтарды құру',
+				},
+			],
+		},
+	]
 
 	return (
 		<View style={styles.container}>
-			{/* ------------ TOP BAR с тенью ------------ */}
-			<View style={styles.topBar}>
-				{/* ФОТО ПРОФИЛЯ (СЛЕВА) */}
-				<View style={styles.profileContainer}>
-					<Image
-						source={{
-							uri: 'https://images.unsplash.com/photo-1647845481422-77fc779e6a41?w=60&h=60&fit=crop&crop=faces',
-						}}
-						style={styles.profileImage}
-					/>
-				</View>
-
-				{/* СТАТЫ ПО СЕРЕДИНЕ (СЕРДЦА, КРИСТАЛЛЫ, ОГОНЁК) */}
-				<View style={styles.statsContainer}>
-					{/* Сердечки */}
-					<View style={styles.statItem}>
+			{/* Header */}
+			<View style={styles.header}>
+				<View style={styles.headerRow}>
+					<View style={styles.headerItem}>
 						<Image
-							source={{ uri: 'https://cdn-icons-png.flaticon.com/512/833/833472.png' }}
-							style={styles.statIcon}
+							source={icons.flag}
+							style={styles.icon}
 						/>
-						<Text style={styles.statText}>{hearts}</Text>
 					</View>
-
-					{/* Кристаллы */}
-					<View style={styles.statItem}>
+					<View style={styles.headerItem}>
 						<Image
-							source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1828/1828817.png' }}
-							style={styles.statIcon}
+							source={icons.fire}
+							style={styles.icon}
 						/>
-						<Text style={styles.statText}>{crystals}</Text>
+						<Text style={styles.iconText}>28</Text>
 					</View>
-
-					{/* Огонёк (стрик) */}
-					<View style={styles.statItem}>
+					<View style={styles.headerItem}>
 						<Image
-							source={{ uri: 'https://cdn-icons-png.flaticon.com/512/10504/10504729.png' }}
-							style={styles.statIcon}
+							source={icons.diamond}
+							style={styles.icon}
 						/>
-						<Text style={styles.statText}>{streak}</Text>
+						<Text style={styles.iconText}>1057</Text>
 					</View>
-				</View>
-
-				{/* ФЛАГ КАЗАХСТАНА (СПРАВА) */}
-				<View style={styles.flagContainer}>
-					<Image
-						source={{
-							uri: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Flag_of_Kazakhstan.svg',
-						}}
-						style={styles.flagIcon}
-					/>
+					<View style={styles.headerItem}>
+						<Image
+							source={icons.heart}
+							style={styles.icon}
+						/>
+						<Text style={styles.iconText}>5</Text>
+					</View>
 				</View>
 			</View>
 
-			{/* ------------ ГОРИЗОНТАЛЬНЫЙ SCROLL (ПО УРОВНЯМ) ------------ */}
-			<ScrollView
-				horizontal
-				pagingEnabled
-				showsHorizontalScrollIndicator={false}
-				onScroll={handleScroll}
-				scrollEventThrottle={16}
-				style={{ flex: 1 }} // пусть занимает всё оставшееся пространство
-			>
-				{levelsData.map((level, index) => (
-					<View
-						key={level.id}
-						style={{ width, paddingBottom: 80 }}
-					>
-						{/* --- Блок LEVEL --- */}
-						<View style={styles.levelContainer}>
-							<Text style={styles.levelText}>{level.levelName}</Text>
-							{/* Индикатор прогресса из нескольких точек */}
-							<View style={styles.dotsContainer}>
-								{[...Array(4)].map((_, dotIndex) => {
-									const isActive = dotIndex < level.dotsCompleted
-									return (
-										<View
-											key={dotIndex}
-											style={[styles.dot, { backgroundColor: isActive ? '#FFC107' : '#ccc' }]}
-										/>
-									)
-								})}
+			{/* Sections with Lessons */}
+			<ScrollView contentContainerStyle={styles.scrollViewContainer}>
+				{sections.map((section, sectionIndex) => (
+					<View key={sectionIndex}>
+						{/* Section Title and Description */}
+						<View style={styles.sectionCard}>
+							<View style={styles.sectionInfo}>
+								<Text style={styles.sectionText}>{section.title}</Text>
+								<Text style={styles.sectionDescription}>{section.description}</Text>
 							</View>
+							<TouchableOpacity style={styles.squareButton}>
+								<Image
+									source={icons.book}
+									style={styles.bookIconSquare}
+								/>
+							</TouchableOpacity>
 						</View>
 
-						{/* --- Список УРОКОВ (Вертикальный скролл внутри) --- */}
-						<ScrollView
-							style={styles.lessonsContainer}
-							contentContainerStyle={{ paddingBottom: 100 }}
-						>
-							{level.lessons.map(lesson => (
-								<View
-									key={lesson.id}
-									style={[styles.lessonCard, { backgroundColor: lesson.color }]}
-								>
-									<View style={styles.lessonCardLeft}>
-										<Text style={styles.lessonProgress}>{lesson.progress}</Text>
-										<Text style={styles.lessonTitle}>{lesson.title}</Text>
-										<Text style={styles.lessonSub}>{lesson.sub}</Text>
-									</View>
-									<View style={styles.lessonCardRight}>
-										<Image
-											source={{ uri: lesson.imageUri }}
-											style={styles.lessonImage}
-										/>
-									</View>
+						{/* Lessons in Section */}
+						{section.lessons.map((lesson, lessonIndex) => (
+							<View
+								key={lessonIndex}
+								style={styles.lessonCard}
+							>
+								<Text style={styles.lessonTitle}>{lesson.title}</Text>
+								<ProgressBar
+									progress={lesson.progress}
+									color='#4CAF50'
+									style={styles.lessonProgress}
+								/>
+								<Text style={styles.lessonProgressText}>
+									{Math.round(lesson.progress * 100)}% завершено
+								</Text>
+								<View style={styles.lessonDescription}>
+									<Text style={styles.descriptionTextRu}>{lesson.descriptionRu}</Text>
+									<Text style={styles.descriptionTextKz}>{lesson.descriptionKz}</Text>
 								</View>
-							))}
-						</ScrollView>
+							</View>
+						))}
 					</View>
 				))}
 			</ScrollView>
@@ -210,130 +132,107 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: '#fff',
 	},
-	/* ---------------- TOP BAR (Синий) ---------------- */
-	topBar: {
-		flexDirection: 'row',
-		backgroundColor: '#0A84FF',
-		paddingHorizontal: 15,
-		paddingVertical: 30,
+	header: {
+		backgroundColor: '#fff',
+		padding: 16,
+		borderBottomLeftRadius: 16,
+		borderBottomRightRadius: 16,
 		alignItems: 'center',
-		justifyContent: 'space-between',
-
-		// ===== Добавляем тень (iOS / Android) =====
-		shadowColor: '#000',
-		shadowOpacity: 0.15,
-		shadowOffset: { width: 0, height: 3 },
-		shadowRadius: 4,
-		elevation: 5,
+		paddingTop: 60,
 	},
-	profileContainer: {
-		width: 42,
-		height: 42,
-		borderRadius: 21,
-		overflow: 'hidden',
-	},
-	profileImage: {
-		width: '100%',
-		height: '100%',
-	},
-	statsContainer: {
-		flex: 1,
+	headerRow: {
 		flexDirection: 'row',
-		marginHorizontal: 15,
+		justifyContent: 'space-between',
+		width: '100%',
+		marginBottom: 20,
+		paddingHorizontal: 16,
+	},
+	headerItem: {
+		flexDirection: 'row',
+		alignItems: 'center',
+	},
+	icon: {
+		width: 32,
+		height: 32,
+		marginRight: 8,
+	},
+	iconText: {
+		color: '#000',
+		fontSize: 14,
+		fontWeight: 'bold',
+	},
+	scrollViewContainer: {
+		paddingVertical: 20,
+		paddingHorizontal: 16,
+	},
+	sectionCard: {
+		backgroundColor: '#f5f5f5',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		padding: 16,
+		borderRadius: 12,
+		marginBottom: 12,
+	},
+	sectionInfo: {
+		flex: 1,
+	},
+	sectionText: {
+		fontSize: 16,
+		fontWeight: 'bold',
+		color: '#000',
+		marginBottom: 4,
+	},
+	sectionDescription: {
+		fontSize: 14,
+		color: '#555',
+	},
+	squareButton: {
+		width: 40,
+		height: 40,
+		borderWidth: 1,
+		borderColor: '#ccc',
 		alignItems: 'center',
 		justifyContent: 'center',
+		borderRadius: 8,
 	},
-	statItem: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		marginHorizontal: 8,
-	},
-	statIcon: {
-		width: 20,
-		height: 20,
-		marginRight: 4,
-		resizeMode: 'contain',
-	},
-	statText: {
-		fontSize: 16,
-		fontWeight: '600',
-		color: '#fff',
-	},
-	flagContainer: {
-		width: 42,
-		height: 42,
-		borderRadius: 21,
-		overflow: 'hidden',
-		borderWidth: 2,
-		borderColor: '#fff',
-	},
-	flagIcon: {
-		width: '100%',
-		height: '100%',
-		resizeMode: 'cover',
-	},
-	/* ---------------- LEVEL ---------------- */
-	levelContainer: {
-		flexDirection: 'column',
-		alignItems: 'center',
-		paddingVertical: 10,
-		backgroundColor: '#FFE65E', // Светлый желтоватый
-	},
-	levelText: {
-		fontSize: 20,
-		fontWeight: '700',
-		color: '#444',
-	},
-	dotsContainer: {
-		flexDirection: 'row',
-		marginTop: 6,
-	},
-	dot: {
-		width: 8,
-		height: 8,
-		borderRadius: 4,
-		backgroundColor: '#ccc',
-		marginHorizontal: 4,
-	},
-	/* ---------------- LESSONS ---------------- */
-	lessonsContainer: {
-		paddingHorizontal: 15,
-		paddingTop: 10,
+	bookIconSquare: {
+		width: 24,
+		height: 24,
 	},
 	lessonCard: {
-		flexDirection: 'row',
-		padding: 15,
-		borderRadius: 20,
-		marginBottom: 15,
-		alignItems: 'center',
-	},
-	lessonCardLeft: {
-		flex: 1,
-	},
-	lessonProgress: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#fff',
-		marginBottom: 2,
+		backgroundColor: '#0076CE',
+		padding: 16,
+		borderRadius: 12,
+		marginBottom: 12,
 	},
 	lessonTitle: {
 		fontSize: 18,
-		fontWeight: '700',
 		color: '#fff',
-		marginBottom: 5,
+		fontWeight: 'bold',
+		marginBottom: 8,
 	},
-	lessonSub: {
+	lessonProgress: {
+		height: 8,
+		borderRadius: 4,
+		marginVertical: 8,
+	},
+	lessonProgressText: {
 		fontSize: 14,
-		fontWeight: '600',
-		color: '#ffffff90', // чуть полупрозрачный белый
+		color: '#fff',
+		marginBottom: 12,
 	},
-	lessonCardRight: {
-		alignItems: 'center',
-		justifyContent: 'center',
+	lessonDescription: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
 	},
-	lessonImage: {
-		width: 60,
-		height: 60,
-		resizeMode: 'contain',
+	descriptionTextRu: {
+		color: '#fff',
+		flex: 1,
+		marginRight: 8,
+	},
+	descriptionTextKz: {
+		color: '#ccc',
+		flex: 1,
 	},
 })

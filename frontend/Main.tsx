@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { StatusBar } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { createNotifications } from 'react-native-notificated'
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -23,6 +24,10 @@ const Main: React.FC = () => {
 			<NotificationsProvider>
 				<QueryClientProvider client={queryClient}>
 					<NavigationContainer ref={navigationRef}>
+						<StatusBar
+							barStyle='dark-content'
+							backgroundColor='#fff'
+						/>
 						<Stack.Navigator
 							screenOptions={{
 								headerShown: false,

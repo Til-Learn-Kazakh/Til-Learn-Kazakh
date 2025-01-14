@@ -6,6 +6,7 @@ import (
 
 	"diploma/src/database"
 	"diploma/src/middlewares"
+	"diploma/src/modules"
 	"diploma/src/modules/auth"
 	"diploma/src/modules/lesson"
 	"diploma/src/services"
@@ -56,6 +57,11 @@ func main() {
 	router.Use(gin.Logger())
 
 	apiRoutes := router.Group("/api/v1")
+	audioService := services.NewAudioService()
+	audioController := modules.NewAudioController(audioService)
+
+	// Маршрут для воспроизведения аудио
+	router.GET("/api/v1/audio/:fileName", audioController.PlayAudio)
 
 	auth.AuthRoutes(apiRoutes, authController)
 	apiRoutes.Use(middlewares.Authentication())
