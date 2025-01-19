@@ -22,7 +22,7 @@ type AuthService struct {
 
 func NewAuthService() *AuthService {
 	return &AuthService{
-		UserCollection: database.GetCollection(database.Client, "Users"),
+		UserCollection: database.GetCollection(database.Client, "User"),
 	}
 }
 

@@ -26,7 +26,7 @@ func (s *AudioService) GetAudioPath(fileName string) (string, error) {
 }
 
 // Отправка аудиофайла в HTTP ответ
-func (s *AudioService) ServeAudioFile(w http.ResponseWriter, r *http.Request, filePath string) error {
+func (_ *AudioService) ServeAudioFile(w http.ResponseWriter, r *http.Request, filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return err

@@ -4,11 +4,12 @@ import (
 	"log"
 	"os"
 
-	"diploma/src/database"
 	"diploma/src/middlewares"
 	"diploma/src/modules"
 	"diploma/src/modules/auth"
-	"diploma/src/modules/lesson"
+	"diploma/src/modules/level"
+	"diploma/src/modules/task"
+	"diploma/src/modules/unit"
 	"diploma/src/services"
 
 	"github.com/gin-contrib/cors"
@@ -36,16 +37,17 @@ func main() {
 
 	authController := auth.NewAuthController(auth.NewAuthService())
 
-	imageService := services.NewImageService() // src/public будет базовым путем
+	levelService := level.NewLevelService()
+	levelController := level.NewLevelController(levelService)
 
-	lessonService := lesson.LessonService{
-		Collection:   database.GetCollection(database.Client, "Lessons"), // Подключение к коллекции "Lessons"
-		ImageService: imageService,                                       // Передаем корректный экземпляр ImageService
-	}
+	unitService := unit.NewUnitService()
+	unitController := unit.NewUnitController(unitService)
 
-	lessonController := lesson.LessonController{
-		Service: &lessonService,
-	}
+	taskService := task.NewTaskService()
+	taskController := task.NewTaskController(taskService)
+
+	// imageService := services.NewImageService() // src/public будет базовым путем
+
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.10:19000"},
@@ -65,7 +67,8 @@ func main() {
 
 	auth.AuthRoutes(apiRoutes, authController)
 	apiRoutes.Use(middlewares.Authentication())
-	lesson.LessonRoutes(apiRoutes, &lessonController)
-
+	level.LevelRoutes(apiRoutes, levelController)
+	unit.UnitRoutes(apiRoutes, unitController)
+	task.TaskRoutes(apiRoutes, taskController)
 	log.Fatal(router.Run(":" + port))
 }
