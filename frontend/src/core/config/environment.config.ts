@@ -1,7 +1,8 @@
 // import { BASE_URL } from '@env'
+// apiUrl: 'http://172.20.10.2:4000/api/v1',
 
 const config = {
-	apiUrl: 'http://192.168.0.10:4000/api/v1',
+	apiUrl: 'http://192.168.0.11:4000/api/v1',
 	// baseUrl: BASE_URL,
 }
 

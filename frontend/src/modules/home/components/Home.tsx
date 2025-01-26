@@ -1,52 +1,48 @@
-import React from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
 
 import { icons } from '../../../core/constants'
+import { useBottomSheet } from '../../../core/hooks/useBottomSheet'
+import { LoadingUi } from '../../../core/ui/LoadingUi'
+import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
+import { useLevels } from '../hooks/home.hooks'
 
-const Home = () => {
-	const sections = [
-		{
-			title: 'Section 1, Unit 1',
-			description: 'Английский для выживания',
-			lessons: [
-				{
-					title: 'Урок 1',
-					progress: 0.8,
-					descriptionRu: 'Приветствие и знакомство',
-					descriptionKz: 'Сәлемдесу және танысу',
-				},
-				{
-					title: 'Урок 2',
-					progress: 0.5,
-					descriptionRu: 'Введение в грамматику',
-					descriptionKz: 'Грамматикаға кіріспе',
-				},
-			],
-		},
-		{
-			title: 'Section 1, Unit 2',
-			description: 'Разговорная грамматика',
-			lessons: [
-				{
-					title: 'Урок 3',
-					progress: 0.6,
-					descriptionRu: 'Использование глаголов',
-					descriptionKz: 'Етістіктерді қолдану',
-				},
-				{
-					title: 'Урок 4',
-					progress: 0.4,
-					descriptionRu: 'Построение вопросов',
-					descriptionKz: 'Сұрақтарды құру',
-				},
-			],
-		},
-	]
+import { HeartsTopSheet, HeartsTopSheetRef } from './HeartsTopSheet'
+import { InfoBottomSheet } from './InfoBottomSheet'
+
+const Home = ({ route }: { route: any }) => {
+	const { data: levels, isLoading: isLoadingLevels } = useLevels()
+	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser() // <-- тут подтягиваем юзера из запроса
+
+	const snapPoints = useMemo(() => ['50%', '35%'], [])
+	const bottomSheet = useBottomSheet()
+
+	const onCloseTopSheet = useCallback(() => {
+		bottomSheet.collapse()
+	}, [bottomSheet])
+
+	const topSheetContent = useMemo(
+		() => <InfoBottomSheet onClose={onCloseTopSheet} />,
+		[onCloseTopSheet]
+	)
+
+	const onOpenTopSheet = useCallback(() => {
+		bottomSheet.snapToIndex({
+			renderContent: () => topSheetContent,
+			index: 0,
+			snapPoints: ['70%', '75%'],
+		})
+	}, [bottomSheet, topSheetContent])
+
+	const topSheetRef = useRef<HeartsTopSheetRef>(null)
+
+	if (isLoadingLevels || isLoadingLevels) {
+		return <LoadingUi />
+	}
 
 	return (
 		<View style={styles.container}>
-			{/* Header */}
 			<View style={styles.header}>
 				<View style={styles.headerRow}>
 					<View style={styles.headerItem}>
@@ -55,39 +51,54 @@ const Home = () => {
 							style={styles.icon}
 						/>
 					</View>
-					<View style={styles.headerItem}>
+					<TouchableOpacity
+						style={styles.headerItem}
+						onPress={() => onOpenTopSheet()}
+					>
 						<Image
-							source={icons.fire}
+							source={(currentUser?.streak ?? 0) < 1 ? icons.grayfire : icons.fire}
 							style={styles.icon}
 						/>
-						<Text style={styles.iconText}>28</Text>
-					</View>
-					<View style={styles.headerItem}>
+						<Text style={styles.iconText}>{currentUser?.streak ?? 0}</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity style={styles.headerItem}>
 						<Image
 							source={icons.diamond}
 							style={styles.icon}
 						/>
-						<Text style={styles.iconText}>1057</Text>
-					</View>
-					<View style={styles.headerItem}>
+						<Text style={styles.iconText}>{currentUser?.crystals ?? 0}</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.headerItem}
+						onPress={() => topSheetRef.current?.toggle()}
+					>
 						<Image
 							source={icons.heart}
 							style={styles.icon}
 						/>
-						<Text style={styles.iconText}>5</Text>
-					</View>
+						<Text style={styles.iconText}>{currentUser?.hearts ?? 0}</Text>
+					</TouchableOpacity>
 				</View>
 			</View>
 
-			{/* Sections with Lessons */}
+			{currentUser && (
+				<HeartsTopSheet
+					ref={topSheetRef}
+					currentUser={{
+						hearts: currentUser.hearts,
+						last_refill_at: currentUser.last_refill_at,
+					}}
+				/>
+			)}
+
 			<ScrollView contentContainerStyle={styles.scrollViewContainer}>
-				{sections.map((section, sectionIndex) => (
-					<View key={sectionIndex}>
-						{/* Section Title and Description */}
+				{levels?.map((level: any) => (
+					<View key={level.id}>
 						<View style={styles.sectionCard}>
 							<View style={styles.sectionInfo}>
-								<Text style={styles.sectionText}>{section.title}</Text>
-								<Text style={styles.sectionDescription}>{section.description}</Text>
+								<Text style={styles.sectionText}>{level.name}</Text>
 							</View>
 							<TouchableOpacity style={styles.squareButton}>
 								<Image
@@ -97,24 +108,21 @@ const Home = () => {
 							</TouchableOpacity>
 						</View>
 
-						{/* Lessons in Section */}
-						{section.lessons.map((lesson, lessonIndex) => (
+						{level.units.map((unit: any) => (
 							<View
-								key={lessonIndex}
+								key={unit.id}
 								style={styles.lessonCard}
 							>
-								<Text style={styles.lessonTitle}>{lesson.title}</Text>
+								<Text style={styles.lessonTitle}>{unit.title}</Text>
 								<ProgressBar
-									progress={lesson.progress}
+									progress={0.5}
 									color='#4CAF50'
 									style={styles.lessonProgress}
 								/>
-								<Text style={styles.lessonProgressText}>
-									{Math.round(lesson.progress * 100)}% завершено
-								</Text>
+								<Text style={styles.lessonProgressText}>50% завершено</Text>
 								<View style={styles.lessonDescription}>
-									<Text style={styles.descriptionTextRu}>{lesson.descriptionRu}</Text>
-									<Text style={styles.descriptionTextKz}>{lesson.descriptionKz}</Text>
+									<Text style={styles.descriptionTextRu}>Description in RU</Text>
+									<Text style={styles.descriptionTextKz}>Description in KZ</Text>
 								</View>
 							</View>
 						))}
@@ -182,10 +190,6 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#000',
 		marginBottom: 4,
-	},
-	sectionDescription: {
-		fontSize: 14,
-		color: '#555',
 	},
 	squareButton: {
 		width: 40,

@@ -16,6 +16,8 @@ type User struct {
 	Crystals         int                  `bson:"crystals" json:"crystals" validate:"required"`           // Кристаллы
 	Streak           int                  `bson:"streak" json:"streak" validate:"required"`               // Дней подряд (огонек)
 	LessonsCompleted []primitive.ObjectID `bson:"lessons_completed" json:"lessons_completed"`             // Завершенные уроки
+	LastRefillAt     time.Time            `bson:"last_refill_at" json:"last_refill_at,omitempty"`
+
 	// CurrentTask      primitive.ObjectID   `bson:"current_task" json:"current_task"`                       // Текущая задача
 	CreatedAt time.Time `bson:"created_at" json:"created_at,omitempty"` // Дата создания пользователя (генерируется автоматически)
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"` // Дата последнего обновления (генерируется автоматически)

@@ -10,6 +10,7 @@ import (
 	"diploma/src/modules/level"
 	"diploma/src/modules/task"
 	"diploma/src/modules/unit"
+	"diploma/src/modules/user"
 	"diploma/src/services"
 
 	"github.com/gin-contrib/cors"
@@ -46,11 +47,14 @@ func main() {
 	taskService := task.NewTaskService()
 	taskController := task.NewTaskController(taskService)
 
+	userService := user.NewUserService()
+	userController := user.NewUserController(userService)
+
 	// imageService := services.NewImageService() // src/public будет базовым путем
 
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.10:19000"},
+		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.11:19000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
@@ -70,5 +74,7 @@ func main() {
 	level.LevelRoutes(apiRoutes, levelController)
 	unit.UnitRoutes(apiRoutes, unitController)
 	task.TaskRoutes(apiRoutes, taskController)
+	user.UserRoutes(apiRoutes, userController)
+
 	log.Fatal(router.Run(":" + port))
 }

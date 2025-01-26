@@ -92,16 +92,18 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 
 	// Создание нового пользователя
 	newUser := User{
+		ID:               primitive.NewObjectID(),
 		FirstName:        dto.FirstName,
 		LastName:         dto.LastName,
 		Email:            dto.Email,
 		Password:         hashedPassword,
 		Hearts:           3,
-		Crystals:         0,
+		Crystals:         1000,
 		Streak:           0,
 		LessonsCompleted: []primitive.ObjectID{},
 		CreatedAt:        time.Now(),
 		UpdatedAt:        time.Now(),
+		LastRefillAt:     time.Now(),
 	}
 
 	_, err = s.UserCollection.InsertOne(ctx, newUser)

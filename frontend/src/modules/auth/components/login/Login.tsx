@@ -3,26 +3,24 @@ import { useForm } from 'react-hook-form'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigation } from '@react-navigation/native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useMutation } from '@tanstack/react-query'
+import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { icons } from '../../../../core/constants'
-import { AuthStackParamList } from '../../../../core/navigation/AuthStack/AuthStackScreen'
 import CustomButton from '../../../../core/ui/CustomButton'
 import InputField from '../../../../core/ui/InputField'
 import { toast } from '../../../../core/ui/toast'
+import { CURRENT_USER_QUERY_KEY } from '../../hooks/user-current-user.hook'
 import { LoginDTO } from '../../models/auth-dto.types'
 import { authService } from '../../services/auth.service'
 import OAuth from '../OAuth/OAuth'
 
 import { LoginFormData, loginFormSchema } from './login-form-types'
 
-type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamList>
-
 const Login = () => {
 	const [isSubmitting, setIsSubmitting] = useState(false)
-	const navigation = useNavigation<AuthStackNavigationProp>()
+	const navigation = useNavigation<NavigationProp<any>>()
+	const queryClient = useQueryClient()
 
 	// Инициализация формы
 	const {
@@ -39,7 +37,11 @@ const Login = () => {
 		mutationFn: (dto: LoginDTO) => authService.login(dto),
 		onSuccess: () => {
 			toast.success('Добро пожаловать!')
+			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
+
+			// navigation.navigate('Home') // Переход к экрану HomeStack, который зарегистрирован в AppStack
 		},
+
 		onError: () => {
 			toast.error('Неверный email или пароль.')
 		},

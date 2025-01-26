@@ -58,17 +58,15 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO) (*Task, error) {
 		UpdatedAt:     time.Now(),
 	}
 
-	// Сохраняем задачу в базе данных
 	_, err = s.Collection.InsertOne(context.Background(), task)
 	if err != nil {
 		return nil, err
 	}
 
-	// Обновляем Unit, добавляя TaskID в массив tasks
 	_, err = s.UnitCollection.UpdateOne(
 		context.Background(),
 		bson.M{"_id": unitID},
-		bson.M{"$push": bson.M{"tasks": task.ID}}, // Добавляем TaskID в массив tasks
+		bson.M{"$push": bson.M{"tasks": task.ID}},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update unit with new task: %w", err)
@@ -77,7 +75,6 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO) (*Task, error) {
 	return &task, nil
 }
 
-// Получение всех задач по UnitID
 func (s *TaskService) GetTasksByUnitID(unitID primitive.ObjectID) ([]Task, error) {
 	cursor, err := s.Collection.Find(context.Background(), bson.M{"unit_id": unitID})
 	if err != nil {

@@ -57,7 +57,13 @@ class AuthService {
 		return axiosWithAuth
 			.get<User>(`${this.url}/current`, config)
 			.then(resp => resp.data)
-			.catch(() => null)
+
+			.catch(e => {
+				if (e?.response?.status === 404) {
+					return null
+				}
+				throw e
+			})
 	}
 }
 

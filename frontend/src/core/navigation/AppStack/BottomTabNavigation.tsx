@@ -66,7 +66,8 @@ const screenOptions: BottomTabNavigationOptions = {
 	tabBarLabelPosition: 'below-icon',
 }
 
-const BottomTabNavigation: React.FC = () => {
+const BottomTabNavigation = ({ route }: { route: any }) => {
+	const { currentUser } = route.params
 	const navigation = useNavigation<NavigationProp<any>>()
 
 	return (
@@ -75,6 +76,7 @@ const BottomTabNavigation: React.FC = () => {
 			<Tab.Screen
 				name='HomeStack'
 				component={HomeStackScreen}
+				initialParams={{ currentUser }}
 				options={{
 					tabBarLabel: 'Lessons',
 					tabBarIcon: ({ color, size }) => (
@@ -91,7 +93,7 @@ const BottomTabNavigation: React.FC = () => {
 								navigation.navigate('AppStack', {
 									screen: 'HomeStack',
 									params: {
-										screen: 'Profile',
+										screen: 'Home',
 									},
 								})
 							}}

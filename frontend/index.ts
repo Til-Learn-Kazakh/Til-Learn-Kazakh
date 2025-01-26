@@ -1,5 +1,10 @@
+import 'react-native-gesture-handler'
+// Обязательно для react-native-navigation
+import 'react-native-reanimated'
+
 import { registerRootComponent } from 'expo'
 
+// Обяз
 import App from './App'
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
