@@ -43,12 +43,14 @@ func (s *UnitService) CreateUnit(dto CreateUnitDTO) (*Unit, error) {
 	}
 
 	unit := Unit{
-		ID:        primitive.NewObjectID(),
-		Title:     dto.Title,
-		LevelID:   levelID,
-		Tasks:     []primitive.ObjectID{}, // Пустой список задач при создании
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		ID:           primitive.NewObjectID(),
+		Title:        dto.Title,
+		LevelID:      levelID,
+		Tasks:        []primitive.ObjectID{}, // Пустой список задач при создании
+		Completed:    []primitive.ObjectID{}, // Пустой список выполненных заданий
+		Descriptions: dto.Descriptions,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	// Вставляем Unit в коллекцию

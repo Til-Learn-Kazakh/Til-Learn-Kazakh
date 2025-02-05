@@ -18,6 +18,8 @@ import study from '../../../public/icons/study.png'
 import sunfire from '../../../public/icons/sunfire.png'
 import task from '../../../public/icons/task.png'
 import auth from '../../../public/images/auth/auth.png'
+import barys from '../../../public/images/auth/barys.mp4'
+// import baryslottie from '../../../public/images/auth/baryslottie.json'
 
 export const images = {
 	auth,
@@ -43,4 +45,6 @@ export const icons = {
 	study,
 	learning,
 	task,
+	barys,
+	// baryslottie
 }

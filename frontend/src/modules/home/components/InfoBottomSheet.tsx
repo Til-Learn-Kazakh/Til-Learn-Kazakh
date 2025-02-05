@@ -6,8 +6,8 @@ import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 
 import { icons } from '../../../core/constants'
-
-// Добавлен grayfire
+import { LoadingUi } from '../../../core/ui/LoadingUi'
+import { useStreak } from '../hooks/home.hooks'
 
 LocaleConfig.locales['en'] = {
 	monthNames: [
@@ -32,11 +32,8 @@ LocaleConfig.defaultLocale = 'en'
 export const InfoBottomSheet = ({ onClose }: any) => {
 	const navigation = useNavigation<NavigationProp<any>>()
 
-	const [streakDays, setStreakDays] = useState([2, 3, 5, 6, 7, 10, 11])
-	const currentStreak = 0
-	const recordStreak = 17
-	const [selectedDate, setSelectedDate] = useState<any>()
-
+	const [selectedDate, setSelectedDate] = useState<string | null>(null)
+	const { data: streak, isPending } = useStreak()
 	const onCloseClick = useCallback(() => {
 		onClose()
 	}, [onClose])
@@ -53,17 +50,11 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 		}, 300)
 	}, [onClose, navigation])
 
-	const markedDates = streakDays.reduce((acc: any, day) => {
-		const formattedDate = `2025-01-${day.toString().padStart(2, '0')}`
-		acc[formattedDate] = {
+	const markedDates = streak?.streak_days.reduce((acc: any, day: any) => {
+		acc[day] = {
 			customStyles: {
-				container: {
-					backgroundColor: '#FFD700',
-				},
-				text: {
-					color: '#333333',
-					fontWeight: 'bold',
-				},
+				container: { backgroundColor: '#FFD700' },
+				text: { color: '#333333', fontWeight: 'bold' },
 			},
 		}
 		return acc
@@ -75,6 +66,9 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 			selectedColor: '#0076CE',
 			selectedTextColor: '#ffffff',
 		}
+	}
+	if (isPending) {
+		return <LoadingUi />
 	}
 
 	return (
@@ -94,17 +88,17 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 				</TouchableOpacity>
 			</View>
 
-			{/* Информация о серии */}
+			{/* Информация о streak */}
 			<View style={styles.streakHeader}>
 				<View style={styles.streakCountContainer}>
-					<Text style={styles.streakCount}>{currentStreak}</Text>
+					<Text style={styles.streakCount}>{streak?.current_streak}</Text>
 					<Image
-						source={currentStreak > 0 ? icons.fire : icons.grayfire}
+						source={streak?.current_streak > 0 ? icons.fire : icons.grayfire}
 						style={styles.largeFireIcon}
 					/>
 					<Text style={styles.streakLabel}>days streak</Text>
 				</View>
-				<Text style={styles.recordText}>Record Streak: {recordStreak} days</Text>
+				<Text style={styles.recordText}>Record Streak: {streak?.max_streak} days</Text>
 			</View>
 
 			<View style={styles.calendarContainer}>
@@ -121,7 +115,6 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 				/>
 			</View>
 
-			{/* Кнопка закрытия */}
 			<TouchableOpacity
 				onPress={onCloseClick}
 				style={styles.cancelButton}

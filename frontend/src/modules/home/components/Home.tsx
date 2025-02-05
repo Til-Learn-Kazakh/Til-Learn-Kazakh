@@ -56,10 +56,10 @@ const Home = ({ route }: { route: any }) => {
 						onPress={() => onOpenTopSheet()}
 					>
 						<Image
-							source={(currentUser?.streak ?? 0) < 1 ? icons.grayfire : icons.fire}
+							source={(currentUser?.streak?.current_streak ?? 0) < 1 ? icons.grayfire : icons.fire}
 							style={styles.icon}
 						/>
-						<Text style={styles.iconText}>{currentUser?.streak ?? 0}</Text>
+						<Text style={styles.iconText}>{currentUser?.streak?.current_streak ?? 0}</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity style={styles.headerItem}>
@@ -115,14 +115,14 @@ const Home = ({ route }: { route: any }) => {
 							>
 								<Text style={styles.lessonTitle}>{unit.title}</Text>
 								<ProgressBar
-									progress={0.5}
+									progress={unit?.progress / 100}
 									color='#4CAF50'
 									style={styles.lessonProgress}
 								/>
-								<Text style={styles.lessonProgressText}>50% завершено</Text>
+								<Text style={styles.lessonProgressText}>{unit?.progress}% завершено</Text>
 								<View style={styles.lessonDescription}>
-									<Text style={styles.descriptionTextRu}>Description in RU</Text>
-									<Text style={styles.descriptionTextKz}>Description in KZ</Text>
+									<Text style={styles.descriptionTextRu}>{unit.descriptions.ru}</Text>
+									<Text style={styles.descriptionTextKz}>{unit.descriptions.kk}</Text>
 								</View>
 							</View>
 						))}

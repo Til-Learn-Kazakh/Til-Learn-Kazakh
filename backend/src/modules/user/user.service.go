@@ -34,10 +34,36 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 		return nil, err
 	}
 
-	var user auth.User
-	err = s.Collection.FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&user)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	pipeline := mongo.Pipeline{
+		bson.D{{Key: "$match", Value: bson.M{"_id": objectID}}},
+		bson.D{{Key: "$lookup", Value: bson.M{
+			"from":         "Streak",
+			"localField":   "_id",
+			"foreignField": "userId",
+			"as":           "streak",
+		}}},
+		bson.D{{Key: "$unwind", Value: bson.M{
+			"path":                       "$streak",
+			"preserveNullAndEmptyArrays": true, // ✅ Если `streak` отсутствует, `streak: null`
+		}}},
+	}
+
+	cursor, err := s.Collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var user auth.User
+	if cursor.Next(ctx) {
+		if err := cursor.Decode(&user); err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, errors.New("user not found")
 	}
 
 	return &user, nil

@@ -8,6 +8,7 @@ import (
 	"diploma/src/modules"
 	"diploma/src/modules/auth"
 	"diploma/src/modules/level"
+	"diploma/src/modules/streak"
 	"diploma/src/modules/task"
 	"diploma/src/modules/unit"
 	"diploma/src/modules/user"
@@ -35,8 +36,12 @@ func main() {
 		port = "8080" // Значение по умолчанию
 		log.Println("PORT не задан, используется порт по умолчанию: 8080")
 	}
+	
+	streakService := streak.NewStreakService()
+	streakController := streak.NewStreakController(streakService)
 
-	authController := auth.NewAuthController(auth.NewAuthService())
+	authService := auth.NewAuthService(streakService)
+	authController := auth.NewAuthController(authService)
 
 	levelService := level.NewLevelService()
 	levelController := level.NewLevelController(levelService)
@@ -49,8 +54,6 @@ func main() {
 
 	userService := user.NewUserService()
 	userController := user.NewUserController(userService)
-
-	// imageService := services.NewImageService() // src/public будет базовым путем
 
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
@@ -75,6 +78,7 @@ func main() {
 	unit.UnitRoutes(apiRoutes, unitController)
 	task.TaskRoutes(apiRoutes, taskController)
 	user.UserRoutes(apiRoutes, userController)
+	streak.StreakRoutes(apiRoutes, streakController)
 
 	log.Fatal(router.Run(":" + port))
 }

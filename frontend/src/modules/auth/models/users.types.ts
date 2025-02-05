@@ -1,3 +1,11 @@
+export interface Streak {
+	user_id: string
+	current_streak: number
+	max_streak: number
+	last_active: string
+	streak_days: string[]
+}
+
 export interface User {
 	id: string
 	email: string
@@ -7,7 +15,7 @@ export interface User {
 	crystals: number
 	hearts: number
 	lessons_completed: any[]
-	streak: number
+	streak: Streak | null // ✅ Теперь это объект или `null`, если streak нет
 	last_refill_at: string
 	created_at: string
 	updated_at: string

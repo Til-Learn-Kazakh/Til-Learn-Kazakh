@@ -44,28 +44,67 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 }
 
 func (s *LevelService) GetAllLevels() ([]Level, error) {
+
 	pipeline := mongo.Pipeline{
+		// Подключаем tasks к Unit
 		{
 			{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "Unit"},             // Коллекция блоков
-				{Key: "localField", Value: "_id"},        // Поле уровня для связи
-				{Key: "foreignField", Value: "level_id"}, // Поле блока для связи
-				{Key: "as", Value: "units"},              // Название поля с объединенными блоками
+				{Key: "from", Value: "Unit"},
+				{Key: "localField", Value: "_id"},
+				{Key: "foreignField", Value: "level_id"},
+				{Key: "as", Value: "units"},
 			}},
 		},
-	}
+		// Добавляем progress в units
+		{
+			{Key: "$addFields", Value: bson.D{
+				{Key: "units", Value: bson.D{
+					{Key: "$map", Value: bson.D{
+						{Key: "input", Value: "$units"},
+						{Key: "as", Value: "u"},
+						{Key: "in", Value: bson.D{
+							// Копируем все поля юнита
+							{Key: "_id", Value: "$$u._id"},
+							{Key: "title", Value: "$$u.title"},
+							{Key: "level_id", Value: "$$u.level_id"},
+							{Key: "tasks", Value: "$$u.tasks"},
+							{Key: "completed", Value: "$$u.completed"},
+							{Key: "descriptions", Value: "$$u.descriptions"},
+							{Key: "created_at", Value: "$$u.created_at"},
+							{Key: "updated_at", Value: "$$u.updated_at"},
 
-	// Выполняем агрегацию
+							// Считаем прогресс
+							{Key: "progress", Value: bson.D{
+								{Key: "$cond", Value: bson.A{
+									// Если tasks пустой, то progress = 100%
+									bson.D{{Key: "$eq", Value: bson.A{bson.D{{Key: "$size", Value: "$$u.tasks"}}, 0}}},
+									100,
+									// Если есть задачи, считаем прогресс
+									bson.D{{Key: "$multiply", Value: bson.A{
+										bson.D{{Key: "$divide", Value: bson.A{
+											bson.D{{Key: "$size", Value: "$$u.completed"}}, // Количество выполненных
+											bson.D{{Key: "$size", Value: "$$u.tasks"}},     // Всего задач
+										}}},
+										100,
+									}}},
+								}},
+							}},
+						}},
+					}},
+				}},
+			}},
+		},
+	} 
+
 	cursor, err := s.Collection.Aggregate(context.Background(), pipeline)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("aggregation error: %w", err)
 	}
 	defer cursor.Close(context.Background())
 
-	// Преобразуем курсор в слайс структур Level
 	var levels []Level
 	if err := cursor.All(context.Background(), &levels); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cursor decoding error: %w", err)
 	}
 
 	return levels, nil

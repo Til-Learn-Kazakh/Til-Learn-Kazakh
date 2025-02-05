@@ -6,6 +6,7 @@ import { axiosWithAuth } from '../../../middleware/axios-interceptors'
 class HomeService {
 	private readonly url = `${server}/levels`
 	private readonly userUrl = `${server}/auth`
+	private readonly streakUrl = `${server}/streak`
 
 	async getLevels(config?: AxiosRequestConfig) {
 		return axiosWithAuth
@@ -36,6 +37,16 @@ class HomeService {
 			.then(resp => resp.data)
 			.catch(e => {
 				console.error('[HomeService] Error refilling hearts with crystals:', e)
+				throw e
+			})
+	}
+
+	async getStreak(config?: AxiosRequestConfig) {
+		return axiosWithAuth
+			.get(`${this.streakUrl}`, config)
+			.then(resp => resp.data)
+			.catch(e => {
+				console.error('[HomeService] Error getting streak:', e)
 				throw e
 			})
 	}
