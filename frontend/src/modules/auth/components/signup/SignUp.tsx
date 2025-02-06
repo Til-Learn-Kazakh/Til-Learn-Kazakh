@@ -1,15 +1,14 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ReactNativeModal } from 'react-native-modal'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useNavigation } from '@react-navigation/native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import LottieView from 'lottie-react-native'
 
-import { icons, images } from '../../../../core/constants'
-import { AuthStackParamList } from '../../../../core/navigation/AuthStack/AuthStackScreen'
+import { icons } from '../../../../core/constants'
 import CustomButton from '../../../../core/ui/CustomButton'
 import InputField from '../../../../core/ui/InputField'
 import { toast } from '../../../../core/ui/toast'
@@ -20,12 +19,12 @@ import OAuth from '../OAuth/OAuth'
 
 import { SignupFormData, signupFormSchema } from './signup-form-types'
 
-type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamList>
+// type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamList>
 
 const SignUp = () => {
 	const queryClient = useQueryClient()
 	const [showSuccessModal, setShowSuccessModal] = useState(false)
-	const navigation = useNavigation<AuthStackNavigationProp>()
+	const navigation = useNavigation<NavigationProp<any>>()
 
 	// Инициализация формы
 	const {
@@ -41,15 +40,18 @@ const SignUp = () => {
 	const { mutate, isPending } = useMutation({
 		mutationFn: (dto: SignupDTO) => authService.signup(dto),
 		onSuccess: () => {
-			toast.success('Успешно прошли регистрацию аккаунта')
-			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
-			setShowSuccessModal(true) // Показываем модальное окно после успешной регистрации
+			setShowSuccessModal(true)
 		},
 		onError: () => {
 			toast.error('Ошибка при регистрации')
 		},
 	})
 
+	const handleBrowseHome = () => {
+		setShowSuccessModal(false)
+
+		queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
+	}
 	const onSubmit = (values: SignupFormData) => {
 		const dto: SignupDTO = {
 			password: values.password,
@@ -128,15 +130,17 @@ const SignUp = () => {
 				</View>
 				<ReactNativeModal isVisible={showSuccessModal}>
 					<View style={styles.modal}>
-						<Image
-							source={images.check}
-							style={styles.successImage}
+						<LottieView
+							style={{ height: 200, width: 300 }}
+							source={require('../../../../../public/images/auth/success.json')}
+							autoPlay
+							loop={false}
 						/>
 						<Text style={styles.successTitle}>Created</Text>
 						<Text style={styles.successText}>You have successfully created your account.</Text>
 						<CustomButton
 							title='Browse Home'
-							onPress={() => console.log('Browse Home pressed')}
+							onPress={handleBrowseHome}
 							style={styles.browseButton}
 						/>
 					</View>

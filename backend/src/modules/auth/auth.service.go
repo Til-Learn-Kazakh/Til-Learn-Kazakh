@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"diploma/src/database"
+	"diploma/src/modules/streak"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,11 +19,13 @@ import (
 // AuthService отвечает за логику авторизации и регистрации
 type AuthService struct {
 	UserCollection *mongo.Collection
+	streakService  *streak.StreakService
 }
 
-func NewAuthService() *AuthService {
+func NewAuthService(streakService *streak.StreakService) *AuthService {
 	return &AuthService{
-		UserCollection: database.GetCollection(database.Client, "Users"),
+		UserCollection: database.GetCollection(database.Client, "User"),
+		streakService:  streakService,
 	}
 }
 
@@ -84,30 +87,56 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 		return nil, err
 	}
 	if count > 0 {
-		return nil, errors.New("user with this email already exists")
+		return nil, errors.New("user already exists")
 	}
 
-	// Хэширование пароля
-	hashedPassword := HashPassword(dto.Password)
+	// Запускаем сессию для транзакции
+	session, err := s.UserCollection.Database().Client().StartSession()
+	if err != nil {
+		return nil, err
+	}
+	defer session.EndSession(context.TODO())
 
-	// Создание нового пользователя
-	newUser := User{
-		FirstName:        dto.FirstName,
-		LastName:         dto.LastName,
-		Email:            dto.Email,
-		Password:         hashedPassword,
-		Hearts:           3,
-		Crystals:         0,
-		Streak:           0,
-		LessonsCompleted: []primitive.ObjectID{},
-		CreatedAt:        time.Now(),
-		UpdatedAt:        time.Now(),
+	callback := func(mongo.SessionContext) (any, error) {
+		hashedPassword := HashPassword(dto.Password)
+
+		newUser := &User{
+			ID:               primitive.NewObjectID(),
+			FirstName:        dto.FirstName,
+			LastName:         dto.LastName,
+			Email:            dto.Email,
+			Password:         hashedPassword,
+			Hearts:           4,
+			Crystals:         1000,
+			LessonsCompleted: []primitive.ObjectID{},
+			CreatedAt:        time.Now(),
+			UpdatedAt:        time.Now(),
+			LastRefillAt:     time.Now(),
+		}
+
+		_, err = s.UserCollection.InsertOne(ctx, newUser)
+		if err != nil {
+			return nil, err
+		}
+
+		err = s.streakService.UpdateStreak(streak.UpdateStreakDTO{UserID: newUser.ID.Hex()})
+		if err != nil {
+			return nil, err
+		}
+
+		return newUser, nil
 	}
 
-	_, err = s.UserCollection.InsertOne(ctx, newUser)
+	// Запускаем транзакцию
+	result, err := session.WithTransaction(context.TODO(), callback)
 	if err != nil {
 		return nil, err
 	}
 
-	return &newUser, nil
+	user, ok := result.(*User)
+	if !ok {
+		return nil, errors.New("failed to cast result to *User")
+	}
+
+	return user, nil
 }

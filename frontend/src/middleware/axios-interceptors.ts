@@ -14,6 +14,7 @@ const options: AxiosRequestConfig = {
 		'Content-Type': 'application/json',
 	},
 	withCredentials: true,
+	maxRedirects: 0, // Отключаем автоматические редиректы
 }
 
 const axiosBase = axios.create(options)
@@ -24,7 +25,7 @@ axiosWithAuth.interceptors.request.use(async (config: InternalAxiosRequestConfig
 	const accessToken = await SecureStore.getItemAsync('token')
 
 	if (config.headers && accessToken) {
-		;(config.headers as AxiosHeaders).set('Authorization', `Bearer ${accessToken}`)
+		;(config.headers as AxiosHeaders).set('Authorization', `${accessToken}`)
 	}
 
 	return config
@@ -35,11 +36,10 @@ axiosWithAuth.interceptors.response.use(
 		return response
 	},
 	async error => {
-		if (error.response?.status === 401) {
-			console.log('Unauthorized! Redirecting to login...')
-			await SecureStore.deleteItemAsync('token')
-		} else if (error.response?.status === 500) {
-			console.log('Server error! Please try again later.')
+		if (error.response) {
+			console.error('[Response Error]', error.response.status, error.response.data)
+		} else {
+			console.error('[Network Error]', error.message)
 		}
 
 		return Promise.reject(error)

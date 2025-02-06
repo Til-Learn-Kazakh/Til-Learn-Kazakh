@@ -4,11 +4,14 @@ import (
 	"log"
 	"os"
 
-	"diploma/src/database"
 	"diploma/src/middlewares"
 	"diploma/src/modules"
 	"diploma/src/modules/auth"
-	"diploma/src/modules/lesson"
+	"diploma/src/modules/level"
+	"diploma/src/modules/streak"
+	"diploma/src/modules/task"
+	"diploma/src/modules/unit"
+	"diploma/src/modules/user"
 	"diploma/src/services"
 
 	"github.com/gin-contrib/cors"
@@ -34,21 +37,27 @@ func main() {
 		log.Println("PORT не задан, используется порт по умолчанию: 8080")
 	}
 
-	authController := auth.NewAuthController(auth.NewAuthService())
+	streakService := streak.NewStreakService()
+	streakController := streak.NewStreakController(streakService)
 
-	imageService := services.NewImageService() // src/public будет базовым путем
+	authService := auth.NewAuthService(streakService)
+	authController := auth.NewAuthController(authService)
 
-	lessonService := lesson.LessonService{
-		Collection:   database.GetCollection(database.Client, "Lessons"), // Подключение к коллекции "Lessons"
-		ImageService: imageService,                                       // Передаем корректный экземпляр ImageService
-	}
+	levelService := level.NewLevelService()
+	levelController := level.NewLevelController(levelService)
 
-	lessonController := lesson.LessonController{
-		Service: &lessonService,
-	}
+	unitService := unit.NewUnitService()
+	unitController := unit.NewUnitController(unitService)
+
+	taskService := task.NewTaskService()
+	taskController := task.NewTaskController(taskService)
+
+	userService := user.NewUserService()
+	userController := user.NewUserController(userService)
+
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.10:19000"},
+		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.11:19000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
@@ -65,7 +74,11 @@ func main() {
 
 	auth.AuthRoutes(apiRoutes, authController)
 	apiRoutes.Use(middlewares.Authentication())
-	lesson.LessonRoutes(apiRoutes, &lessonController)
+	level.LevelRoutes(apiRoutes, levelController)
+	unit.UnitRoutes(apiRoutes, unitController)
+	task.TaskRoutes(apiRoutes, taskController)
+	user.UserRoutes(apiRoutes, userController)
+	streak.StreakRoutes(apiRoutes, streakController)
 
 	log.Fatal(router.Run(":" + port))
 }
