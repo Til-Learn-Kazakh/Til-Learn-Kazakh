@@ -44,7 +44,6 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 }
 
 func (s *LevelService) GetAllLevels() ([]Level, error) {
-
 	pipeline := mongo.Pipeline{
 		// Подключаем tasks к Unit
 		{
@@ -94,7 +93,7 @@ func (s *LevelService) GetAllLevels() ([]Level, error) {
 				}},
 			}},
 		},
-	} 
+	}
 
 	cursor, err := s.Collection.Aggregate(context.Background(), pipeline)
 	if err != nil {

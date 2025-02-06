@@ -26,7 +26,7 @@ func (ctrl *UnitController) CreateUnit(c *gin.Context) {
 		return
 	}
 
-	unit, err := ctrl.Service.CreateUnit(dto)
+	unit, err := ctrl.Service.CreateUnit(&dto)
 	if err != nil {
 		if err.Error() == "level not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Level not found"})

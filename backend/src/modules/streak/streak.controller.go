@@ -14,23 +14,6 @@ func NewStreakController(streakService *StreakService) *StreakController {
 	return &StreakController{streakService: streakService}
 }
 
-// 1️⃣ Обновление streak при завершении урока
-func (sc *StreakController) UpdateStreak(c *gin.Context) {
-	var req UpdateStreakDTO
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err := sc.streakService.UpdateStreak(req)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Streak updated"})
-}
-
 // 2️⃣ Получение streak по `uid` (из токена, без `/:userId`)
 func (sc *StreakController) GetUserStreak(c *gin.Context) {
 	userID, exists := c.Get("uid")
@@ -54,19 +37,32 @@ func (sc *StreakController) GetUserStreak(c *gin.Context) {
 	c.JSON(http.StatusOK, streak)
 }
 
-// 3️⃣ Сброс streak
-func (sc *StreakController) ResetStreak(c *gin.Context) {
-	var req ResetStreakDTO
-	if err := c.ShouldBindJSON(&req); err != nil {
+func handleStreak(c *gin.Context, req any, serviceFunc func(any) error, successMessage string) {
+	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := sc.streakService.ResetStreak(req)
-	if err != nil {
+	if err := serviceFunc(req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Streak reset"})
+	c.JSON(http.StatusOK, gin.H{"message": successMessage})
+}
+
+// 1️⃣ Обновление streak при завершении урока
+func (sc *StreakController) UpdateStreak(c *gin.Context) {
+	var req UpdateStreakDTO
+	handleStreak(c, &req, func(data any) error {
+		return sc.streakService.UpdateStreak(data.(UpdateStreakDTO))
+	}, "Streak updated")
+}
+
+// 2️⃣ Сброс streak
+func (sc *StreakController) ResetStreak(c *gin.Context) {
+	var req ResetStreakDTO
+	handleStreak(c, &req, func(data any) error {
+		return sc.streakService.ResetStreak(data.(ResetStreakDTO))
+	}, "Streak reset")
 }

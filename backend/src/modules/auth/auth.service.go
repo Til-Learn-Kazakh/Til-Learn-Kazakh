@@ -97,8 +97,7 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 	}
 	defer session.EndSession(context.TODO())
 
-	callback := func(sessCtx mongo.SessionContext) (interface{}, error) {
-
+	callback := func(mongo.SessionContext) (any, error) {
 		hashedPassword := HashPassword(dto.Password)
 
 		newUser := &User{

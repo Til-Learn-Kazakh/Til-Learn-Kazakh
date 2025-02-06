@@ -26,7 +26,7 @@ func NewUnitService() *UnitService {
 }
 
 // Создание нового блока
-func (s *UnitService) CreateUnit(dto CreateUnitDTO) (*Unit, error) {
+func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
 	levelID, err := primitive.ObjectIDFromHex(dto.LevelID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid level ID: %w", err)

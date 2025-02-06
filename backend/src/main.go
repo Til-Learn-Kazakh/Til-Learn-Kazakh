@@ -36,7 +36,7 @@ func main() {
 		port = "8080" // Значение по умолчанию
 		log.Println("PORT не задан, используется порт по умолчанию: 8080")
 	}
-	
+
 	streakService := streak.NewStreakService()
 	streakController := streak.NewStreakController(streakService)
 

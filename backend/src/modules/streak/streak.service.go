@@ -35,7 +35,7 @@ func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 	var streak Streak
 	err = s.collection.FindOne(ctx, bson.M{"userId": objectID}).Decode(&streak)
 
-	if err == mongo.ErrNoDocuments {
+	if errors.Is(err, mongo.ErrNoDocuments) {
 		// ✅ **Создаем новый streak с `ObjectID`**
 		streak = Streak{
 			UserID:        objectID, // ✅ Теперь это `ObjectID`
@@ -111,7 +111,7 @@ func (s *StreakService) GetUserStreak(userID string) (*StreakResponseDTO, error)
 
 	var streak Streak
 	err = s.collection.FindOne(ctx, bson.M{"userId": objectID}).Decode(&streak)
-	if err == mongo.ErrNoDocuments {
+	if errors.Is(err, mongo.ErrNoDocuments) {
 		return nil, errors.New("Streak not found")
 	} else if err != nil {
 		return nil, err
