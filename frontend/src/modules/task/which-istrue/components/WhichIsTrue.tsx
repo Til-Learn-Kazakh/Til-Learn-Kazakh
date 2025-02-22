@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
-import { icons } from '../../../../core/constants'
+import { useMutation } from '@tanstack/react-query'
+
+import { imageserver } from '../../../../core/config/environment.config'
+// Adjust path
+import { taskService } from '../../main/services/task.service'
+// Adjust the path if needed
 import Footer from '../../translate-audio/components/footer/Footer'
 import Header from '../../translate-audio/components/header/Header'
 
 import ImageCard from './ImageCard'
-
-// Import the new ImageCard component
 
 const styles = StyleSheet.create({
 	container: {
@@ -28,57 +31,61 @@ const styles = StyleSheet.create({
 	},
 })
 
-const WhichIsTrue = () => {
+const WhichIsTrue = ({ task, onNext }: any) => {
 	const [selectedOption, setSelectedOption] = useState<string | null>(null)
 	const [actionDone, setActionDone] = useState(false)
+	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
+	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 
-	const handleOptionSelect = (option: string) => {
-		setSelectedOption(option)
-		setActionDone(true) // Activate the footer button
+	// Backend request to check the answer
+	const { mutate } = useMutation({
+		mutationFn: ({ taskId, userAnswer }: { taskId: string; userAnswer: string }) =>
+			taskService.checkAnswer(taskId, userAnswer),
+		onSuccess: response => {
+			setIsCorrect(response.is_correct)
+			if (!response.is_correct) {
+				setCorrectAnswer(response.correct_answer)
+			}
+		},
+		onError: error => {
+			console.error('❌ Error checking answer:', error)
+		},
+	})
+
+	const handleOptionSelect = (optionId: string) => {
+		setSelectedOption(optionId)
+		setActionDone(true)
 	}
 
 	const handleCheck = () => {
-		console.log('Selected Option:', selectedOption)
+		if (selectedOption) {
+			mutate({ taskId: task.id, userAnswer: selectedOption })
+		}
 	}
 
-	const options = [
-		{
-			id: '1',
-			text: 'Құлпынай',
-			image: icons.strawberry,
-		},
-		{
-			id: '2',
-			text: 'ет',
-			image: icons.bbq,
-		},
-		{
-			id: '3',
-			text: 'лимон',
-			image: icons.lemon,
-		},
-		{
-			id: '4',
-			text: 'ірімшік',
-			image: icons.cheese,
-		},
-	]
+	const handleContinue = () => {
+		setSelectedOption(null)
+		setActionDone(false)
+		setIsCorrect(null)
+		setCorrectAnswer(null)
+		onNext()
+	}
 
 	return (
 		<View style={styles.container}>
 			{/* Header */}
-			<Header title='Which of these is "the cheese"?' />
+			<Header title={task?.question?.en || 'Which of these is correct?'} />
 
 			{/* Content */}
 			<ScrollView contentContainerStyle={styles.content}>
 				<View style={styles.cardContainer}>
-					{options.map(option => (
+					{task?.image_options?.map((option: any) => (
 						<ImageCard
 							key={option.id}
 							text={option.text}
-							image={option.image}
-							isSelected={selectedOption === option.text}
-							onPress={() => handleOptionSelect(option.text)}
+							image={{ uri: `${imageserver}${option.image}` }}
+							isSelected={selectedOption === option.id}
+							onPress={() => handleOptionSelect(option.id)}
 						/>
 					))}
 				</View>
@@ -88,6 +95,9 @@ const WhichIsTrue = () => {
 			<Footer
 				isDisabled={!actionDone}
 				onPress={handleCheck}
+				isSuccess={isCorrect}
+				correctAnswer={isCorrect === false ? correctAnswer : undefined}
+				onContinue={handleContinue}
 			/>
 		</View>
 	)

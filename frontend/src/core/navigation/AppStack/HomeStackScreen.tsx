@@ -4,10 +4,11 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import Home from '../../../modules/home/components/Home'
 import { InfoPage } from '../../../modules/home/components/InfoPage'
+import TaskScreen from '../../../modules/task/main/components/TaskScreen'
 
 const HomeStack = createNativeStackNavigator()
 
-const HomeStackScreen = ({ route }: { route: any }) => {
+const HomeStackScreen = ({ route, navigation }: { route: any; navigation: any }) => {
 	const { currentUser } = route.params
 
 	return (
@@ -25,8 +26,13 @@ const HomeStackScreen = ({ route }: { route: any }) => {
 				name='InfoPage'
 				component={InfoPage}
 				options={{
-					gestureDirection: 'vertical', 
+					presentation: 'modal',
+					gestureDirection: 'vertical',
 				}}
+			/>
+			<HomeStack.Screen
+				name='TaskScreen'
+				component={TaskScreen}
 			/>
 		</HomeStack.Navigator>
 	)

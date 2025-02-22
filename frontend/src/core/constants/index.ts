@@ -21,6 +21,7 @@ import information from '../../../public/icons/information.png'
 import learning from '../../../public/icons/learning.png'
 import lemon from '../../../public/icons/lemon.png'
 import sound from '../../../public/icons/sound.png'
+import soundbarys from '../../../public/icons/soundbarys.png'
 import strawberry from '../../../public/icons/strawberry.png'
 import study from '../../../public/icons/study.png'
 import sunfire from '../../../public/icons/sunfire.png'
@@ -63,5 +64,6 @@ export const icons = {
 	bbq,
 	lemon,
 	fish,
+	soundbarys,
 	// baryslottie
 }

@@ -1,10 +1,10 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import Svg, { Image } from 'react-native-svg'
 
 import { icons } from '../../../../core/constants'
 
-const CHARACTER_WIDTH = 120 // Немного уменьшили ширину
+const CHARACTER_WIDTH = 120
 const CHARACTER_ASPECT_RATIO = 560 / 449.75
 
 const styles = StyleSheet.create({
@@ -15,13 +15,16 @@ const styles = StyleSheet.create({
 	image: {
 		width: CHARACTER_WIDTH,
 		height: CHARACTER_WIDTH * CHARACTER_ASPECT_RATIO,
-		alignSelf: 'center', // Центрирование внутри родителя
+		alignSelf: 'center',
 	},
 })
 
-const SoundImage = () => {
+const SoundImage = ({ onPress }: { onPress: () => void }) => {
 	return (
-		<View style={styles.container}>
+		<TouchableOpacity
+			onPress={onPress}
+			style={styles.container}
+		>
 			<Svg style={styles.image}>
 				<Image
 					width='100%'
@@ -29,7 +32,7 @@ const SoundImage = () => {
 					href={icons.sound}
 				/>
 			</Svg>
-		</View>
+		</TouchableOpacity>
 	)
 }
 

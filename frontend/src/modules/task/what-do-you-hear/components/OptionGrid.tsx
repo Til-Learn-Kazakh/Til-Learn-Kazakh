@@ -6,35 +6,31 @@ interface OptionGridProps {
 	onOptionPress: (option: string) => void
 }
 
-const OptionGrid = ({ options, onOptionPress }: OptionGridProps) => {
+const OptionGrid = ({ options = [], onOptionPress }: OptionGridProps) => {
 	const [selectedOption, setSelectedOption] = useState<string | null>(null)
 
 	const handlePress = (option: string) => {
-		setSelectedOption(option) // Устанавливаем выбранный вариант
-		onOptionPress(option) // Вызываем переданную функцию
+		setSelectedOption(option) // Set selected option
+		onOptionPress(option) // Trigger parent function
 	}
 
 	return (
 		<View style={styles.grid}>
-			{options.map(option => (
-				<TouchableOpacity
-					key={option}
-					style={[
-						styles.option,
-						selectedOption === option && styles.selectedOption, // Добавляем стиль для выбранной карточки
-					]}
-					onPress={() => handlePress(option)}
-				>
-					<Text
-						style={[
-							styles.text,
-							selectedOption === option && styles.selectedText, // Изменяем текст для выбранной карточки
-						]}
+			{options.length > 0 ? (
+				options.map(option => (
+					<TouchableOpacity
+						key={option}
+						style={[styles.option, selectedOption === option && styles.selectedOption]}
+						onPress={() => handlePress(option)}
 					>
-						{option}
-					</Text>
-				</TouchableOpacity>
-			))}
+						<Text style={[styles.text, selectedOption === option && styles.selectedText]}>
+							{option}
+						</Text>
+					</TouchableOpacity>
+				))
+			) : (
+				<Text>No options available</Text> // Fallback message
+			)}
 		</View>
 	)
 }

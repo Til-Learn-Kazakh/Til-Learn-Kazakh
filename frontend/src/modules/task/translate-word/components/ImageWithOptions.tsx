@@ -6,6 +6,7 @@ interface ImageWithOptionsProps {
 	options: string[]
 	selectedOption: string | null
 	onOptionSelect: (option: string) => void
+	isDisabled: boolean
 }
 
 const ImageWithOptions = ({
@@ -13,14 +14,16 @@ const ImageWithOptions = ({
 	options,
 	selectedOption,
 	onOptionSelect,
+	isDisabled,
 }: ImageWithOptionsProps) => {
 	return (
 		<View style={styles.container}>
 			{/* Image in the Center */}
 			<Image
-				source={image}
+				source={{ uri: image }}
 				style={styles.image}
 				resizeMode='contain'
+				onError={error => console.log('Image Load Error:', error.nativeEvent)}
 			/>
 
 			{/* Options */}
@@ -29,7 +32,8 @@ const ImageWithOptions = ({
 					<TouchableOpacity
 						key={index}
 						style={[styles.optionButton, selectedOption === option && styles.selectedOption]}
-						onPress={() => onOptionSelect(option)}
+						onPress={() => !isDisabled && onOptionSelect(option)}
+						disabled={isDisabled}
 					>
 						<Text
 							style={[styles.optionText, selectedOption === option && styles.selectedOptionText]}

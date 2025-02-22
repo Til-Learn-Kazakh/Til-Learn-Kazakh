@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
 
-import axios from 'axios'
+import { useNavigation } from '@react-navigation/native'
 
 import FillBlank from '../../fill-blank/components/FillBlank'
 import ReadRespond from '../../read-respond/components/ReadRespond'
@@ -10,26 +10,27 @@ import TranslateAudio from '../../translate-audio/components/page/TranslateAudio
 import TranslateWord from '../../translate-word/components/TranslateWord'
 import WhatYouHear from '../../what-do-you-hear/components/WhatYouHear'
 import WhichIsTrue from '../../which-istrue/components/WhichIsTrue'
+import { useTask } from '../hooks/task.hook'
 
 const TaskScreen = ({ route }: any) => {
 	const { unitId } = route.params
-	const [task, setTask] = useState(null)
-	const [loading, setLoading] = useState(true)
+	const [currentOrder, setCurrentOrder] = useState(0)
+	const navigation = useNavigation()
+
+	// Load current task
+	const { data: task, isLoading, isError } = useTask(unitId, currentOrder)
 
 	useEffect(() => {
-		axios
-			.get(`https://yourapi.com/tasks?unit_id=${unitId}`)
-			.then(response => {
-				setTask(response.data)
-				setLoading(false)
-			})
-			.catch(error => {
-				console.error('Error fetching task:', error)
-				setLoading(false)
-			})
-	}, [unitId])
+		navigation.setOptions({ gestureEnabled: false })
+	}, [navigation])
 
-	if (loading) {
+	const handleNextTask = () => {
+		if (task) {
+			setCurrentOrder(prev => prev + 1)
+		}
+	}
+
+	if (isLoading) {
 		return (
 			<ActivityIndicator
 				size='large'
@@ -38,26 +39,65 @@ const TaskScreen = ({ route }: any) => {
 		)
 	}
 
-	if (!task) {
-		return <Text>No Task Found</Text>
+	if (isError || !task) {
+		return <Text>Error loading task</Text>
 	}
 
 	const renderTaskComponent = () => {
-		switch (task?.type) {
+		switch (task.type) {
 			case 'translation_word':
-				return <TranslateWord task={task} />
-			case 'translation_sentence':
-				return <TranslateAudio task={task} />
-			case 'tap_audio':
-				return <TapAudio task={task} />
-			case 'audio':
-				return <WhatYouHear task={task} />
-			case 'choose_correct_image':
-				return <WhichIsTrue task={task} />
-			case 'complete_text':
-				return <FillBlank task={task} />
+				return (
+					<TranslateWord
+						key={task.id}
+						task={task}
+						onNext={handleNextTask}
+					/>
+				)
+			case 'fill_blank':
+				return (
+					<FillBlank
+						key={task.id}
+						task={task}
+						onNext={handleNextTask}
+					/>
+				)
 			case 'read_respond':
-				return <ReadRespond task={task} />
+				return (
+					<ReadRespond
+						task={task}
+						onNext={handleNextTask}
+					/>
+				)
+			case 'choose_correct_image':
+				return (
+					<WhichIsTrue
+						task={task}
+						onNext={handleNextTask}
+					/>
+				)
+			case 'audio':
+				return (
+					<WhatYouHear
+						task={task}
+						onNext={handleNextTask}
+					/>
+				)
+			case 'tap_audio':
+				return (
+					<TapAudio
+						task={task}
+						onNext={handleNextTask}
+					/>
+				)
+
+			case 'translation_audio':
+				return (
+					<TranslateAudio
+						task={task}
+						onNext={handleNextTask}
+					/>
+				)
+
 			default:
 				return <Text>Unknown Task Type</Text>
 		}

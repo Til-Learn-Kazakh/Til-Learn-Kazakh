@@ -20,10 +20,8 @@ const QuestionCard = ({
 }: QuestionCardProps) => {
 	return (
 		<View style={styles.card}>
-			{/* Разбиваем строку description на слова и рендерим с пробелами */}
 			<Text style={styles.description}>
 				{description.split(' ').map((word, index, array) => {
-					// Удаляем знаки пунктуации перед сравнением
 					const cleanWord = word.replace(/[.,!?]/g, '')
 
 					return (
@@ -43,10 +41,8 @@ const QuestionCard = ({
 				})}
 			</Text>
 
-			{/* Question */}
 			<Text style={styles.question}>{question}</Text>
 
-			{/* Options */}
 			{options.map((option, index) => (
 				<TouchableOpacity
 					key={index}
@@ -88,7 +84,7 @@ const styles = StyleSheet.create({
 	},
 	highlightedWord: {
 		textDecorationLine: 'underline',
-		color: '#FF00FF', // Розовый цвет
+		color: '#FF00FF',
 		fontWeight: 'bold',
 	},
 	question: {

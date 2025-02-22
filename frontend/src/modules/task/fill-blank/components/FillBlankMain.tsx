@@ -1,101 +1,84 @@
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import { LinearGradient } from 'expo-linear-gradient'
-
 interface FillBlankMainProps {
 	words: string[]
-	sentence: string[]
+	sentence: string[] // e.g. ["Ұстаз", "__", "тапсырмасын", "тексерді."]
 	onComplete: (isComplete: boolean) => void
+	onAnswerChange: (answer: string) => void
 }
 
-const FillBlankMain = ({ words, sentence, onComplete }: any) => {
-	const [filledSentence, setFilledSentence] = useState<(any | null)[]>(
-		Array(sentence.length).fill(null)
-	)
+const FillBlankMain: React.FC<FillBlankMainProps> = ({
+	words,
+	sentence,
+	onComplete,
+	onAnswerChange,
+}) => {
+	// If there's only ONE blank, we can just store the single chosen word
+	const [chosenWord, setChosenWord] = useState<string | null>(null)
 
-	// Проверяем, все ли пропуски заполнены, после каждого изменения
+	// The displayed sentence can be built from the original array,
+	// replacing the single blank with `chosenWord` if any.
+	const displaySentence = sentence.map(part => (part === '__' && chosenWord ? chosenWord : part))
+
+	// Any time `chosenWord` changes, check if user has chosen something
 	useEffect(() => {
-		console.log('>>> filledSentence changed:', filledSentence)
-		const allFilled = sentence.every((part, i) => part !== '__' || filledSentence[i] !== null)
-		console.log('>>> allFilled =', allFilled)
-		onComplete(allFilled)
-	}, [filledSentence, sentence, onComplete])
+		// If user has chosen a word, we can say "complete = true"
+		const isComplete = chosenWord !== null
+		onComplete(isComplete)
 
-	// Клик по слову: вставляем сразу в первый пропуск "__", который ещё пуст (null)
+		// Pass the single chosen word up to parent
+		onAnswerChange(chosenWord || '')
+	}, [chosenWord])
+
 	const handleWordPress = (word: string) => {
-		console.log('>>> handleWordPress clicked word:', word)
-
-		// Находим индекс первого пропуска "__", который не заполнен
-		const blankIndex = sentence.findIndex((part, i) => part === '__' && filledSentence[i] === null)
-
-		console.log('>>> handleWordPress blankIndex:', blankIndex)
-		if (blankIndex === -1) {
-			console.log('>>> No free blanks left, ignoring')
-			return
-		}
-
-		setFilledSentence(prev => {
-			const updated = [...prev]
-			updated[blankIndex] = word
-			console.log('>>> Updating blank index', blankIndex, 'with word:', word)
-			return updated
-		})
+		// Only allow choosing one word for the blank
+		setChosenWord(word)
 	}
 
-	// Клик по пропуску: удаляем слово в этом индексе
-	const handleRemoveWord = (index: number) => {
-		console.log('>>> handleRemoveWord at index:', index)
-		setFilledSentence(prev => {
-			const updated = [...prev]
-			updated[index] = null
-			return updated
-		})
+	const handleRemoveWord = () => {
+		setChosenWord(null)
 	}
 
 	return (
 		<View style={styles.container}>
-			{/* Предложение с пропусками */}
+			{/* Render the sentence with the single blank */}
 			<View style={styles.sentenceContainer}>
-				{sentence.map((text, idx) => {
-					if (text === '__') {
+				{displaySentence.map((part, idx) => {
+					if (sentence[idx] === '__') {
+						// This is the blank
 						return (
 							<TouchableOpacity
 								key={idx}
 								style={styles.blank}
-								onPress={() => handleRemoveWord(idx)}
+								onPress={handleRemoveWord}
 							>
-								<Text style={styles.blankText}>{filledSentence[idx] || ''}</Text>
+								<Text style={styles.blankText}>{part !== '__' ? part : ''}</Text>
 							</TouchableOpacity>
 						)
+					} else {
+						// Normal text
+						return (
+							<Text
+								key={idx}
+								style={styles.word}
+							>
+								{part}
+							</Text>
+						)
 					}
-					return (
-						<Text
-							key={idx}
-							style={styles.word}
-						>
-							{text}
-						</Text>
-					)
 				})}
 			</View>
 
-			{/* Набор слов для вставки */}
+			{/* Render the set of words to choose from */}
 			<View style={styles.wordsContainer}>
-				{words.map((word: any) => (
+				{words.map(word => (
 					<TouchableOpacity
 						key={word}
 						style={styles.wordButton}
 						onPress={() => handleWordPress(word)}
 					>
-						<LinearGradient
-							colors={['#4facfe', '#00f2fe']} // Gradient colors (warm orange-pink tones)
-							style={styles.wordButton}
-						>
-							<View style={styles.wordContent}>
-								<Text style={styles.wordText}>{word}</Text>
-							</View>
-						</LinearGradient>
+						<Text style={styles.wordText}>{word}</Text>
 					</TouchableOpacity>
 				))}
 			</View>
@@ -136,32 +119,26 @@ const styles = StyleSheet.create({
 	wordsContainer: {
 		flexDirection: 'row',
 		flexWrap: 'wrap',
-		justifyContent: 'center', // Center words in the container
-		gap: 6, // Reduce spacing between words for a more compact look
-		paddingHorizontal: 10, // Add horizontal padding for better alignment
+		justifyContent: 'center',
+		gap: 6,
+		paddingHorizontal: 10,
 	},
 	wordButton: {
-		paddingVertical: 10, // Reduce vertical padding
-		paddingHorizontal: 16, // Reduce horizontal padding
-		borderRadius: 8, // Slightly smaller rounded edges
-		overflow: 'hidden',
-		shadowColor: '#000',
-		shadowOffset: { width: 0, height: 2 }, // Softer shadow
-		shadowOpacity: 0.12,
-		shadowRadius: 4,
-		elevation: 3,
-		minWidth: 70, // Ensure buttons maintain a structured look
+		backgroundColor: '#fff',
+		paddingVertical: 8,
+		paddingHorizontal: 14,
+		borderRadius: 13,
+		borderWidth: 2,
+		borderColor: '#999',
+		minWidth: 60,
 		alignItems: 'center',
 		justifyContent: 'center',
+		margin: 4,
 	},
 	wordText: {
-		fontSize: 18, // Reduce text size slightly
-		color: '#fff',
-		fontWeight: '600', // Adjust font weight for better readability
+		fontSize: 18,
+		color: '#333',
+		fontWeight: '500',
 		textAlign: 'center',
-	},
-	wordContent: {
-		justifyContent: 'center',
-		alignItems: 'center',
 	},
 })

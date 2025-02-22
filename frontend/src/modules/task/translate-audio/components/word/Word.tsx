@@ -1,5 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 
 import { WORD_HEIGHT } from './Layout'
 
@@ -29,18 +30,19 @@ const styles = StyleSheet.create({
 })
 
 interface WordProps {
-	id: number
 	word: string
+	isSelected?: boolean // Added optional isSelected prop
+	onPress?: () => void // Added optional onPress prop
 }
 
-const Word = ({ word }: WordProps) => (
+const Word = ({ word, onPress }: WordProps) => (
 	<View style={styles.root}>
-		<View>
+		<TouchableOpacity onPress={onPress}>
 			<View style={styles.container}>
 				<Text style={styles.text}>{word}</Text>
 			</View>
 			<View style={styles.shadow} />
-		</View>
+		</TouchableOpacity>
 	</View>
 )
 

@@ -36,12 +36,6 @@ axiosWithAuth.interceptors.response.use(
 		return response
 	},
 	async error => {
-		if (error.response) {
-			console.error('[Response Error]', error.response.status, error.response.data)
-		} else {
-			console.error('[Network Error]', error.message)
-		}
-
 		return Promise.reject(error)
 	}
 )

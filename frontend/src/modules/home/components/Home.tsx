@@ -2,6 +2,8 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
 
+import { NavigationProp, useNavigation } from '@react-navigation/native'
+
 import { icons } from '../../../core/constants'
 import { useBottomSheet } from '../../../core/hooks/useBottomSheet'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
@@ -12,6 +14,8 @@ import { HeartsTopSheet, HeartsTopSheetRef } from './HeartsTopSheet'
 import { InfoBottomSheet } from './InfoBottomSheet'
 
 const Home = ({ route }: { route: any }) => {
+	const navigation = useNavigation<NavigationProp<any>>()
+
 	const { data: levels, isLoading: isLoadingLevels } = useLevels()
 	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser() // <-- тут подтягиваем юзера из запроса
 
@@ -109,9 +113,10 @@ const Home = ({ route }: { route: any }) => {
 						</View>
 
 						{level.units.map((unit: any) => (
-							<View
+							<TouchableOpacity
 								key={unit.id}
 								style={styles.lessonCard}
+								onPress={() => navigation.navigate('TaskScreen', { unitId: unit.id })}
 							>
 								<Text style={styles.lessonTitle}>{unit.title}</Text>
 								<ProgressBar
@@ -124,7 +129,7 @@ const Home = ({ route }: { route: any }) => {
 									<Text style={styles.descriptionTextRu}>{unit.descriptions.ru}</Text>
 									<Text style={styles.descriptionTextKz}>{unit.descriptions.kk}</Text>
 								</View>
-							</View>
+							</TouchableOpacity>
 						))}
 					</View>
 				))}

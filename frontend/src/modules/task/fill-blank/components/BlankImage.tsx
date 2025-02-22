@@ -2,8 +2,6 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import Svg, { Image } from 'react-native-svg'
 
-import { icons } from '../../../../core/constants'
-
 const CHARACTER_WIDTH = 150
 const CHARACTER_ASPECT_RATIO = 560 / 449.75
 
@@ -19,14 +17,14 @@ const styles = StyleSheet.create({
 	},
 })
 
-const BlankImage = () => {
+const BlankImage = ({ image }: any) => {
 	return (
 		<View style={styles.container}>
 			<Svg style={styles.image}>
 				<Image
+					href={image}
 					width='100%'
 					height='100%'
-					href={icons.fillblank}
 				/>
 			</Svg>
 		</View>

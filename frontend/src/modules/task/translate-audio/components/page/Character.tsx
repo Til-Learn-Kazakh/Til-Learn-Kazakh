@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity } from 'react-native'
 import Svg, { Image } from 'react-native-svg'
 
 import { icons } from '../../../../../core/constants'
@@ -13,15 +13,17 @@ const styles = StyleSheet.create({
 	},
 })
 
-const Character = () => {
+const Character = ({ onPress }: { onPress: () => void }) => {
 	return (
-		<Svg style={styles.image}>
-			<Image
-				width='100%'
-				height='100%'
-				href={icons.character}
-			/>
-		</Svg>
+		<TouchableOpacity onPress={onPress}>
+			<Svg style={styles.image}>
+				<Image
+					width='100%'
+					height='100%'
+					href={icons.soundbarys}
+				/>
+			</Svg>
+		</TouchableOpacity>
 	)
 }
 

@@ -59,10 +59,10 @@ class AuthService {
 			.then(resp => resp.data)
 
 			.catch(e => {
-				if (e?.response?.status === 404) {
-					return null
+				if (e?.response?.status === 401 || e?.response?.status === 404) {
+					return null 
 				}
-				throw e
+				throw e 
 			})
 	}
 }

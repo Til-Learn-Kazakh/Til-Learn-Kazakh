@@ -3,7 +3,7 @@ import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native'
 
 interface ImageCardProps {
 	text: string
-	image: any
+	image: { uri: string }
 	isSelected: boolean
 	onPress: () => void
 }
@@ -28,13 +28,13 @@ export default ImageCard
 
 const styles = StyleSheet.create({
 	card: {
-		width: '45%', // Increased card width
+		width: '45%',
 		borderWidth: 3,
 		borderColor: 'transparent',
-		borderRadius: 16, // Slightly more rounded corners
+		borderRadius: 16,
 		marginBottom: 40,
 		alignItems: 'center',
-		padding: 16, // Added more padding
+		padding: 16,
 		backgroundColor: '#f8f9fa',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 4 },
@@ -46,12 +46,12 @@ const styles = StyleSheet.create({
 		borderColor: '#007BFF',
 	},
 	image: {
-		width: 120, // Increased image size
+		width: 120,
 		height: 120,
 		marginBottom: 12,
 	},
 	optionText: {
-		fontSize: 24, // Increased font size for text
+		fontSize: 24,
 		color: '#333',
 		textAlign: 'center',
 	},
