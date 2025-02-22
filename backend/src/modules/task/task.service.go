@@ -3,8 +3,10 @@ package task
 import (
 	"context"
 	"diploma/src/database"
+	"diploma/src/services"
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -27,8 +29,7 @@ func NewTaskService() *TaskService {
 }
 
 // Создание новой задачи
-func (s *TaskService) CreateTask(dto *CreateTaskDTO) (*Task, error) {
-	// Проверяем валидность UnitID
+func (s *TaskService) CreateTask(dto *CreateTaskDTO, imageFile multipart.File, imageHeader *multipart.FileHeader, imageOptionsFiles []*multipart.FileHeader) (*Task, error) {
 	unitID, err := primitive.ObjectIDFromHex(dto.UnitID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid unit ID: %w", err)
@@ -43,19 +44,57 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO) (*Task, error) {
 		return nil, fmt.Errorf("unit with ID %s does not exist", dto.UnitID)
 	}
 
-	// Создаем задачу
+	// Загружаем изображение (если оно было отправлено)
+	var imagePath string
+	if imageFile != nil && imageHeader != nil {
+		imageService := services.NewImageService()
+		imagePath, err = imageService.SaveImage("tasks", imageFile, imageHeader)
+		if err != nil {
+			return nil, fmt.Errorf("failed to save image: %w", err)
+		}
+	}
+
+	// ✅ Загружаем изображения для ImageOptions через SaveMultipleImages
+	var savedImageOptions []ImageOption
+	if len(imageOptionsFiles) > 0 {
+		imageService := services.NewImageService()
+		savedPaths, err := imageService.SaveMultipleImages("tasks/options", imageOptionsFiles, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to save image options: %w", err)
+		}
+
+		// ✅ Привязываем сохранённые пути к соответствующим ImageOptions
+		for i, option := range dto.ImageOptions {
+			if i < len(savedPaths) {
+				option.Image = savedPaths[i] // Привязываем сохранённый путь
+			} else {
+				option.Image = ""
+			}
+			savedImageOptions = append(savedImageOptions, option)
+		}
+	} else {
+		// Если изображения не были загружены, используем оригинальные опции
+		savedImageOptions = dto.ImageOptions
+	}
+
 	task := Task{
-		ID:            primitive.NewObjectID(),
-		UnitID:        unitID,
-		Type:          TaskType(dto.Type),
-		Question:      dto.Question,
-		CorrectAnswer: dto.CorrectAnswer,
-		Hints:         dto.Hints,
-		AudioPath:     dto.AudioPath,
-		ImagePath:     dto.ImagePath,
-		Order:         dto.Order,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		ID:                     primitive.NewObjectID(),
+		UnitID:                 unitID,
+		Type:                   TaskType(dto.Type),
+		Question:               dto.Question,
+		CorrectAnswer:          dto.CorrectAnswer,
+		Hints:                  dto.Hints,
+		AudioPath:              dto.AudioPath,
+		ImagePath:              imagePath,
+		Order:                  dto.Order,
+		Sentence:               dto.Sentence,
+		Description:            dto.Description,
+		HighlightedWord:        dto.HighlightedWord,
+		LocalizedHints:         dto.LocalizedHints,
+		LocalizedCorrectAnswer: dto.LocalizedCorrectAnswer,
+		ImageOptions:           savedImageOptions,
+		CreatedAt:              time.Now(),
+		UpdatedAt:              time.Now(),
 	}
 
 	_, err = s.Collection.InsertOne(context.Background(), task)
@@ -112,15 +151,45 @@ func (s *TaskService) GetNextTask(unitID primitive.ObjectID, currentOrder int) (
 	return &nextTask, nil
 }
 
-func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer string) (bool, error) {
+func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer string, userLang string) (bool, string, error) {
 	var task Task
 	err := s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
 	if err != nil {
-		return false, fmt.Errorf("task not found: %w", err)
+		return false, "", fmt.Errorf("task not found: %w", err)
 	}
 
-	isCorrect := task.CorrectAnswer == userAnswer
-	return isCorrect, nil
+	// 1) Определим правильно ли ответ
+	isCorrect := (userAnswer == task.CorrectAnswer)
+	correctAnswerText := ""
+
+	// 2) Если ответ неверный, ищем текст правильного варианта в image_options
+	if !isCorrect && len(task.ImageOptions) > 0 {
+		for _, option := range task.ImageOptions {
+			if option.ID == task.CorrectAnswer {
+				correctAnswerText = option.Text // Например, "Cheese"
+				break
+			}
+		}
+	}
+
+	// 3) Если есть локализованный правильный ответ
+	if len(task.LocalizedCorrectAnswer) > 0 && userLang != "" {
+		realCorrectAnswer := task.LocalizedCorrectAnswer[userLang]
+		if realCorrectAnswer == "" {
+			realCorrectAnswer = task.CorrectAnswer
+		}
+		isCorrect = (userAnswer == realCorrectAnswer)
+		if !isCorrect && correctAnswerText == "" {
+			correctAnswerText = realCorrectAnswer
+		}
+	}
+
+	// 4) Если не удалось найти текст, возвращаем оригинальный correctAnswer
+	if correctAnswerText == "" {
+		correctAnswerText = task.CorrectAnswer
+	}
+
+	return isCorrect, correctAnswerText, nil
 }
 
 // Обновление задачи

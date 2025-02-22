@@ -63,7 +63,13 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	router.Use(gin.Logger())
+	router.Use(gin.Logger(), gin.Recovery())
+
+	// Инициализируем rateLimiter и подключаем наше middleware
+	rateLimiter := middlewares.NewRateLimiter()
+	router.Use(middlewares.RateLimitMiddleware(rateLimiter))
+
+	router.Static("/src/public", "./src/public")
 
 	apiRoutes := router.Group("/api/v1")
 	audioService := services.NewAudioService()
