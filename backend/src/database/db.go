@@ -20,7 +20,6 @@ func DBSet() *mongo.Client {
 		log.Println("Ошибка загрузки .env файла:", err)
 	}
 
-	// Получаем URI и имя базы данных из переменных окружения
 	mongoURI := os.Getenv("MONGO_URI_DEVELOPMENT")
 	DatabaseName = os.Getenv("MONGO_DATABASE")
 

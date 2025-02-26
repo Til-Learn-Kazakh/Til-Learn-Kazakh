@@ -16,7 +16,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// AuthService отвечает за логику авторизации и регистрации
 type AuthService struct {
 	UserCollection *mongo.Collection
 	streakService  *streak.StreakService
@@ -29,7 +28,6 @@ func NewAuthService(streakService *streak.StreakService) *AuthService {
 	}
 }
 
-// Хэширование пароля
 func HashPassword(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -38,7 +36,6 @@ func HashPassword(password string) string {
 	return string(bytes)
 }
 
-// Проверка пароля
 func VerifyPassword(inputPassword, userPassword string) (valid bool, msg string) {
 	err := bcrypt.CompareHashAndPassword([]byte(userPassword), []byte(inputPassword))
 
@@ -51,7 +48,6 @@ func VerifyPassword(inputPassword, userPassword string) (valid bool, msg string)
 	return valid, msg
 }
 
-// Логика авторизации
 func (s *AuthService) Login(dto LoginDTO) (*User, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
@@ -59,13 +55,12 @@ func (s *AuthService) Login(dto LoginDTO) (*User, error) {
 	var foundUser User
 	err := s.UserCollection.FindOne(ctx, bson.M{"email": dto.Email}).Decode(&foundUser)
 	if err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) { // Используем errors.Is
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, errors.New("user not found")
 		}
 		return nil, err
 	}
 
-	// Проверка пароля
 	isValid, msg := VerifyPassword(dto.Password, foundUser.Password)
 
 	if !isValid {
@@ -76,12 +71,10 @@ func (s *AuthService) Login(dto LoginDTO) (*User, error) {
 	return &foundUser, nil
 }
 
-// Логика регистрации
 func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 
-	// Проверка наличия пользователя с таким email
 	count, err := s.UserCollection.CountDocuments(ctx, bson.M{"email": dto.Email})
 	if err != nil {
 		return nil, err
@@ -90,7 +83,6 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 		return nil, errors.New("user already exists")
 	}
 
-	// Запускаем сессию для транзакции
 	session, err := s.UserCollection.Database().Client().StartSession()
 	if err != nil {
 		return nil, err
@@ -127,7 +119,6 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 		return newUser, nil
 	}
 
-	// Запускаем транзакцию
 	result, err := session.WithTransaction(context.TODO(), callback)
 	if err != nil {
 		return nil, err

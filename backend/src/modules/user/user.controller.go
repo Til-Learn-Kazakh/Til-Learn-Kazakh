@@ -16,7 +16,6 @@ func NewUserController(service *UserService) *UserController {
 	}
 }
 
-// Метод для получения текущего пользователя
 func (ctrl *UserController) GetCurrentUser(c *gin.Context) {
 	userID, exists := c.Get("uid")
 	if !exists {
@@ -49,7 +48,6 @@ func (ctrl *UserController) RefillHeartsWithCrystals(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// Автоматическое восстановление сердец
 func (ctrl *UserController) RefillHearts(c *gin.Context) {
 	userID, exists := c.Get("uid")
 	if !exists {

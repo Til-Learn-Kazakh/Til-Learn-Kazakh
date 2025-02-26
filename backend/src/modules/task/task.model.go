@@ -35,13 +35,13 @@ type Task struct {
 	CreatedAt     time.Time          `bson:"created_at" json:"created_at"`        // Дата создания
 	UpdatedAt     time.Time          `bson:"updated_at" json:"updated_at"`        // Дата обновления
 
-	AudioPath string `bson:"audio_path,omitempty" json:"audio_path,omitempty"` // Путь к аудиофайлу (для audio задач)
+	AudioPath string `bson:"audio_path,omitempty" json:"audio_path,omitempty"`
 
 	// TranslationWord
-	ImagePath string `bson:"image_path,omitempty" json:"image_path,omitempty"` // Путь к изображению (для задач с картинками)
+	ImagePath string `bson:"image_path,omitempty" json:"image_path,omitempty"`
 
 	// Fill_Blank
-	Sentence []string `bson:"sentence,omitempty" json:"sentence,omitempty"` // Только для FillBlank
+	Sentence []string `bson:"sentence,omitempty" json:"sentence,omitempty"`
 
 	// Read and Respond
 	Description     map[string]string `bson:"description,omitempty" json:"description,omitempty"`

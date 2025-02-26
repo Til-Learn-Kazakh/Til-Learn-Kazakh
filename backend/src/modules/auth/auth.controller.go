@@ -13,7 +13,6 @@ type AuthController struct {
 	Service *AuthService
 }
 
-// NewAuthController создаёт новый экземпляр AuthController
 func NewAuthController(service *AuthService) *AuthController {
 	return &AuthController{
 		Service: service,
@@ -24,7 +23,6 @@ func NewAuthController(service *AuthService) *AuthController {
 func (c *AuthController) LoginHandler(ctx *gin.Context) {
 	var loginDTO LoginDTO
 
-	// Валидация входных данных
 	if err := ctx.ShouldBindJSON(&loginDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -34,15 +32,13 @@ func (c *AuthController) LoginHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	// Логика авторизации
 	user, err := c.Service.Login(loginDTO)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Генерация токена
-	accessToken, _, err := generate.TokenGenerator(user.Email, user.FirstName, user.LastName, user.ID.Hex())
+	accessToken, refreshToken, err := generate.TokenGenerator(user.Email, user.FirstName, user.LastName, user.ID.Hex())
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
 		return
@@ -50,8 +46,9 @@ func (c *AuthController) LoginHandler(ctx *gin.Context) {
 
 	// Успешный ответ
 	ctx.JSON(http.StatusOK, gin.H{
-		"message":      "Login successful",
-		"access_token": accessToken,
+		"message":       "Login successful",
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }
 
@@ -59,27 +56,23 @@ func (c *AuthController) LoginHandler(ctx *gin.Context) {
 func (c *AuthController) SignUpHandler(ctx *gin.Context) {
 	var signUpDTO SignUpDTO
 
-	// Валидация JSON
 	if err := ctx.ShouldBindJSON(&signUpDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Дополнительная валидация через Validate
 	if err := config.Validate.Struct(signUpDTO); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Вызов сервиса для регистрации
 	user, err := c.Service.SignUp(signUpDTO)
 	if err != nil {
-		ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()}) // Ошибка, если email уже существует
+		ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Генерация токена
-	accessToken, _, err := generate.TokenGenerator(user.Email, user.FirstName, user.LastName, user.ID.Hex())
+	accessToken, refreshToken, err := generate.TokenGenerator(user.Email, user.FirstName, user.LastName, user.ID.Hex())
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate access token"})
 		return
@@ -87,7 +80,36 @@ func (c *AuthController) SignUpHandler(ctx *gin.Context) {
 
 	// Успешный ответ
 	ctx.JSON(http.StatusCreated, gin.H{
-		"message":      "Registration successful",
-		"access_token": accessToken,
+		"message":       "Registration successful",
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	})
+}
+
+func (*AuthController) RefreshTokenHandler(ctx *gin.Context) {
+	var body struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Refresh token is required"})
+		return
+	}
+
+	claims, err := generate.ValidateToken(body.RefreshToken)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid refresh token"})
+		return
+	}
+
+	accessToken, refreshToken, err := generate.TokenGenerator(claims.Email, claims.FirstName, claims.LastName, claims.Uid)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate tokens"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
 	})
 }

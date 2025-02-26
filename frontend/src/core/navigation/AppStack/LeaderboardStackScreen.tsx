@@ -10,6 +10,7 @@ import TranslateAudio from '../../../modules/task/translate-audio/components/pag
 import TranslateWord from '../../../modules/task/translate-word/components/TranslateWord'
 import WhatYouHear from '../../../modules/task/what-do-you-hear/components/WhatYouHear'
 import WhichIsTrue from '../../../modules/task/which-istrue/components/WhichIsTrue'
+import LeaderboardScreen from '../../../modules/leaderboard/components/Leaderboard'
 
 const LeaderboardStack = createNativeStackNavigator()
 
@@ -21,8 +22,8 @@ const LeaderboardStackScreen = () => (
 	>
 		{/* Главный тестовый экран с кнопками */}
 		<LeaderboardStack.Screen
-			name='TestTasks'
-			component={TestTasksPage}
+			name='Leaderboard'
+			component={LeaderboardScreen}
 		/>
 
 		{/* Страницы заданий */}

@@ -11,14 +11,12 @@ type LevelController struct {
 	Service *LevelService
 }
 
-// Конструктор для LevelController
 func NewLevelController(service *LevelService) *LevelController {
 	return &LevelController{
 		Service: service,
 	}
 }
 
-// Создание нового уровня
 func (ctrl *LevelController) CreateLevel(c *gin.Context) {
 	var dto CreateLevelDTO
 	if err := c.ShouldBindJSON(&dto); err != nil {
@@ -35,7 +33,6 @@ func (ctrl *LevelController) CreateLevel(c *gin.Context) {
 	c.JSON(http.StatusCreated, level)
 }
 
-// Получение всех уровней
 func (ctrl *LevelController) GetAllLevels(c *gin.Context) {
 	levels, err := ctrl.Service.GetAllLevels()
 	if err != nil {
@@ -46,7 +43,6 @@ func (ctrl *LevelController) GetAllLevels(c *gin.Context) {
 	c.JSON(http.StatusOK, levels)
 }
 
-// Удаление уровня
 func (ctrl *LevelController) DeleteLevel(c *gin.Context) {
 	levelID := c.Param("levelID")
 	objectID, err := primitive.ObjectIDFromHex(levelID)

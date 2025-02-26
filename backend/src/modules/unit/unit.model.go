@@ -17,7 +17,7 @@ type Unit struct {
 	Title        string               `bson:"title" json:"title"`
 	LevelID      primitive.ObjectID   `bson:"level_id" json:"level_id"`
 	Tasks        []primitive.ObjectID `bson:"tasks" json:"tasks"`
-	Completed    []primitive.ObjectID `bson:"completed" json:"completed"` // Список выполненных задач
+	Completed    []primitive.ObjectID `bson:"completed" json:"completed"`
 	Descriptions LocalizedDescription `bson:"descriptions" json:"descriptions"`
 	Progress     int                  `json:"progress" bson:"progress"`
 	CreatedAt    time.Time            `bson:"created_at" json:"created_at"`

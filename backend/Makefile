@@ -20,6 +20,10 @@ lint-check: ## Check code using golangci-lint (no output if clean)
 lint: ## Run golangci-lint
 	@$(LINTER) run
 
+# Run gosec for security analysis
+gosec: 
+	@gosec ./...
+
 
 # Fix linter issues
 lint-fix: ## Run golangci-lint with auto-fix

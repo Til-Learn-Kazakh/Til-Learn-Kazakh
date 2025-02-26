@@ -38,8 +38,6 @@ const Login = () => {
 		onSuccess: () => {
 			toast.success('Добро пожаловать!')
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
-
-			// navigation.navigate('Home') // Переход к экрану HomeStack, который зарегистрирован в AppStack
 		},
 
 		onError: () => {
@@ -54,7 +52,7 @@ const Login = () => {
 		}
 		setIsSubmitting(true)
 		mutate(dto, {
-			onSettled: () => setIsSubmitting(false), // Сбрасываем состояние отправки
+			onSettled: () => setIsSubmitting(false),
 		})
 	}
 

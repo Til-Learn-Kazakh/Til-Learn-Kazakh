@@ -24,7 +24,7 @@ type UserService struct {
 
 func NewUserService() *UserService {
 	return &UserService{
-		Collection: database.GetCollection(database.Client, "User"), // Коллекция пользователей
+		Collection: database.GetCollection(database.Client, "User"),
 	}
 }
 
@@ -47,7 +47,7 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 		}}},
 		bson.D{{Key: "$unwind", Value: bson.M{
 			"path":                       "$streak",
-			"preserveNullAndEmptyArrays": true, // ✅ Если `streak` отсутствует, `streak: null`
+			"preserveNullAndEmptyArrays": true,
 		}}},
 	}
 
@@ -111,7 +111,6 @@ func (s *UserService) RefillHearts(userID string) (*auth.User, error) {
 	return user, nil
 }
 
-// Восстановление сердец за кристаллы
 func (s *UserService) RefillHeartsWithCrystals(userID string) (*auth.User, error) {
 	user, err := s.GetUserByID(userID)
 	if err != nil {

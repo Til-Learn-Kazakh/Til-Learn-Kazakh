@@ -16,26 +16,24 @@ import (
 )
 
 type TaskService struct {
-	Collection     *mongo.Collection // Коллекция задач
-	UnitCollection *mongo.Collection // Коллекция блоков (Units)
+	Collection     *mongo.Collection
+	UnitCollection *mongo.Collection
 }
 
 // Конструктор для TaskService
 func NewTaskService() *TaskService {
 	return &TaskService{
-		Collection:     database.GetCollection(database.Client, "Task"), // Подключение к коллекции "Task"
-		UnitCollection: database.GetCollection(database.Client, "Unit"), // Подключение к коллекции "Unit"
+		Collection:     database.GetCollection(database.Client, "Task"),
+		UnitCollection: database.GetCollection(database.Client, "Unit"),
 	}
 }
 
-// Создание новой задачи
 func (s *TaskService) CreateTask(dto *CreateTaskDTO, imageFile multipart.File, imageHeader *multipart.FileHeader, imageOptionsFiles []*multipart.FileHeader) (*Task, error) {
 	unitID, err := primitive.ObjectIDFromHex(dto.UnitID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid unit ID: %w", err)
 	}
 
-	// Проверяем существование Unit в базе данных
 	unitExists, err := s.UnitCollection.CountDocuments(context.Background(), bson.M{"_id": unitID})
 	if err != nil {
 		return nil, fmt.Errorf("failed to check unit existence: %w", err)
@@ -44,7 +42,6 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO, imageFile multipart.File, i
 		return nil, fmt.Errorf("unit with ID %s does not exist", dto.UnitID)
 	}
 
-	// Загружаем изображение (если оно было отправлено)
 	var imagePath string
 	if imageFile != nil && imageHeader != nil {
 		imageService := services.NewImageService()
@@ -54,26 +51,25 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO, imageFile multipart.File, i
 		}
 	}
 
-	// ✅ Загружаем изображения для ImageOptions через SaveMultipleImages
 	var savedImageOptions []ImageOption
+	var savedPaths []string
+	var imageService *services.ImageService
 	if len(imageOptionsFiles) > 0 {
-		imageService := services.NewImageService()
-		savedPaths, err := imageService.SaveMultipleImages("tasks/options", imageOptionsFiles, nil)
+		imageService = services.NewImageService()
+		savedPaths, err = imageService.SaveMultipleImages("tasks/options", imageOptionsFiles, nil)
 		if err != nil {
 			return nil, fmt.Errorf("failed to save image options: %w", err)
 		}
 
-		// ✅ Привязываем сохранённые пути к соответствующим ImageOptions
 		for i, option := range dto.ImageOptions {
 			if i < len(savedPaths) {
-				option.Image = savedPaths[i] // Привязываем сохранённый путь
+				option.Image = savedPaths[i]
 			} else {
 				option.Image = ""
 			}
 			savedImageOptions = append(savedImageOptions, option)
 		}
 	} else {
-		// Если изображения не были загружены, используем оригинальные опции
 		savedImageOptions = dto.ImageOptions
 	}
 
@@ -130,7 +126,6 @@ func (s *TaskService) GetTasksByUnitID(unitID primitive.ObjectID) ([]Task, error
 }
 
 func (s *TaskService) GetNextTask(unitID primitive.ObjectID, currentOrder int) (*Task, error) {
-	// Найти задачу с порядковым номером больше текущего
 	filter := bson.M{
 		"unit_id": unitID,
 		"order":   bson.M{"$gt": currentOrder},
@@ -151,28 +146,26 @@ func (s *TaskService) GetNextTask(unitID primitive.ObjectID, currentOrder int) (
 	return &nextTask, nil
 }
 
-func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer string, userLang string) (bool, string, error) {
+func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer, userLang string) (isCorrect bool, correctAnswerText string, err error) {
 	var task Task
-	err := s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
+	err = s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
 	if err != nil {
-		return false, "", fmt.Errorf("task not found: %w", err)
+		err = fmt.Errorf("task not found: %w", err)
+		return false, "", err
 	}
 
-	// 1) Определим правильно ли ответ
-	isCorrect := (userAnswer == task.CorrectAnswer)
-	correctAnswerText := ""
+	isCorrect = (userAnswer == task.CorrectAnswer)
+	correctAnswerText = ""
 
-	// 2) Если ответ неверный, ищем текст правильного варианта в image_options
 	if !isCorrect && len(task.ImageOptions) > 0 {
 		for _, option := range task.ImageOptions {
 			if option.ID == task.CorrectAnswer {
-				correctAnswerText = option.Text // Например, "Cheese"
+				correctAnswerText = option.Text
 				break
 			}
 		}
 	}
 
-	// 3) Если есть локализованный правильный ответ
 	if len(task.LocalizedCorrectAnswer) > 0 && userLang != "" {
 		realCorrectAnswer := task.LocalizedCorrectAnswer[userLang]
 		if realCorrectAnswer == "" {
@@ -184,7 +177,6 @@ func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer string, 
 		}
 	}
 
-	// 4) Если не удалось найти текст, возвращаем оригинальный correctAnswer
 	if correctAnswerText == "" {
 		correctAnswerText = task.CorrectAnswer
 	}
@@ -192,7 +184,6 @@ func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer string, 
 	return isCorrect, correctAnswerText, nil
 }
 
-// Обновление задачи
 func (s *TaskService) UpdateTask(taskID primitive.ObjectID, dto *UpdateTaskDTO) (*Task, error) {
 	update := bson.M{
 		"$set": bson.M{
@@ -215,7 +206,6 @@ func (s *TaskService) UpdateTask(taskID primitive.ObjectID, dto *UpdateTaskDTO) 
 	return s.GetTaskByID(taskID)
 }
 
-// Получение задачи по ID
 func (s *TaskService) GetTaskByID(taskID primitive.ObjectID) (*Task, error) {
 	var task Task
 	err := s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
@@ -226,7 +216,6 @@ func (s *TaskService) GetTaskByID(taskID primitive.ObjectID) (*Task, error) {
 	return &task, nil
 }
 
-// Удаление задачи
 func (s *TaskService) DeleteTask(taskID primitive.ObjectID) error {
 	_, err := s.Collection.DeleteOne(context.Background(), bson.M{"_id": taskID})
 	return err

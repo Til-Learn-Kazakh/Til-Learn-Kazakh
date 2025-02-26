@@ -21,12 +21,10 @@ func NewStreakService() *StreakService {
 	}
 }
 
-// 1️⃣ Обновление streak (вызывается при завершении урока)
 func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// ✅ Преобразуем `userId` из `string` в `ObjectID`
 	objectID, err := primitive.ObjectIDFromHex(req.UserID)
 	if err != nil {
 		return err
@@ -36,9 +34,8 @@ func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 	err = s.collection.FindOne(ctx, bson.M{"userId": objectID}).Decode(&streak)
 
 	if errors.Is(err, mongo.ErrNoDocuments) {
-		// ✅ **Создаем новый streak с `ObjectID`**
 		streak = Streak{
-			UserID:        objectID, // ✅ Теперь это `ObjectID`
+			UserID:        objectID,
 			CurrentStreak: 0,
 			MaxStreak:     0,
 			LastActive:    time.Time{},
@@ -50,7 +47,6 @@ func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 		return err
 	}
 
-	// ✅ Если у пользователя еще не было активности — устанавливаем `LastActive`
 	if streak.LastActive.IsZero() {
 		streak.LastActive = time.Now()
 		streak.CurrentStreak = 1
@@ -86,7 +82,6 @@ func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 		}
 	}
 
-	// ✅ Обновляем в MongoDB
 	_, err = s.collection.UpdateOne(ctx, bson.M{"userId": objectID}, bson.M{
 		"$set": bson.M{
 			"current_streak": streak.CurrentStreak,
@@ -98,12 +93,10 @@ func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 	return err
 }
 
-// 2️⃣ Получение streak для пользователя
 func (s *StreakService) GetUserStreak(userID string) (*StreakResponseDTO, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// ✅ Преобразуем `userID` в `ObjectID`
 	objectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return nil, errors.New("Invalid user ID format")
@@ -125,7 +118,6 @@ func (s *StreakService) GetUserStreak(userID string) (*StreakResponseDTO, error)
 	}, nil
 }
 
-// 3️⃣ Сброс streak (если streak прерван)
 func (s *StreakService) ResetStreak(req ResetStreakDTO) error {
 	_, err := s.collection.UpdateOne(context.TODO(), bson.M{"userId": req.UserID}, bson.M{
 		"$set": bson.M{"current_streak": 0, "streak_days": []string{}},
@@ -133,7 +125,6 @@ func (s *StreakService) ResetStreak(req ResetStreakDTO) error {
 	return err
 }
 
-// Вспомогательная функция для проверки, есть ли дата в массиве
 func contains(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {
