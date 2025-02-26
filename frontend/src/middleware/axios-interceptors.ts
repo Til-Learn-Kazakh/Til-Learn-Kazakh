@@ -18,7 +18,6 @@ const options: AxiosRequestConfig = {
 }
 
 const axiosBase = axios.create(options)
-
 const axiosWithAuth = axios.create(options)
 
 axiosWithAuth.interceptors.request.use(async (config: InternalAxiosRequestConfig<any>) => {
@@ -32,14 +31,35 @@ axiosWithAuth.interceptors.request.use(async (config: InternalAxiosRequestConfig
 })
 
 axiosWithAuth.interceptors.response.use(
-	(response: AxiosResponse) => {
-		return response
-	},
+	(response: AxiosResponse) => response,
 	async error => {
-		if (error.response) {
-			console.error('[Response Error]', error.response.status, error.response.data)
-		} else {
-			console.error('[Network Error]', error.message)
+		const originalRequest = error.config
+
+		// Если ошибка 401 и запрос не был повторён ранее
+		if (error.response?.status === 401 && !originalRequest._retry) {
+			originalRequest._retry = true
+
+			try {
+				const refreshToken = await SecureStore.getItemAsync('refresh_token')
+				if (!refreshToken) throw new Error('No refresh token')
+
+				const res = await axiosBase.post<{ access_token: string }>(`${server}/auth/refresh`, {
+					refresh_token: refreshToken,
+				})
+
+				const newAccessToken = res.data.access_token
+
+				await SecureStore.setItemAsync('token', newAccessToken)
+
+				originalRequest.headers['Authorization'] = `${newAccessToken}`
+
+				return axiosWithAuth(originalRequest)
+			} catch (refreshError) {
+				console.error('Ошибка при обновлении токена:', refreshError)
+				// Очистка токенов, если обновление не удалось
+				await SecureStore.deleteItemAsync('token')
+				await SecureStore.deleteItemAsync('refresh_token')
+			}
 		}
 
 		return Promise.reject(error)

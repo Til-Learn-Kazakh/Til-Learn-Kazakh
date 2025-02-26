@@ -11,32 +11,29 @@ class AuthService {
 
 	async login(dto: LoginDTO, config?: AxiosRequestConfig) {
 		return axiosBase
-			.post<{ access_token: string }>(`${this.url}/login`, dto, config)
+			.post<{ access_token: string; refresh_token: string }>(`${this.url}/login`, dto, config)
 			.then(async resp => {
-				const access_token = resp.data.access_token
+				const { access_token, refresh_token } = resp.data
 
-				if (access_token) {
-					// Сохраняем токен в SecureStore
-					await SecureStore.setItemAsync('token', access_token)
-				}
+				if (access_token) await SecureStore.setItemAsync('token', access_token)
+				if (refresh_token) await SecureStore.setItemAsync('refresh_token', refresh_token)
+
 				return resp.data
 			})
 			.catch(e => {
-				console.error('Ошибка при регистрации:', e)
+				console.error('Ошибка при логине:', e)
 				throw e
 			})
 	}
 
 	async signup(dto: SignupDTO, config?: AxiosRequestConfig) {
 		return axiosBase
-			.post<{ access_token: string }>(`${this.url}/register`, dto, config) // Предполагаем, что сервер возвращает объект с токеном
+			.post<{ access_token: string; refresh_token: string }>(`${this.url}/register`, dto, config)
 			.then(async resp => {
-				const access_token = resp.data.access_token
+				const { access_token, refresh_token } = resp.data
 
-				if (access_token) {
-					// Сохраняем токен в SecureStore
-					await SecureStore.setItemAsync('token', access_token)
-				}
+				if (access_token) await SecureStore.setItemAsync('token', access_token)
+				if (refresh_token) await SecureStore.setItemAsync('refresh_token', refresh_token)
 
 				return resp.data
 			})
@@ -49,7 +46,12 @@ class AuthService {
 	async logout(config?: AxiosRequestConfig) {
 		return axiosWithAuth
 			.get<void>(`${this.url}/logout`, config)
-			.then(resp => resp.data)
+			.then(async resp => {
+				// Удаляем токены из SecureStore
+				await SecureStore.deleteItemAsync('token')
+				await SecureStore.deleteItemAsync('refresh_token')
+				return resp.data
+			})
 			.catch(e => console.error(e))
 	}
 
@@ -59,7 +61,7 @@ class AuthService {
 			.then(resp => resp.data)
 
 			.catch(e => {
-				if (e?.response?.status === 404) {
+				if (e?.response?.status === 401 || e?.response?.status === 404) {
 					return null
 				}
 				throw e

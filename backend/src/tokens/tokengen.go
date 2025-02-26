@@ -53,7 +53,6 @@ func TokenGenerator(email, firstname, lastname, uid string) (signedtoken, signed
 }
 
 func ValidateToken(signedtoken string) (*SignedDetails, error) {
-	// Парсим токен
 	token, err := jwt.ParseWithClaims(signedtoken, &SignedDetails{}, func(_ *jwt.Token) (any, error) {
 		return []byte(SECRET_KEY), nil
 	})

@@ -2,6 +2,8 @@ package services
 
 import (
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -12,78 +14,72 @@ type AudioService struct {
 	BasePath string
 }
 
-// Конструктор для AudioService
 func NewAudioService() *AudioService {
-	return &AudioService{BasePath: "src/public/voice"}
+	return &AudioService{BasePath: "src/public"}
 }
 
-// Получение пути к аудиофайлу
+func (s *AudioService) SaveAudio(folder string, file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
+	if fileHeader == nil {
+		return "", fmt.Errorf("fileHeader is nil")
+	}
+	savePath := filepath.Join(s.BasePath, folder)
+	if err := os.MkdirAll(savePath, 0750); err != nil {
+		return "", fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	fileName := sanitizeFileName(fileHeader.Filename)
+	fullPath := filepath.Join(savePath, fileName)
+
+	if !strings.HasPrefix(filepath.Clean(fullPath), filepath.Clean(savePath)) {
+		return "", fmt.Errorf("invalid file path detected")
+	}
+
+	dst, err := os.Create(fullPath)
+	if err != nil {
+		return "", fmt.Errorf("failed to create audio file: %w", err)
+	}
+	defer dst.Close()
+
+	if _, err = io.Copy(dst, file); err != nil {
+		return "", fmt.Errorf("failed to save audio: %w", err)
+	}
+
+	relativePath := strings.TrimPrefix(fullPath, "src/public")
+	return "/" + strings.ReplaceAll(relativePath, "\\", "/"), nil
+}
+
 func (s *AudioService) GetAudioPath(fileName string) (string, error) {
-	audioPath := filepath.Join(s.BasePath, fileName)
+	audioPath := filepath.Join(s.BasePath, sanitizeFileName(fileName))
 	if _, err := os.Stat(audioPath); os.IsNotExist(err) {
 		return "", fmt.Errorf("audio file not found: %s", fileName)
 	}
 	return audioPath, nil
 }
 
-// Отправка аудиофайла в HTTP ответ
 func (s *AudioService) ServeAudioFile(w http.ResponseWriter, r *http.Request, filePath string) error {
-	// Очистка пути от потенциально вредных символов
-	cleanPath := filepath.Clean(filePath)
-
-	// Вычисляем относительный путь от BasePath до cleanPath
-	relPath, err := filepath.Rel(s.BasePath, cleanPath)
-	if err != nil || strings.Contains(relPath, "..") {
+	cleanPath := filepath.Clean(filepath.Join(s.BasePath, filePath))
+	if !strings.HasPrefix(cleanPath, s.BasePath) {
 		return fmt.Errorf("access denied: %s", filePath)
 	}
 
-	// Создаем абсолютный путь
-	fullPath := filepath.Join(s.BasePath, relPath)
-
-	// Проверяем, что fullPath действительно внутри BasePath
-	absBasePath, err := filepath.Abs(s.BasePath)
+	file, err := os.Open(cleanPath)
 	if err != nil {
-		return fmt.Errorf("failed to resolve base path: %w", err)
-	}
-
-	absFullPath, err := filepath.Abs(fullPath)
-	if err != nil {
-		return fmt.Errorf("failed to resolve full path: %w", err)
-	}
-
-	// Дополнительно проверяем символические ссылки, чтобы избежать обхода через них
-	realBasePath, err := filepath.EvalSymlinks(absBasePath)
-	if err != nil {
-		return fmt.Errorf("failed to evaluate symlink for base path: %w", err)
-	}
-
-	realFullPath, err := filepath.EvalSymlinks(absFullPath)
-	if err != nil {
-		return fmt.Errorf("failed to evaluate symlink for requested file: %w", err)
-	}
-
-	// Проверяем, что realFullPath начинается с realBasePath (чтобы предотвратить обход)
-	if !strings.HasPrefix(realFullPath, realBasePath) {
-		return fmt.Errorf("access denied: %s", filePath)
-	}
-
-	// Открываем файл (теперь полностью безопасно)
-	file, err := os.Open(realFullPath)
-	if err != nil {
-		return err
+		return fmt.Errorf("failed to open audio file: %w", err)
 	}
 	defer file.Close()
 
 	fileInfo, err := file.Stat()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to get file info: %w", err)
 	}
 
+	w.Header().Set("Content-Type", "audio/mpeg")
+	http.ServeContent(w, r, fileInfo.Name(), fileInfo.ModTime(), file)
 	fmt.Printf("Serving audio file: %s (size: %d bytes)\n", fileInfo.Name(), fileInfo.Size())
 
-	fileName := filepath.Base(realFullPath)
-
-	w.Header().Set("Content-Type", "audio/mpeg")
-	http.ServeContent(w, r, fileName, fileInfo.ModTime(), file)
 	return nil
+}
+
+func sanitizeFileName(fileName string) string {
+	return strings.ReplaceAll(filepath.Base(fileName), " ", "_")
 }

@@ -17,7 +17,6 @@ type UnitService struct {
 	LevelCollection *mongo.Collection
 }
 
-// Конструктор для UnitService
 func NewUnitService() *UnitService {
 	return &UnitService{
 		Collection:      database.GetCollection(database.Client, "Unit"),
@@ -25,14 +24,12 @@ func NewUnitService() *UnitService {
 	}
 }
 
-// Создание нового блока
 func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
 	levelID, err := primitive.ObjectIDFromHex(dto.LevelID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid level ID: %w", err)
 	}
 
-	// Проверяем, существует ли указанный LevelID в базе данных
 	var level bson.M
 	err = s.LevelCollection.FindOne(context.Background(), bson.M{"_id": levelID}).Decode(&level)
 	if err != nil {
@@ -46,14 +43,13 @@ func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
 		ID:           primitive.NewObjectID(),
 		Title:        dto.Title,
 		LevelID:      levelID,
-		Tasks:        []primitive.ObjectID{}, // Пустой список задач при создании
-		Completed:    []primitive.ObjectID{}, // Пустой список выполненных заданий
+		Tasks:        []primitive.ObjectID{},
+		Completed:    []primitive.ObjectID{},
 		Descriptions: dto.Descriptions,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
 
-	// Вставляем Unit в коллекцию
 	_, err = s.Collection.InsertOne(context.Background(), unit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create unit: %w", err)
@@ -62,8 +58,8 @@ func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
 	// Обновляем Level, добавляя созданный Unit
 	_, err = s.LevelCollection.UpdateOne(
 		context.Background(),
-		bson.M{"_id": levelID},                    // Условие: обновляем уровень с этим ID
-		bson.M{"$push": bson.M{"units": unit.ID}}, // Добавляем ID Unit в массив Units
+		bson.M{"_id": levelID},
+		bson.M{"$push": bson.M{"units": unit.ID}},
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to update level with new unit: %w", err)
@@ -72,7 +68,6 @@ func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
 	return &unit, nil
 }
 
-// Получение всех блоков по LevelID
 func (s *UnitService) GetUnitsByLevelID(levelID primitive.ObjectID) ([]Unit, error) {
 	cursor, err := s.Collection.Find(context.Background(), bson.M{"level_id": levelID})
 	if err != nil {
@@ -88,7 +83,6 @@ func (s *UnitService) GetUnitsByLevelID(levelID primitive.ObjectID) ([]Unit, err
 	return units, nil
 }
 
-// Обновление блока
 func (s *UnitService) UpdateUnit(unitID primitive.ObjectID, dto UpdateUnitDTO) (*Unit, error) {
 	update := bson.M{
 		"$set": bson.M{
@@ -111,7 +105,6 @@ func (s *UnitService) DeleteUnit(unitID primitive.ObjectID) error {
 	return err
 }
 
-// Получение блока по ID
 func (s *UnitService) GetUnitByID(unitID primitive.ObjectID) (*Unit, error) {
 	var unit Unit
 	err := s.Collection.FindOne(context.Background(), bson.M{"_id": unitID}).Decode(&unit)

@@ -16,11 +16,10 @@ type LevelService struct {
 	UnitCollection *mongo.Collection
 }
 
-// Конструктор для LevelService
 func NewLevelService() *LevelService {
 	return &LevelService{
-		Collection:     database.GetCollection(database.Client, "Level"), // Подключение к коллекции "Levels"
-		UnitCollection: database.GetCollection(database.Client, "Unit"),  // Подключение к коллекции "Levels"
+		Collection:     database.GetCollection(database.Client, "Level"),
+		UnitCollection: database.GetCollection(database.Client, "Unit"),
 	}
 }
 
@@ -29,12 +28,11 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 	level := Level{
 		ID:        primitive.NewObjectID(),
 		Name:      dto.Name,
-		Units:     nil, // Пустой список блоков при создании уровня
+		Units:     nil,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
-	// Добавление уровня в базу данных
 	_, err := s.Collection.InsertOne(context.Background(), level)
 	if err != nil {
 		return nil, err
@@ -45,7 +43,6 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 
 func (s *LevelService) GetAllLevels() ([]Level, error) {
 	pipeline := mongo.Pipeline{
-		// Подключаем tasks к Unit
 		{
 			{Key: "$lookup", Value: bson.D{
 				{Key: "from", Value: "Unit"},
@@ -78,11 +75,10 @@ func (s *LevelService) GetAllLevels() ([]Level, error) {
 									// Если tasks пустой, то progress = 100%
 									bson.D{{Key: "$eq", Value: bson.A{bson.D{{Key: "$size", Value: "$$u.tasks"}}, 0}}},
 									100,
-									// Если есть задачи, считаем прогресс
 									bson.D{{Key: "$multiply", Value: bson.A{
 										bson.D{{Key: "$divide", Value: bson.A{
-											bson.D{{Key: "$size", Value: "$$u.completed"}}, // Количество выполненных
-											bson.D{{Key: "$size", Value: "$$u.tasks"}},     // Всего задач
+											bson.D{{Key: "$size", Value: "$$u.completed"}},
+											bson.D{{Key: "$size", Value: "$$u.tasks"}},
 										}}},
 										100,
 									}}},
@@ -109,9 +105,7 @@ func (s *LevelService) GetAllLevels() ([]Level, error) {
 	return levels, nil
 }
 
-// Удаление уровня
 func (s *LevelService) DeleteLevel(levelID primitive.ObjectID) error {
-	// Начало транзакции
 	session, err := s.Collection.Database().Client().StartSession()
 	if err != nil {
 		return fmt.Errorf("failed to start session: %w", err)
@@ -119,7 +113,6 @@ func (s *LevelService) DeleteLevel(levelID primitive.ObjectID) error {
 	defer session.EndSession(context.Background())
 
 	err = mongo.WithSession(context.Background(), session, func(sc mongo.SessionContext) error {
-		// Удаляем все Units, связанные с Level
 		_, err = s.UnitCollection.DeleteMany(sc, bson.M{"level_id": levelID})
 		if err != nil {
 			abortErr := session.AbortTransaction(sc)
@@ -129,7 +122,6 @@ func (s *LevelService) DeleteLevel(levelID primitive.ObjectID) error {
 			return fmt.Errorf("failed to delete units: %w", err)
 		}
 
-		// Удаляем сам Level
 		_, err = s.Collection.DeleteOne(sc, bson.M{"_id": levelID})
 		if err != nil {
 			abortErr := session.AbortTransaction(sc)
@@ -139,7 +131,6 @@ func (s *LevelService) DeleteLevel(levelID primitive.ObjectID) error {
 			return fmt.Errorf("failed to delete level: %w", err)
 		}
 
-		// Завершаем транзакцию
 		return session.CommitTransaction(sc)
 	})
 

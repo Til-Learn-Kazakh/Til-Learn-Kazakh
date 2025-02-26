@@ -14,7 +14,6 @@ func NewStreakController(streakService *StreakService) *StreakController {
 	return &StreakController{streakService: streakService}
 }
 
-// 2️⃣ Получение streak по `uid` (из токена, без `/:userId`)
 func (sc *StreakController) GetUserStreak(c *gin.Context) {
 	userID, exists := c.Get("uid")
 	if !exists {
@@ -51,7 +50,6 @@ func handleStreak(c *gin.Context, req any, serviceFunc func(any) error, successM
 	c.JSON(http.StatusOK, gin.H{"message": successMessage})
 }
 
-// 1️⃣ Обновление streak при завершении урока
 func (sc *StreakController) UpdateStreak(c *gin.Context) {
 	var req UpdateStreakDTO
 	handleStreak(c, &req, func(data any) error {
@@ -59,7 +57,6 @@ func (sc *StreakController) UpdateStreak(c *gin.Context) {
 	}, "Streak updated")
 }
 
-// 2️⃣ Сброс streak
 func (sc *StreakController) ResetStreak(c *gin.Context) {
 	var req ResetStreakDTO
 	handleStreak(c, &req, func(data any) error {

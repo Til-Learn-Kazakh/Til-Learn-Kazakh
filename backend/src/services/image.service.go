@@ -4,96 +4,101 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 type ImageService struct {
 	BasePath string
 }
 
-// Конструктор для ImageService
 func NewImageService() *ImageService {
-	// Базовый путь устанавливается по умолчанию
 	return &ImageService{BasePath: "src/public"}
 }
 
-// Сохранение изображения
 func (s *ImageService) SaveImage(folder string, file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
-	// Создаем безопасный путь
 	savePath := filepath.Join(s.BasePath, folder)
 	savePath = filepath.Clean(savePath)
 
-	// Проверяем, что путь находится внутри BasePath
-	if !strings.HasPrefix(savePath, s.BasePath) {
-		return "", errors.New("invalid folder path")
+	if !strings.HasPrefix(savePath, filepath.Clean(s.BasePath)) {
+		return "", fmt.Errorf("invalid directory path detected")
 	}
 
-	// Создаем папку, если она не существует
-	err := os.MkdirAll(savePath, 0750)
-	if err != nil {
+	if err := os.MkdirAll(savePath, 0750); err != nil {
 		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
 
-	// Оригинальное имя файла
 	originalName := fileHeader.Filename
-	cleanName := strings.ReplaceAll(originalName, " ", "_") // Удаляем пробелы из имени файла
+	cleanName := strings.ReplaceAll(originalName, " ", "_")
 
-	// Полный путь к файлу
 	filePath := filepath.Join(savePath, cleanName)
-
-	// Проверяем, существует ли файл
-	if _, err = os.Stat(filePath); err == nil {
-		// Если файл существует, добавляем префикс времени, чтобы избежать конфликта имен
-		newName := fmt.Sprintf("%d_%s", time.Now().Unix(), cleanName)
-		filePath = filepath.Join(savePath, newName)
-	}
-
-	// Очистка пути для безопасности
 	filePath = filepath.Clean(filePath)
 
-	// Проверяем, что путь находится внутри BasePath
-	if !strings.HasPrefix(filePath, s.BasePath) {
+	if !strings.HasPrefix(filePath, filepath.Clean(s.BasePath)) {
+		log.Println("Error: filePath is outside BasePath")
 		return "", errors.New("invalid file path")
 	}
 
-	// Открываем файл для записи
 	dst, err := os.Create(filePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to create file: %w", err)
 	}
 	defer dst.Close()
 
-	// Копируем содержимое файла
 	_, err = io.Copy(dst, file)
 	if err != nil {
 		return "", fmt.Errorf("failed to save file: %w", err)
 	}
 
-	// Преобразуем путь в формат с прямыми слешами
-	unixStylePath := strings.ReplaceAll(filePath, "\\", "/")
+	relativePath := strings.TrimPrefix(filePath, s.BasePath)
+	relativePath = strings.TrimLeft(relativePath, "/\\")       // Убираем лишние `/`
+	relativePath = fmt.Sprintf("/%s", relativePath)            // Добавляем `/` в начале
+	relativePath = strings.ReplaceAll(relativePath, "\\", "/") // Для Windows/Linux
 
-	return unixStylePath, nil
+	return relativePath, nil
 }
 
-// Удаление изображения
+func (s *ImageService) SaveMultipleImages(folder string, files []*multipart.FileHeader, _ *multipart.Form) ([]string, error) {
+	var savedPaths []string
+	var err error
+
+	for _, fileHeader := range files {
+		var file multipart.File
+
+		file, err = fileHeader.Open()
+		if err != nil {
+			return nil, fmt.Errorf("failed to open file %s: %w", fileHeader.Filename, err)
+		}
+
+		var savedPath string
+		savedPath, err = s.SaveImage(folder, file, fileHeader)
+
+		if closeErr := file.Close(); closeErr != nil {
+			log.Printf("warning: failed to close file %s: %v", fileHeader.Filename, closeErr)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("failed to save file %s: %w", fileHeader.Filename, err)
+		}
+
+		savedPaths = append(savedPaths, savedPath)
+	}
+
+	return savedPaths, nil
+}
+
 func (*ImageService) DeleteImage(filePath string) error {
-	// Преобразуем путь в формат ОС
 	fullPath := filepath.Clean(filepath.FromSlash(filePath))
 
-	// Проверяем, что путь безопасен
 	if !strings.HasPrefix(fullPath, "src/public") {
 		return errors.New("invalid file path")
 	}
 
-	// Удаляем файл
 	err := os.Remove(fullPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			// Если файл уже не существует, игнорируем ошибку
 			return nil
 		}
 		return fmt.Errorf("failed to delete file: %w", err)

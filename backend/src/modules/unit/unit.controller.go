@@ -11,14 +11,12 @@ type UnitController struct {
 	Service *UnitService
 }
 
-// Конструктор для UnitController
 func NewUnitController(service *UnitService) *UnitController {
 	return &UnitController{
 		Service: service,
 	}
 }
 
-// Создание нового блока
 func (ctrl *UnitController) CreateUnit(c *gin.Context) {
 	var dto CreateUnitDTO
 	if err := c.ShouldBindJSON(&dto); err != nil {
@@ -39,7 +37,6 @@ func (ctrl *UnitController) CreateUnit(c *gin.Context) {
 	c.JSON(http.StatusCreated, unit)
 }
 
-// Получение всех блоков по LevelID
 func (ctrl *UnitController) GetUnitsByLevelID(c *gin.Context) {
 	levelIDHex := c.Param("levelID")
 	levelID, err := primitive.ObjectIDFromHex(levelIDHex)
@@ -57,7 +54,6 @@ func (ctrl *UnitController) GetUnitsByLevelID(c *gin.Context) {
 	c.JSON(http.StatusOK, units)
 }
 
-// Обновление блока
 func (ctrl *UnitController) UpdateUnit(c *gin.Context) {
 	unitIDHex := c.Param("unitID")
 	unitID, err := primitive.ObjectIDFromHex(unitIDHex)
@@ -85,7 +81,6 @@ func (ctrl *UnitController) UpdateUnit(c *gin.Context) {
 	c.JSON(http.StatusOK, unit)
 }
 
-// Удаление блока
 func (ctrl *UnitController) DeleteUnit(c *gin.Context) {
 	unitIDHex := c.Param("unitID")
 	unitID, err := primitive.ObjectIDFromHex(unitIDHex)

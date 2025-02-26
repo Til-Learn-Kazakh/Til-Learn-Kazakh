@@ -3,8 +3,10 @@ package task
 import (
 	"context"
 	"diploma/src/database"
+	"diploma/src/services"
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -14,27 +16,24 @@ import (
 )
 
 type TaskService struct {
-	Collection     *mongo.Collection // Коллекция задач
-	UnitCollection *mongo.Collection // Коллекция блоков (Units)
+	Collection     *mongo.Collection
+	UnitCollection *mongo.Collection
 }
 
 // Конструктор для TaskService
 func NewTaskService() *TaskService {
 	return &TaskService{
-		Collection:     database.GetCollection(database.Client, "Task"), // Подключение к коллекции "Task"
-		UnitCollection: database.GetCollection(database.Client, "Unit"), // Подключение к коллекции "Unit"
+		Collection:     database.GetCollection(database.Client, "Task"),
+		UnitCollection: database.GetCollection(database.Client, "Unit"),
 	}
 }
 
-// Создание новой задачи
-func (s *TaskService) CreateTask(dto *CreateTaskDTO) (*Task, error) {
-	// Проверяем валидность UnitID
+func (s *TaskService) CreateTask(dto *CreateTaskDTO, imageFile multipart.File, imageHeader *multipart.FileHeader, imageOptionsFiles []*multipart.FileHeader) (*Task, error) {
 	unitID, err := primitive.ObjectIDFromHex(dto.UnitID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid unit ID: %w", err)
 	}
 
-	// Проверяем существование Unit в базе данных
 	unitExists, err := s.UnitCollection.CountDocuments(context.Background(), bson.M{"_id": unitID})
 	if err != nil {
 		return nil, fmt.Errorf("failed to check unit existence: %w", err)
@@ -43,19 +42,55 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO) (*Task, error) {
 		return nil, fmt.Errorf("unit with ID %s does not exist", dto.UnitID)
 	}
 
-	// Создаем задачу
+	var imagePath string
+	if imageFile != nil && imageHeader != nil {
+		imageService := services.NewImageService()
+		imagePath, err = imageService.SaveImage("tasks", imageFile, imageHeader)
+		if err != nil {
+			return nil, fmt.Errorf("failed to save image: %w", err)
+		}
+	}
+
+	var savedImageOptions []ImageOption
+	var savedPaths []string
+	var imageService *services.ImageService
+	if len(imageOptionsFiles) > 0 {
+		imageService = services.NewImageService()
+		savedPaths, err = imageService.SaveMultipleImages("tasks/options", imageOptionsFiles, nil)
+		if err != nil {
+			return nil, fmt.Errorf("failed to save image options: %w", err)
+		}
+
+		for i, option := range dto.ImageOptions {
+			if i < len(savedPaths) {
+				option.Image = savedPaths[i]
+			} else {
+				option.Image = ""
+			}
+			savedImageOptions = append(savedImageOptions, option)
+		}
+	} else {
+		savedImageOptions = dto.ImageOptions
+	}
+
 	task := Task{
-		ID:            primitive.NewObjectID(),
-		UnitID:        unitID,
-		Type:          TaskType(dto.Type),
-		Question:      dto.Question,
-		CorrectAnswer: dto.CorrectAnswer,
-		Hints:         dto.Hints,
-		AudioPath:     dto.AudioPath,
-		ImagePath:     dto.ImagePath,
-		Order:         dto.Order,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
+		ID:                     primitive.NewObjectID(),
+		UnitID:                 unitID,
+		Type:                   TaskType(dto.Type),
+		Question:               dto.Question,
+		CorrectAnswer:          dto.CorrectAnswer,
+		Hints:                  dto.Hints,
+		AudioPath:              dto.AudioPath,
+		ImagePath:              imagePath,
+		Order:                  dto.Order,
+		Sentence:               dto.Sentence,
+		Description:            dto.Description,
+		HighlightedWord:        dto.HighlightedWord,
+		LocalizedHints:         dto.LocalizedHints,
+		LocalizedCorrectAnswer: dto.LocalizedCorrectAnswer,
+		ImageOptions:           savedImageOptions,
+		CreatedAt:              time.Now(),
+		UpdatedAt:              time.Now(),
 	}
 
 	_, err = s.Collection.InsertOne(context.Background(), task)
@@ -91,7 +126,6 @@ func (s *TaskService) GetTasksByUnitID(unitID primitive.ObjectID) ([]Task, error
 }
 
 func (s *TaskService) GetNextTask(unitID primitive.ObjectID, currentOrder int) (*Task, error) {
-	// Найти задачу с порядковым номером больше текущего
 	filter := bson.M{
 		"unit_id": unitID,
 		"order":   bson.M{"$gt": currentOrder},
@@ -112,18 +146,44 @@ func (s *TaskService) GetNextTask(unitID primitive.ObjectID, currentOrder int) (
 	return &nextTask, nil
 }
 
-func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer string) (bool, error) {
+func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer, userLang string) (isCorrect bool, correctAnswerText string, err error) {
 	var task Task
-	err := s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
+	err = s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
 	if err != nil {
-		return false, fmt.Errorf("task not found: %w", err)
+		err = fmt.Errorf("task not found: %w", err)
+		return false, "", err
 	}
 
-	isCorrect := task.CorrectAnswer == userAnswer
-	return isCorrect, nil
+	isCorrect = (userAnswer == task.CorrectAnswer)
+	correctAnswerText = ""
+
+	if !isCorrect && len(task.ImageOptions) > 0 {
+		for _, option := range task.ImageOptions {
+			if option.ID == task.CorrectAnswer {
+				correctAnswerText = option.Text
+				break
+			}
+		}
+	}
+
+	if len(task.LocalizedCorrectAnswer) > 0 && userLang != "" {
+		realCorrectAnswer := task.LocalizedCorrectAnswer[userLang]
+		if realCorrectAnswer == "" {
+			realCorrectAnswer = task.CorrectAnswer
+		}
+		isCorrect = (userAnswer == realCorrectAnswer)
+		if !isCorrect && correctAnswerText == "" {
+			correctAnswerText = realCorrectAnswer
+		}
+	}
+
+	if correctAnswerText == "" {
+		correctAnswerText = task.CorrectAnswer
+	}
+
+	return isCorrect, correctAnswerText, nil
 }
 
-// Обновление задачи
 func (s *TaskService) UpdateTask(taskID primitive.ObjectID, dto *UpdateTaskDTO) (*Task, error) {
 	update := bson.M{
 		"$set": bson.M{
@@ -146,7 +206,6 @@ func (s *TaskService) UpdateTask(taskID primitive.ObjectID, dto *UpdateTaskDTO) 
 	return s.GetTaskByID(taskID)
 }
 
-// Получение задачи по ID
 func (s *TaskService) GetTaskByID(taskID primitive.ObjectID) (*Task, error) {
 	var task Task
 	err := s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
@@ -157,7 +216,6 @@ func (s *TaskService) GetTaskByID(taskID primitive.ObjectID) (*Task, error) {
 	return &task, nil
 }
 
-// Удаление задачи
 func (s *TaskService) DeleteTask(taskID primitive.ObjectID) error {
 	_, err := s.Collection.DeleteOne(context.Background(), bson.M{"_id": taskID})
 	return err

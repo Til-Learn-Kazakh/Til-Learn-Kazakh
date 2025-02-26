@@ -3,10 +3,9 @@ package streak
 import "time"
 
 type UpdateStreakDTO struct {
-	UserID string `json:"user_id" binding:"required"` // ID пользователя
+	UserID string `json:"user_id" binding:"required"`
 }
 
-// DTO для ответа о текущем streak
 type StreakResponseDTO struct {
 	CurrentStreak int       `json:"current_streak"` // Текущий streak (дней подряд)
 	MaxStreak     int       `json:"max_streak"`     // Максимальный streak
@@ -14,7 +13,6 @@ type StreakResponseDTO struct {
 	StreakDays    []string  `json:"streak_days"`    // Даты, когда был streak
 }
 
-// DTO для сброса streak
 type ResetStreakDTO struct {
-	UserID string `json:"user_id" binding:"required"` // ID пользователя
+	UserID string `json:"user_id" binding:"required"`
 }

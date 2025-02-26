@@ -3,7 +3,11 @@ import { TouchableOpacity } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
 import { BottomTabNavigationOptions, createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { NavigationProp, useNavigation } from '@react-navigation/native'
+import {
+	NavigationProp,
+	getFocusedRouteNameFromRoute,
+	useNavigation,
+} from '@react-navigation/native'
 
 import HomeStackScreen from './HomeStackScreen'
 import LeaderboardStackScreen from './LeaderboardStackScreen'
@@ -77,28 +81,50 @@ const BottomTabNavigation = ({ route }: { route: any }) => {
 				name='HomeStack'
 				component={HomeStackScreen}
 				initialParams={{ currentUser }}
-				options={{
-					tabBarLabel: 'Lessons',
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons
-							name='book-outline'
-							size={size}
-							color={color}
-						/>
-					),
-					tabBarButton: props => (
-						<CustomTabBarButton
-							{...props}
-							onPress={() => {
-								navigation.navigate('AppStack', {
-									screen: 'HomeStack',
-									params: {
-										screen: 'Home',
-									},
-								})
-							}}
-						/>
-					),
+				options={({ route }) => {
+					const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home'
+
+					// Проверяем, нужно ли скрыть таббар
+					const isTabBarHidden = routeName === 'TaskScreen'
+
+					return {
+						// Возвращаем нужные настройки для таб-бара
+						tabBarStyle: isTabBarHidden
+							? { display: 'none' }
+							: {
+									position: 'absolute',
+									bottom: 0,
+									right: 0,
+									left: 0,
+									elevation: 0,
+									height: 85,
+									borderTopColor: COLORS.GRAY2,
+									borderTopWidth: 1,
+									backgroundColor: '#fff',
+								},
+
+						tabBarLabel: 'Lessons',
+						tabBarIcon: ({ color, size }) => (
+							<Ionicons
+								name='book-outline'
+								size={size}
+								color={color}
+							/>
+						),
+						tabBarButton: props => (
+							<CustomTabBarButton
+								{...props}
+								onPress={() => {
+									navigation.navigate('AppStack', {
+										screen: 'HomeStack',
+										params: {
+											screen: 'Home',
+										},
+									})
+								}}
+							/>
+						),
+					}
 				}}
 			/>
 
