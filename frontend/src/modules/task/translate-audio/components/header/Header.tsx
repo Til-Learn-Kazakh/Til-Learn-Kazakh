@@ -20,12 +20,12 @@ const styles = StyleSheet.create({
 	},
 })
 
-const Header = ({ title }: { title: string }) => {
+const Header = ({ title, progress }: { title: string; progress: number }) => {
 	return (
 		<View>
 			<View style={styles.row}>
 				<Cross />
-				<Progress />
+				<Progress progress={progress} />
 				<Heart />
 			</View>
 			<Text style={styles.title}>{title}</Text>

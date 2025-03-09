@@ -85,7 +85,10 @@ const BottomTabNavigation = ({ route }: { route: any }) => {
 					const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home'
 
 					// Проверяем, нужно ли скрыть таббар
-					const isTabBarHidden = routeName === 'TaskScreen'
+					const isTabBarHidden =
+						routeName === 'TaskScreen' ||
+						routeName === 'LessonCompleteScreen' ||
+						routeName === 'StreakTracker'
 
 					return {
 						// Возвращаем нужные настройки для таб-бара

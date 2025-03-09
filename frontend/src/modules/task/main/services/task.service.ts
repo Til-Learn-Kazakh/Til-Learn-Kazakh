@@ -32,6 +32,30 @@ class TaskService {
 				throw e
 			})
 	}
+
+	async calculateXP(
+		unitId: string,
+		accuracy: number,
+		committedTime: number,
+		mistakes: number,
+		combo: number
+	) {
+		const payload = {
+			unitId,
+			accuracy,
+			committedTime,
+			mistakes,
+			combo,
+		}
+
+		return axiosWithAuth
+			.post(`${server}/user/calculate-xp`, payload)
+			.then(resp => resp.data)
+			.catch(e => {
+				console.error('[TaskService] Error calculating XP:', e)
+				throw e
+			})
+	}
 }
 
 export const taskService = new TaskService()

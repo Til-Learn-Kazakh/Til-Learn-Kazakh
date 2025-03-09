@@ -18,7 +18,7 @@ type User struct {
 	LessonsCompleted []primitive.ObjectID `bson:"lessons_completed" json:"lessons_completed"`             // Завершенные уроки
 	LastRefillAt     time.Time            `bson:"last_refill_at" json:"last_refill_at,omitempty"`
 	Streak           *streak.Streak       `bson:"streak,omitempty" json:"streak,omitempty"`
-
+	XP               int                  `bson:"xp" json:"xp"`
 	// CurrentTask      primitive.ObjectID   `bson:"current_task" json:"current_task"`                       // Текущая задача
 	CreatedAt time.Time `bson:"created_at" json:"created_at,omitempty"` // Дата создания пользователя (генерируется автоматически)
 	UpdatedAt time.Time `bson:"updated_at" json:"updated_at,omitempty"` // Дата последнего обновления (генерируется автоматически)

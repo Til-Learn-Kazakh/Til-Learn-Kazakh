@@ -1,22 +1,40 @@
-import * as React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { TouchableOpacity } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
+import { useBottomSheet } from '../../../../../core/hooks/useBottomSheet'
+
+import { CloseBottomsheet } from './CloseBottomsheet'
+
 export const CROSS_SIZE = 24
 
 const Cross = () => {
 	const navigation = useNavigation<NativeStackNavigationProp<any>>()
+	const bottomSheet = useBottomSheet()
 
-	const handlePress = () => {
-		navigation.goBack() // Закрываем экран
-	}
+	const onCloseTopSheet = useCallback(() => {
+		bottomSheet.collapse()
+	}, [bottomSheet])
+
+	const topSheetContent = useMemo(
+		() => <CloseBottomsheet onClose={onCloseTopSheet} />,
+		[onCloseTopSheet]
+	)
+
+	const onOpenTopSheet = useCallback(() => {
+		bottomSheet.snapToIndex({
+			renderContent: () => topSheetContent,
+			index: 0,
+			snapPoints: ['40%'],
+		})
+	}, [bottomSheet, topSheetContent])
 
 	return (
 		<TouchableOpacity
-			onPress={handlePress}
+			onPress={() => onOpenTopSheet()}
 			activeOpacity={0.7}
 		>
 			<Svg

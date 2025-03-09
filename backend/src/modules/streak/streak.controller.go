@@ -50,12 +50,12 @@ func handleStreak(c *gin.Context, req any, serviceFunc func(any) error, successM
 	c.JSON(http.StatusOK, gin.H{"message": successMessage})
 }
 
-func (sc *StreakController) UpdateStreak(c *gin.Context) {
-	var req UpdateStreakDTO
-	handleStreak(c, &req, func(data any) error {
-		return sc.streakService.UpdateStreak(data.(UpdateStreakDTO))
-	}, "Streak updated")
-}
+// func (sc *StreakController) UpdateStreak(c *gin.Context) {
+// 	var req UpdateStreakDTO
+// 	handleStreak(c, &req, func(data any) error {
+// 		return sc.streakService.UpdateStreak(data.(UpdateStreakDTO))
+// 	}, "Streak updated")
+// }
 
 func (sc *StreakController) ResetStreak(c *gin.Context) {
 	var req ResetStreakDTO

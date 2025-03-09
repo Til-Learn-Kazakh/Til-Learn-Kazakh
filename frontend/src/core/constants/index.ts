@@ -1,3 +1,4 @@
+import accuracy from '../../../public/icons/accuracy.png'
 import email from '../../../public/icons/auth/email.png'
 import eyeoff from '../../../public/icons/auth/eye-off.png'
 import eye from '../../../public/icons/auth/eye.png'
@@ -8,6 +9,8 @@ import bbq from '../../../public/icons/bbq.png'
 import book from '../../../public/icons/book.png'
 import character from '../../../public/icons/character.png'
 import cheese from '../../../public/icons/cheese.png'
+import clock from '../../../public/icons/clock.png'
+import completedstreak from '../../../public/icons/completedstreak.png'
 import diamond from '../../../public/icons/diamond.png'
 import fillblank from '../../../public/icons/fillblank.png'
 import fire from '../../../public/icons/fire.png'
@@ -20,6 +23,8 @@ import heart from '../../../public/icons/heart.png'
 import information from '../../../public/icons/information.png'
 import learning from '../../../public/icons/learning.png'
 import lemon from '../../../public/icons/lemon.png'
+import light from '../../../public/icons/light.png'
+import loseheart from '../../../public/icons/loseheart.png'
 import sound from '../../../public/icons/sound.png'
 import soundbarys from '../../../public/icons/soundbarys.png'
 import strawberry from '../../../public/icons/strawberry.png'
@@ -28,11 +33,11 @@ import sunfire from '../../../public/icons/sunfire.png'
 import task from '../../../public/icons/task.png'
 import auth from '../../../public/images/auth/auth.png'
 import barys from '../../../public/images/auth/barys.mp4'
-
-// import baryslottie from '../../../public/images/auth/baryslottie.json'
+import taskcompleted from '../../../public/images/taskcompleted.json'
 
 export const images = {
 	auth,
+	taskcompleted,
 }
 
 export const icons = {
@@ -65,5 +70,9 @@ export const icons = {
 	lemon,
 	fish,
 	soundbarys,
-	// baryslottie
+	loseheart,
+	clock,
+	light,
+	accuracy,
+	completedstreak
 }
