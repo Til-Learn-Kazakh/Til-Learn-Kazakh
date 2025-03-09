@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { imageserver } from '../../../../core/config/environment.config'
+import { CURRENT_USER_QUERY_KEY } from '../../../auth/hooks/user-current-user.hook'
 import { taskService } from '../../main/services/task.service'
 import Footer from '../../translate-audio/components/footer/Footer'
-import Header from '../../translate-audio/components/header/Header'
 
 import ImageWithOptions from './ImageWithOptions'
 
@@ -21,11 +21,19 @@ const styles = StyleSheet.create({
 	},
 })
 
-const TranslateWord = ({ task, onNext }: any) => {
+const TranslateWord = ({
+	task,
+	onNext,
+	hearts,
+	bottomSheetRef,
+	onCorrectAnswer,
+	onMistake,
+}: any) => {
 	const [selectedOption, setSelectedOption] = useState<string | null>(null)
 	const [actionDone, setActionDone] = useState(false) // For disabling CHECK
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
+	const queryClient = useQueryClient() // Получаем queryClient
 
 	// Whenever user picks an option
 	const handleOptionSelect = (option: string) => {
@@ -41,7 +49,11 @@ const TranslateWord = ({ task, onNext }: any) => {
 			setIsCorrect(response.is_correct)
 			if (!response.is_correct) {
 				setCorrectAnswer(response.correct_answer)
+				onMistake()
+			} else {
+				onCorrectAnswer()
 			}
+			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 		},
 		onError: err => {
 			console.error('Check answer error:', err)
@@ -66,8 +78,6 @@ const TranslateWord = ({ task, onNext }: any) => {
 
 	return (
 		<View style={styles.container}>
-			<Header title={task?.question?.en || 'Translate the word'} />
-
 			<ScrollView contentContainerStyle={styles.content}>
 				<ImageWithOptions
 					image={`${imageserver}${task.image_path}`}
@@ -84,6 +94,8 @@ const TranslateWord = ({ task, onNext }: any) => {
 				isSuccess={isCorrect}
 				correctAnswer={isCorrect === false ? correctAnswer : undefined}
 				onContinue={handleContinue}
+				hearts={hearts}
+				bottomSheetRef={bottomSheetRef}
 			/>
 		</View>
 	)

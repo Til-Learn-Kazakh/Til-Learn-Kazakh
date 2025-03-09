@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { imageserver } from '../../../../core/config/environment.config'
+import { CURRENT_USER_QUERY_KEY } from '../../../auth/hooks/user-current-user.hook'
 import { taskService } from '../../main/services/task.service'
 import Footer from '../../translate-audio/components/footer/Footer'
-import Header from '../../translate-audio/components/header/Header'
 
 import BlankImage from './BlankImage'
 import FillBlankMain from './FillBlankMain'
@@ -18,20 +18,26 @@ const styles = StyleSheet.create({
 	},
 })
 
-const FillBlank = ({ task, onNext }: any) => {
+const FillBlank = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, onMistake }: any) => {
 	const [actionDone, setActionDone] = useState(false) // For enabling/disabling "CHECK"
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const [userAnswer, setUserAnswer] = useState('') // The chosen word
+	const queryClient = useQueryClient() // Получаем queryClient
 
 	const { mutate } = useMutation({
 		mutationFn: ({ taskId, userAnswer }: { taskId: string; userAnswer: string }) =>
 			taskService.checkAnswer(taskId, userAnswer),
+
 		onSuccess: response => {
 			setIsCorrect(response.is_correct)
 			if (!response.is_correct) {
 				setCorrectAnswer(response.correct_answer)
+				onMistake()
+			} else {
+				onCorrectAnswer()
 			}
+			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 		},
 		onError: error => {
 			console.error('Ошибка при проверке ответа:', error)
@@ -39,10 +45,6 @@ const FillBlank = ({ task, onNext }: any) => {
 	})
 
 	const handleCheck = () => {
-		if (!userAnswer) {
-			console.log('❌ userAnswer is empty, cannot check')
-			return
-		}
 		mutate({ taskId: task.id, userAnswer })
 	}
 
@@ -56,8 +58,6 @@ const FillBlank = ({ task, onNext }: any) => {
 
 	return (
 		<View style={styles.container}>
-			<Header title={task?.question?.en || 'Fill in the blank'} />
-
 			<BlankImage image={`${imageserver}${task.image_path}`} />
 
 			<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -75,6 +75,8 @@ const FillBlank = ({ task, onNext }: any) => {
 				isSuccess={isCorrect}
 				correctAnswer={isCorrect === false ? correctAnswer : undefined}
 				onContinue={handleContinue}
+				hearts={hearts}
+				bottomSheetRef={bottomSheetRef}
 			/>
 		</View>
 	)

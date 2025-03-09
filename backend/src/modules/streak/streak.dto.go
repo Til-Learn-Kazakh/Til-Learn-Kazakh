@@ -11,6 +11,8 @@ type StreakResponseDTO struct {
 	MaxStreak     int       `json:"max_streak"`     // Максимальный streak
 	LastActive    time.Time `json:"last_active"`    // Последняя активность
 	StreakDays    []string  `json:"streak_days"`    // Даты, когда был streak
+	Week          []bool    `json:"week"`           // Добавили массив активности за неделю
+
 }
 
 type ResetStreakDTO struct {

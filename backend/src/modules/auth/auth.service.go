@@ -111,7 +111,7 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 			return nil, err
 		}
 
-		err = s.streakService.UpdateStreak(streak.UpdateStreakDTO{UserID: newUser.ID.Hex()})
+		err = s.streakService.UpdateStreak(newUser.ID.Hex())
 		if err != nil {
 			return nil, err
 		}

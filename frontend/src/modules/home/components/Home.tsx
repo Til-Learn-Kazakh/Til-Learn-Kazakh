@@ -2,12 +2,14 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ProgressBar } from 'react-native-paper'
 
+import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 
 import { icons } from '../../../core/constants'
 import { useBottomSheet } from '../../../core/hooks/useBottomSheet'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
 import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
+import RefillBottomSheet from '../../task/main/components/RefillBottomSheet'
 import { useLevels } from '../hooks/home.hooks'
 
 import { HeartsTopSheet, HeartsTopSheetRef } from './HeartsTopSheet'
@@ -19,8 +21,10 @@ const Home = ({ route }: { route: any }) => {
 	const { data: levels, isLoading: isLoadingLevels } = useLevels()
 	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser() // <-- тут подтягиваем юзера из запроса
 
-	const snapPoints = useMemo(() => ['50%', '35%'], [])
 	const bottomSheet = useBottomSheet()
+
+	const hearts = currentUser?.hearts || 0 // Get current hearts
+	const refillBottomSheetRef = useRef<BottomSheetModal>(null)
 
 	const onCloseTopSheet = useCallback(() => {
 		bottomSheet.collapse()
@@ -40,6 +44,14 @@ const Home = ({ route }: { route: any }) => {
 	}, [bottomSheet, topSheetContent])
 
 	const topSheetRef = useRef<HeartsTopSheetRef>(null)
+
+	const handleUnitPress = (unitId: string) => {
+		if (hearts === 0) {
+			refillBottomSheetRef.current?.present()
+		} else {
+			navigation.navigate('TaskScreen', { unitId })
+		}
+	}
 
 	if (isLoadingLevels || isLoadingLevels) {
 		return <LoadingUi />
@@ -116,7 +128,7 @@ const Home = ({ route }: { route: any }) => {
 							<TouchableOpacity
 								key={unit.id}
 								style={styles.lessonCard}
-								onPress={() => navigation.navigate('TaskScreen', { unitId: unit.id })}
+								onPress={() => handleUnitPress(unit.id)}
 							>
 								<Text style={styles.lessonTitle}>{unit.title}</Text>
 								<ProgressBar
@@ -134,6 +146,7 @@ const Home = ({ route }: { route: any }) => {
 					</View>
 				))}
 			</ScrollView>
+			<RefillBottomSheet bottomSheetRef={refillBottomSheetRef} />
 		</View>
 	)
 }

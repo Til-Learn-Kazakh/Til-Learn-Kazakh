@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Audio } from 'expo-av'
 
 import { imageserver } from '../../../../../core/config/environment.config'
+import { CURRENT_USER_QUERY_KEY } from '../../../../auth/hooks/user-current-user.hook'
 import { taskService } from '../../../main/services/task.service'
 import Footer from '../footer/Footer'
-import Header from '../header/Header'
 import WordList from '../wordList/WordList'
 
 import Character from './Character'
@@ -42,13 +42,21 @@ const styles = StyleSheet.create({
 
 const MAX_FIRST_LINE = 3 // Пример: сначала 3 слова идут в первую линию
 
-const TranslateAudio = ({ task, onNext }: any) => {
+const TranslateAudio = ({
+	task,
+	onNext,
+	hearts,
+	bottomSheetRef,
+	onCorrectAnswer,
+	onMistake,
+}: any) => {
 	const [availableWords, setAvailableWords] = useState<string[]>([])
 	const [selectedWords, setSelectedWords] = useState<string[]>([])
 	const [actionDone, setActionDone] = useState(false)
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const [sound, setSound] = useState<Audio.Sound | null>(null)
+	const queryClient = useQueryClient() // Получаем queryClient
 
 	// Мутация
 	const { mutate } = useMutation({
@@ -65,7 +73,11 @@ const TranslateAudio = ({ task, onNext }: any) => {
 			setIsCorrect(response.is_correct)
 			if (!response.is_correct) {
 				setCorrectAnswer(response.correct_answer)
+				onMistake()
+			} else {
+				onCorrectAnswer()
 			}
+			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 		},
 		onError: error => {
 			console.error('❌ Error checking answer:', error)
@@ -192,7 +204,6 @@ const TranslateAudio = ({ task, onNext }: any) => {
 
 	return (
 		<View style={styles.container}>
-			<Header title={task.question?.[userLang] || 'Translate this sentence'} />
 			<Character onPress={handlePlayAudio} />
 
 			<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -209,6 +220,8 @@ const TranslateAudio = ({ task, onNext }: any) => {
 				isSuccess={isCorrect}
 				correctAnswer={isCorrect === false ? correctAnswer : undefined}
 				onContinue={handleContinue}
+				hearts={hearts}
+				bottomSheetRef={bottomSheetRef}
 			/>
 		</View>
 	)

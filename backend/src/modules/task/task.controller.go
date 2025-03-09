@@ -1,6 +1,7 @@
 package task
 
 import (
+	"diploma/src/modules/user"
 	"diploma/src/services"
 	"encoding/json"
 	"errors"
@@ -14,12 +15,14 @@ import (
 )
 
 type TaskController struct {
-	Service *TaskService
+	Service     *TaskService
+	UserService *user.UserService
 }
 
-func NewTaskController(service *TaskService) *TaskController {
+func NewTaskController(service *TaskService, userService *user.UserService) *TaskController {
 	return &TaskController{
-		Service: service,
+		Service:     service,
+		UserService: userService,
 	}
 }
 
@@ -213,6 +216,12 @@ func (ctrl *TaskController) CheckAnswer(c *gin.Context) {
 		return
 	}
 
+	userID, exists := c.Get("uid")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var requestBody struct {
 		UserAnswer string `json:"user_answer" binding:"required"`
 		UserLang   string `json:"user_lang"`
@@ -231,6 +240,13 @@ func (ctrl *TaskController) CheckAnswer(c *gin.Context) {
 	response := gin.H{"is_correct": isCorrect}
 	if !isCorrect {
 		response["correct_answer"] = correctAnswer
+
+		oid, _ := primitive.ObjectIDFromHex(userID.(string))
+		err = ctrl.UserService.DecreaseUserHeart(oid)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update hearts"})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, response)

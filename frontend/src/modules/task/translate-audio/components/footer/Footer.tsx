@@ -3,6 +3,7 @@ import { StyleSheet, Text, Vibration, View } from 'react-native'
 import { RectButton } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
+import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import { AVPlaybackSource, Audio } from 'expo-av'
 
 interface FooterProps {
@@ -11,9 +12,19 @@ interface FooterProps {
 	isSuccess?: boolean | null
 	correctAnswer?: any // Добавлен правильный ответ
 	onContinue?: () => void // Добавлен обработчик нажатия "CONTINUE"
+	hearts: number // Pass the current hearts
+	bottomSheetRef: React.RefObject<BottomSheetModal>
 }
 
-const Footer = ({ isDisabled, onPress, isSuccess, correctAnswer, onContinue }: FooterProps) => {
+const Footer = ({
+	isDisabled,
+	onPress,
+	isSuccess,
+	correctAnswer,
+	onContinue,
+	hearts,
+	bottomSheetRef,
+}: FooterProps) => {
 	const insets = useSafeAreaInsets()
 
 	// Определяем стили в зависимости от правильности ответа
@@ -54,6 +65,23 @@ const Footer = ({ isDisabled, onPress, isSuccess, correctAnswer, onContinue }: F
 		playSound()
 	}, [isSuccess])
 
+	const handleCheckPress = () => {
+		if (hearts === 0) {
+			bottomSheetRef.current?.present()
+		} else {
+			onPress()
+		}
+	}
+
+	const handleContinuePress = () => {
+		if (hearts === 0) {
+			bottomSheetRef.current?.present()
+		} else {
+			// Continue to next task
+			onContinue?.()
+		}
+	}
+
 	return (
 		<View style={{ paddingBottom: insets.bottom, alignItems: 'center' }}>
 			{/* Если ответ еще не проверен, показываем кнопку CHECK */}
@@ -61,7 +89,7 @@ const Footer = ({ isDisabled, onPress, isSuccess, correctAnswer, onContinue }: F
 				<RectButton
 					style={[styles.checkButton, { backgroundColor: isDisabled ? '#B0BEC5' : '#0286FF' }]}
 					enabled={!isDisabled}
-					onPress={isDisabled ? undefined : onPress}
+					onPress={isDisabled ? undefined : handleCheckPress}
 				>
 					<Text style={styles.buttonLabel}>CHECK</Text>
 				</RectButton>
@@ -77,7 +105,7 @@ const Footer = ({ isDisabled, onPress, isSuccess, correctAnswer, onContinue }: F
 					)}
 					<RectButton
 						style={[styles.button, { backgroundColor: buttonColor }]}
-						onPress={onContinue} // Теперь нажимаем "CONTINUE", чтобы перейти к следующему заданию
+						onPress={handleContinuePress}
 					>
 						<Text style={styles.buttonLabel}>CONTINUE</Text>
 					</RectButton>

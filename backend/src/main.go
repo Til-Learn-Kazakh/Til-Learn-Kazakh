@@ -45,15 +45,15 @@ func main() {
 	unitService := unit.NewUnitService()
 	unitController := unit.NewUnitController(unitService)
 
-	taskService := task.NewTaskService()
-	taskController := task.NewTaskController(taskService)
-
 	userService := user.NewUserService()
 	userController := user.NewUserController(userService)
 
+	taskService := task.NewTaskService()
+	taskController := task.NewTaskController(taskService, userService)
+
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{CORS_ORIGIN, "http://172.20.10.3:19000"},
+		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.12:19000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,

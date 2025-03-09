@@ -21,11 +21,11 @@ func NewStreakService() *StreakService {
 	}
 }
 
-func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
+func (s *StreakService) UpdateStreak(userID string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	objectID, err := primitive.ObjectIDFromHex(req.UserID)
+	objectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {
 		return err
 	}
@@ -34,12 +34,13 @@ func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 	err = s.collection.FindOne(ctx, bson.M{"userId": objectID}).Decode(&streak)
 
 	if errors.Is(err, mongo.ErrNoDocuments) {
+		// ✅ Создаем новый streak, если его нет
 		streak = Streak{
 			UserID:        objectID,
-			CurrentStreak: 0,
-			MaxStreak:     0,
-			LastActive:    time.Time{},
-			StreakDays:    []string{},
+			CurrentStreak: 1,
+			MaxStreak:     1,
+			LastActive:    time.Now(),
+			StreakDays:    []string{time.Now().Format("2006-01-02")},
 		}
 		_, err = s.collection.InsertOne(ctx, streak)
 		return err
@@ -47,41 +48,32 @@ func (s *StreakService) UpdateStreak(req UpdateStreakDTO) error {
 		return err
 	}
 
-	if streak.LastActive.IsZero() {
-		streak.LastActive = time.Now()
-		streak.CurrentStreak = 1
-		streak.MaxStreak = 1
-		streak.StreakDays = append(streak.StreakDays, time.Now().Format("2006-01-02"))
+	// ✅ Проверяем последний активный день
+	today := time.Now().Format("2006-01-02")
+	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
+	lastActiveDate := streak.LastActive.Format("2006-01-02")
+
+	if lastActiveDate == today {
+		// 🔹 Уже обновляли streak сегодня, ничего не делаем
+		return nil
+	} else if lastActiveDate == yesterday {
+		// 🔹 Продолжаем streak
+		streak.CurrentStreak += 1
 	} else {
-		today := time.Now().Format("2006-01-02")
-		yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
-		dayBeforeYesterday := time.Now().AddDate(0, 0, -2).Format("2006-01-02")
-
-		lastActiveDate := streak.LastActive.Format("2006-01-02")
-
-		if lastActiveDate == yesterday {
-			// ✅ Если streak продолжается (был активен вчера)
-			streak.CurrentStreak += 1
-		} else if lastActiveDate == dayBeforeYesterday {
-			// ✅ Если он **пропустил один день**, сбрасываем streak в `0`
-			streak.CurrentStreak = 0
-		}
-
-		if streak.CurrentStreak == 0 {
-			// ✅ Если streak обнулен, начинается новый streak
-			streak.CurrentStreak = 1
-		}
-
-		if streak.CurrentStreak > streak.MaxStreak {
-			streak.MaxStreak = streak.CurrentStreak
-		}
-
-		// ✅ Добавляем дату в streakDays
-		if !contains(streak.StreakDays, today) {
-			streak.StreakDays = append(streak.StreakDays, today)
-		}
+		// 🔹 Сброс streak, если был разрыв
+		streak.CurrentStreak = 1
+		streak.StreakDays = []string{}
 	}
 
+	// ✅ Обновляем максимальный streak
+	if streak.CurrentStreak > streak.MaxStreak {
+		streak.MaxStreak = streak.CurrentStreak
+	}
+
+	// ✅ Добавляем дату в StreakDays
+	streak.StreakDays = append(streak.StreakDays, today)
+
+	// ✅ Обновляем в MongoDB
 	_, err = s.collection.UpdateOne(ctx, bson.M{"userId": objectID}, bson.M{
 		"$set": bson.M{
 			"current_streak": streak.CurrentStreak,
@@ -110,11 +102,27 @@ func (s *StreakService) GetUserStreak(userID string) (*StreakResponseDTO, error)
 		return nil, err
 	}
 
+	// ✅ Создаем массив `week` (7 дней)
+	week := make([]bool, 7)
+
+	// ✅ Заполняем массив `week` на основе streak.StreakDays
+	for _, streakDay := range streak.StreakDays {
+		parsedTime, err := time.Parse("2006-01-02", streakDay)
+		if err != nil {
+			continue // Пропускаем ошибки парсинга
+		}
+
+		dayIndex := int(parsedTime.Weekday()) // Определяем день недели (0 = Sunday, 6 = Saturday)
+		week[dayIndex] = true                 // Устанавливаем `true` для этого дня
+	}
+
+	// ✅ Возвращаем правильный массив `week`
 	return &StreakResponseDTO{
 		CurrentStreak: streak.CurrentStreak,
 		MaxStreak:     streak.MaxStreak,
 		LastActive:    streak.LastActive,
 		StreakDays:    streak.StreakDays,
+		Week:          week,
 	}, nil
 }
 

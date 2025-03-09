@@ -9,11 +9,11 @@ const screenWidth = Dimensions.get('window').width
 const padding = 16 * 4.3
 const containerWidth = screenWidth - padding - CROSS_SIZE - HEART_SIZE
 const svgHeight = (containerWidth * 11) / 111
-const maxLineWidth = 99.55 
+const maxLineWidth = 99.55
 
-const Progress = ({ progress = 10 }) => {
-	const safeProgress = Math.max(0, Math.min(progress, 100)) 
-	const progressWidth = (safeProgress / 100) * maxLineWidth 
+const Progress = ({ progress }: any) => {
+	const safeProgress = Math.max(progress, Math.min(progress, 100))
+	const progressWidth = (safeProgress / 100) * maxLineWidth
 
 	return (
 		<View style={styles.container}>

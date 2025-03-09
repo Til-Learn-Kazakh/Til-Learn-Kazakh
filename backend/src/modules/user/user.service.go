@@ -4,7 +4,9 @@ import (
 	"context"
 	"diploma/src/database"
 	"diploma/src/modules/auth"
+	"diploma/src/modules/streak"
 	"errors"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -137,4 +139,115 @@ func (s *UserService) RefillHeartsWithCrystals(userID string) (*auth.User, error
 	}
 
 	return user, nil
+}
+
+func (s *UserService) DecreaseUserHeart(userID primitive.ObjectID) error {
+	// Обновляем количество сердец (-1), но не даём уйти в отрицательные значения
+	filter := bson.M{"_id": userID, "hearts": bson.M{"$gt": 0}}
+	update := bson.M{
+		"$inc": bson.M{"hearts": -1},
+		"$set": bson.M{"last_refill_at": time.Now()}, // Обновляем время последнего refil
+	}
+
+	result, err := s.Collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to update user hearts: %w", err)
+	}
+
+	// Если пользователь не найден или сердца уже были 0
+	if result.MatchedCount == 0 {
+		return fmt.Errorf("no hearts left or user not found")
+	}
+
+	return nil
+}
+
+func (s *UserService) CalculateXP(accuracy float64, committedTime, mistakes, combo int) int {
+	baseXP := 10
+
+	// Дополнительный XP за отсутствие ошибок
+	if mistakes == 0 {
+		baseXP += 7
+	} else {
+		// Бонус за комбо (учитывается только если были ошибки)
+		if combo >= 7 {
+			baseXP += 5
+		} else if combo >= 5 {
+			baseXP += 3
+		} else if combo >= 3 {
+			baseXP += 1
+		}
+	}
+
+	// Испытание на время (добавляем XP, а не заменяем!)
+	if committedTime < 45 {
+		baseXP += 7
+	} else if committedTime < 80 {
+		baseXP += 5
+	} else if committedTime > 150 {
+		baseXP += 2
+	}
+
+	//  Новый блок: Добавляем XP за точность (accuracy)
+	if accuracy >= 90 {
+		baseXP += 5
+	} else if accuracy >= 75 {
+		baseXP += 3
+	} else if accuracy >= 50 {
+		baseXP += 1
+	}
+
+	return baseXP
+}
+
+func (s *UserService) UpdateXP(userID string, unitID string, accuracy float64, committedTime int, mistakes int, combo int) (*auth.User, int, error) {
+	unitObjectID, err := primitive.ObjectIDFromHex(unitID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Получаем пользователя
+	user, err := s.GetUserByID(userID)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	//  Проверяем, проходил ли он этот `unitId` раньше
+	unitAlreadyCompleted := false
+	for _, completed := range user.LessonsCompleted {
+		if completed == unitObjectID {
+			unitAlreadyCompleted = true
+			break
+		}
+	}
+
+	//  Если unit уже был пройден, не даем XP, но позволяем сохранить прохождение
+	unitXP := 0
+	if !unitAlreadyCompleted {
+		unitXP = s.CalculateXP(accuracy, committedTime, mistakes, combo)
+		user.XP += unitXP
+	}
+
+	// ✅ Добавляем `unitId` в `LessonsCompleted`, если его еще нет
+	if !unitAlreadyCompleted {
+		user.LessonsCompleted = append(user.LessonsCompleted, unitObjectID)
+	}
+
+	_, err = s.Collection.UpdateOne(
+		context.Background(),
+		bson.M{"_id": user.ID},
+		bson.M{
+			"$set": bson.M{"xp": user.XP, "lessons_completed": user.LessonsCompleted},
+		},
+	)
+
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// ✅ Вызываем UpdateStreak (streak обновляется всегда)
+	streakService := streak.NewStreakService()
+	_ = streakService.UpdateStreak(userID)
+
+	return user, unitXP, nil
 }

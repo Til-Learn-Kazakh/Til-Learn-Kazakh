@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { imageserver } from '../../../../core/config/environment.config'
+import { CURRENT_USER_QUERY_KEY } from '../../../auth/hooks/user-current-user.hook'
 // Adjust path
 import { taskService } from '../../main/services/task.service'
 // Adjust the path if needed
 import Footer from '../../translate-audio/components/footer/Footer'
-import Header from '../../translate-audio/components/header/Header'
 
 import ImageCard from './ImageCard'
 
@@ -31,11 +31,12 @@ const styles = StyleSheet.create({
 	},
 })
 
-const WhichIsTrue = ({ task, onNext }: any) => {
+const WhichIsTrue = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, onMistake }: any) => {
 	const [selectedOption, setSelectedOption] = useState<string | null>(null)
 	const [actionDone, setActionDone] = useState(false)
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
+	const queryClient = useQueryClient() // Получаем queryClient
 
 	// Backend request to check the answer
 	const { mutate } = useMutation({
@@ -45,7 +46,11 @@ const WhichIsTrue = ({ task, onNext }: any) => {
 			setIsCorrect(response.is_correct)
 			if (!response.is_correct) {
 				setCorrectAnswer(response.correct_answer)
+				onMistake()
+			} else {
+				onCorrectAnswer()
 			}
+			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 		},
 		onError: error => {
 			console.error('❌ Error checking answer:', error)
@@ -74,7 +79,6 @@ const WhichIsTrue = ({ task, onNext }: any) => {
 	return (
 		<View style={styles.container}>
 			{/* Header */}
-			<Header title={task?.question?.en || 'Which of these is correct?'} />
 
 			{/* Content */}
 			<ScrollView contentContainerStyle={styles.content}>
@@ -98,6 +102,8 @@ const WhichIsTrue = ({ task, onNext }: any) => {
 				isSuccess={isCorrect}
 				correctAnswer={isCorrect === false ? correctAnswer : undefined}
 				onContinue={handleContinue}
+				hearts={hearts}
+				bottomSheetRef={bottomSheetRef}
 			/>
 		</View>
 	)

@@ -13,6 +13,7 @@ import moment from 'moment'
 
 import { icons } from '../../../core/constants'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
+import { toast } from '../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY } from '../../auth/hooks/user-current-user.hook'
 import { homeService } from '../services/home.service'
 
@@ -138,6 +139,7 @@ export const HeartsTopSheet = forwardRef<HeartsTopSheetRef, HeartsTopSheetProps>
 			onSuccess: data => {
 				queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 				setHearts(data.hearts)
+				toast.success('Сердца успешно пополнились!')
 			},
 			onError: error => {
 				console.error('Error refilling hearts with crystals:', error)
