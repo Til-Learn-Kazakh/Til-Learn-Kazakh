@@ -12,5 +12,4 @@ func UserRoutes(router *gin.RouterGroup, controller *UserController) {
 	userGroup.POST("/refill-hearts", controller.RefillHearts)
 	userGroup.POST("/refill-hearts-with-crystals", controller.RefillHeartsWithCrystals)
 	routerGroup.POST("/calculate-xp", controller.UpdateXP)
-
 }

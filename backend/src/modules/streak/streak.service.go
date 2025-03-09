@@ -132,12 +132,3 @@ func (s *StreakService) ResetStreak(req ResetStreakDTO) error {
 	})
 	return err
 }
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}

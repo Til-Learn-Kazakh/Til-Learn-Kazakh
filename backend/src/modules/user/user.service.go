@@ -162,7 +162,7 @@ func (s *UserService) DecreaseUserHeart(userID primitive.ObjectID) error {
 	return nil
 }
 
-func (s *UserService) CalculateXP(accuracy float64, committedTime, mistakes, combo int) int {
+func (*UserService) CalculateXP(accuracy float64, committedTime, mistakes, combo int) int {
 	baseXP := 10
 
 	// Дополнительный XP за отсутствие ошибок
@@ -200,7 +200,7 @@ func (s *UserService) CalculateXP(accuracy float64, committedTime, mistakes, com
 	return baseXP
 }
 
-func (s *UserService) UpdateXP(userID string, unitID string, accuracy float64, committedTime int, mistakes int, combo int) (*auth.User, int, error) {
+func (s *UserService) UpdateXP(userID, unitID string, accuracy float64, committedTime, mistakes, combo int) (*auth.User, int, error) {
 	unitObjectID, err := primitive.ObjectIDFromHex(unitID)
 	if err != nil {
 		return nil, 0, err
