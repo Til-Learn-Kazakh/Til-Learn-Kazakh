@@ -80,7 +80,7 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 	return &user, nil
 }
 
-func (s *UserService) checkAndResetStreak(user *auth.User) error {
+func (*UserService) checkAndResetStreak(user *auth.User) error {
 	today := time.Now()
 	lastActive := user.Streak.LastActive
 	daysSinceLastActive := int(today.Sub(lastActive).Hours() / 24)
@@ -197,7 +197,7 @@ func (s *UserService) DecreaseUserHeart(userID primitive.ObjectID) error {
 	return nil
 }
 
-func (s *UserService) CalculateXP(correct, attempts, committedTime, mistakes, combo int) (int, int) {
+func (*UserService) CalculateXP(correct, attempts, committedTime, mistakes, combo int) (xp, accuracy int) {
 	baseXP := 10
 
 	// Считаем accuracy "на лету"
@@ -244,14 +244,14 @@ func (s *UserService) CalculateXP(correct, attempts, committedTime, mistakes, co
 	return baseXP, accuracyPercent
 }
 
-func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committedTime, mistakes, combo int) (*auth.User, int, int, error) {
+func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committedTime, mistakes, combo int) (user *auth.User, xp, accuracy int, err error) {
 	unitObjectID, err := primitive.ObjectIDFromHex(unitID)
 	if err != nil {
 		return nil, 0, 0, err
 	}
 
 	// Получаем пользователя
-	user, err := s.GetUserByID(userID)
+	user, err = s.GetUserByID(userID)
 	if err != nil {
 		return nil, 0, 0, err
 	}
@@ -272,6 +272,9 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 		unitXP = 0
 	} else {
 		user.XP += unitXP
+		user.WeeklyXP += unitXP
+		user.MonthlyXP += unitXP
+		fmt.Println("user.WeeklyXP", user.MonthlyXP)
 		user.LessonsCompleted = append(user.LessonsCompleted, unitObjectID)
 
 		analyticsSvc := analytics.NewAnalyticsService()
@@ -286,7 +289,6 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 			committedTime,
 			/* lessons= */ 1,
 			unitXP,
-			accuracy,
 		)
 		if err != nil {
 			return nil, 0, 0, err
@@ -297,7 +299,11 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 		context.Background(),
 		bson.M{"_id": user.ID},
 		bson.M{
-			"$set": bson.M{"xp": user.XP, "lessons_completed": user.LessonsCompleted},
+			"$set": bson.M{"xp": user.XP,
+				"weekly_xp":         user.WeeklyXP,
+				"monthly_xp":        user.MonthlyXP,
+				"lessons_completed": user.LessonsCompleted,
+			},
 		},
 	)
 

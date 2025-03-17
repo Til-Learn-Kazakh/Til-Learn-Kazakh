@@ -37,10 +37,10 @@ func (s *StreakService) UpdateStreak(userID string) error {
 		// ✅ Создаем новый streak, если его нет
 		streak = Streak{
 			UserID:        objectID,
-			CurrentStreak: 1,
-			MaxStreak:     1,
+			CurrentStreak: 0,
+			MaxStreak:     0,
 			LastActive:    time.Now(),
-			StreakDays:    []string{time.Now().Format("2006-01-02")},
+			StreakDays:    []string{},
 		}
 		_, err = s.collection.InsertOne(ctx, streak)
 		return err

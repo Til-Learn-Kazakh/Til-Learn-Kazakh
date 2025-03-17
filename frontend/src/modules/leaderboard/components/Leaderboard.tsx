@@ -10,63 +10,107 @@ import {
 } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 
-// Демоданные, отсортированные по position
-const MOCK_DATA = [
-	{ id: '1', name: 'Roy Kapoor', stars: 19800, avatar: 'https://picsum.photos/200?1', position: 1 },
-	{ id: '2', name: 'Alicia', stars: 19750, avatar: 'https://picsum.photos/200?2', position: 2 },
-	{ id: '3', name: 'Dua', stars: 19600, avatar: 'https://picsum.photos/200?3', position: 3 },
-	{ id: '4', name: 'Deepika', stars: 18900, avatar: 'https://picsum.photos/200?4', position: 4 },
-	{ id: '5', name: 'Danish', stars: 18602, avatar: 'https://picsum.photos/200?5', position: 5 },
-	{ id: '6', name: 'Hania', stars: 18403, avatar: 'https://picsum.photos/200?6', position: 6 },
-	{ id: '7', name: 'Luke Gil', stars: 17905, avatar: 'https://picsum.photos/200?7', position: 7 },
-	{ id: '8', name: 'User8', stars: 17210, avatar: 'https://picsum.photos/200?8', position: 8 },
-	{ id: '9', name: 'User9', stars: 16888, avatar: 'https://picsum.photos/200?9', position: 9 },
-	{ id: '10', name: 'User10', stars: 16600, avatar: 'https://picsum.photos/200?10', position: 10 },
-	{ id: '11', name: 'User11', stars: 16300, avatar: 'https://picsum.photos/200?11', position: 11 },
-	{ id: '12', name: 'User12', stars: 16100, avatar: 'https://picsum.photos/200?12', position: 12 },
-	{ id: '13', name: 'User13', stars: 15900, avatar: 'https://picsum.photos/200?13', position: 13 },
-	{ id: '14', name: 'User14', stars: 15800, avatar: 'https://picsum.photos/200?14', position: 14 },
-	// Пусть ваш userId = '26'
-	{ id: '26', name: 'YOU', stars: 9999, avatar: 'https://picsum.photos/200?26', position: 26 },
-	{ id: '15', name: 'User15', stars: 15555, avatar: 'https://picsum.photos/200?15', position: 15 },
-	{ id: '16', name: 'User16', stars: 15333, avatar: 'https://picsum.photos/200?16', position: 16 },
-	// и т.д.
-]
+// пример
+
+import { LoadingUi } from '../../../core/ui/LoadingUi'
+import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
+import {
+	useAllTimeLeaderboard,
+	useMonthlyLeaderboard,
+	useWeeklyLeaderboard,
+} from '../hooks/leaderboard.hooks'
 
 export default function LeaderboardScreen() {
+	// Табы: week | month | All Time
 	const [activeTab, setActiveTab] = useState<'week' | 'month' | 'All Time'>('week')
 
-	// ID текущего пользователя
-	const userId = '26'
+	// Получаем данные текущего юзера
+	const { data: currentUser } = useCurrentUser()
 
-	// Находим объект пользователя (пусть будет и в общем списке)
-	const currentUser = MOCK_DATA.find(item => item.id === userId)
+	// В зависимости от tab, получаем разные данные
+	const { data: weeklyData, isLoading: isLoadingWeek, error: weekError } = useWeeklyLeaderboard()
 
-	// ---------------------
-	// 1) Разделяем Top-3
-	const topThree = MOCK_DATA.slice(0, 3)
-	// Остальные (#4..∞) — включая пользователя, чтобы при скролле его место действительно встретилось
-	const rest = MOCK_DATA.slice(3)
-	// ---------------------
+	const {
+		data: monthlyData,
+		isLoading: isLoadingMonth,
+		error: monthError,
+	} = useMonthlyLeaderboard()
 
-	// Состояние: виден ли пользователь в списке
-	const [userVisible, setUserVisible] = useState(false)
+	const { data: allTimeData, isLoading: isLoadingAll, error: allError } = useAllTimeLeaderboard()
 
-	// Конфигурация видимости:
-	//   itemVisiblePercentThreshold = 50 означает,
-	//   что элемент считается "visible", если 50% или более его площади
-	//   оказалось в видимой зоне FlatList.
-	const viewabilityConfig = {
-		itemVisiblePercentThreshold: 50,
+	// Выбираем массив для текущего таба
+	let rawData: any[] = []
+	let isLoading = false
+	let error: any = null
+
+	if (activeTab === 'week') {
+		rawData = weeklyData || []
+		isLoading = isLoadingWeek
+		error = weekError
+	} else if (activeTab === 'month') {
+		rawData = monthlyData || []
+		isLoading = isLoadingMonth
+		error = monthError
+	} else {
+		rawData = allTimeData || []
+		isLoading = isLoadingAll
+		error = allError
 	}
 
-	// Callback, срабатывающий при изменении списка видимых элементов
-	const onViewableItemsChanged = useRef(({ viewableItems }) => {
-		// Проверяем, есть ли среди видимых элементов наш userId
-		const isUserInView = viewableItems.some(({ item }) => item.id === userId)
-		// Обновляем стейт
+	// Если бэкенд возвращает ( _id, first_name, weekly_xp, monthly_xp, xp, avatar? )
+	// Нам нужно привести к единому виду:
+	// {
+	//   id: string
+	//   name: string
+	//   stars: number   <-- например weekly_xp / monthly_xp / xp
+	//   avatar: string
+	//   position: number
+	// }
+	// Ниже - пример маппинга:
+	const mappedData = rawData.map((user, idx) => {
+		const rank = idx + 1 // место в общем списке, т.к. отсортированы
+		return {
+			id: user._id,
+			name: user.first_name || 'Unknown',
+			stars:
+				activeTab === 'week' ? user.weekly_xp : activeTab === 'month' ? user.monthly_xp : user.xp, // all-time
+			avatar: user.avatar || 'https://picsum.photos/200', // если у вас есть поле user.avatar
+			position: rank,
+		}
+	})
+
+	// Делим на topThree / rest
+	const topThree = mappedData.slice(0, 3)
+	const rest = mappedData.slice(3)
+
+	// Состояние: виден ли текущий пользователь?
+	const [userVisible, setUserVisible] = useState(false)
+
+	// Если в базе нет currentUser или user._id не совпадает
+	// возможно, не показываем футер
+	const currentUserId = currentUser?.id
+
+	// Callback "какие items видны"
+	const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+		if (!currentUserId) return
+		const isUserInView = viewableItems.some(({ item }: any) => item.id === currentUserId)
 		setUserVisible(isUserInView)
 	}).current
+
+	// viewabilityConfig
+	const viewabilityConfig = { itemVisiblePercentThreshold: 50 }
+
+	if (isLoading) {
+		return <LoadingUi />
+	}
+
+	if (error) {
+		return (
+			<SafeAreaView style={styles.safeArea}>
+				<Text>Error loading {activeTab} Leaderboard</Text>
+			</SafeAreaView>
+		)
+	}
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
@@ -92,7 +136,6 @@ export default function LeaderboardScreen() {
 							Month
 						</Text>
 					</TouchableOpacity>
-
 					<TouchableOpacity
 						onPress={() => setActiveTab('All Time')}
 						style={[styles.tabButton, activeTab === 'All Time' && styles.tabButtonActive]}
@@ -118,49 +161,69 @@ export default function LeaderboardScreen() {
 					</Svg>
 					<View style={styles.topThreeWrapper}>
 						{/* #2 */}
-						<View style={styles.topItem}>
-							<Image
-								source={{ uri: topThree[1].avatar }}
-								style={styles.topAvatarSm}
-							/>
-							<Text style={styles.topPosition}>2</Text>
-							<Text style={styles.topName}>{topThree[1].name}</Text>
-							<Text style={styles.topStars}>⭐ {topThree[1].stars}</Text>
-						</View>
+						{topThree[1] ? (
+							<View style={styles.topItem}>
+								<Image
+									source={{ uri: topThree[1].avatar }}
+									style={styles.topAvatarSm}
+								/>
+								<Text style={styles.topPosition}>2</Text>
+								<Text style={styles.topName}>{topThree[1].name}</Text>
+								<Text style={styles.topStars}>⭐ {topThree[1].stars}</Text>
+							</View>
+						) : (
+							<View style={styles.topItem}>
+								<Text style={styles.topPosition}>--</Text>
+								<Text style={styles.topName}>No user</Text>
+							</View>
+						)}
 
 						{/* #1 */}
-						<View style={styles.topItemCenter}>
-							<Text style={styles.crownIcon}>👑</Text>
-							<Image
-								source={{ uri: topThree[0].avatar }}
-								style={styles.topAvatarLg}
-							/>
-							<Text style={styles.topPosition}>1</Text>
-							<Text style={styles.topName}>{topThree[0].name}</Text>
-							<Text style={styles.topStars}>⭐ {topThree[0].stars}</Text>
-						</View>
+						{topThree[0] ? (
+							<View style={styles.topItemCenter}>
+								<Text style={styles.crownIcon}>👑</Text>
+								<Image
+									source={{ uri: topThree[0].avatar }}
+									style={styles.topAvatarLg}
+								/>
+								<Text style={styles.topPosition}>1</Text>
+								<Text style={styles.topName}>{topThree[0].name}</Text>
+								<Text style={styles.topStars}>⭐ {topThree[0].stars}</Text>
+							</View>
+						) : (
+							<View style={styles.topItemCenter}>
+								<Text style={styles.topPosition}>--</Text>
+								<Text style={styles.topName}>No user</Text>
+							</View>
+						)}
 
 						{/* #3 */}
-						<View style={styles.topItem}>
-							<Image
-								source={{ uri: topThree[2].avatar }}
-								style={styles.topAvatarSm}
-							/>
-							<Text style={styles.topPosition}>3</Text>
-							<Text style={styles.topName}>{topThree[2].name}</Text>
-							<Text style={styles.topStars}>⭐ {topThree[2].stars}</Text>
-						</View>
+						{topThree[2] ? (
+							<View style={styles.topItem}>
+								<Image
+									source={{ uri: topThree[2].avatar }}
+									style={styles.topAvatarSm}
+								/>
+								<Text style={styles.topPosition}>3</Text>
+								<Text style={styles.topName}>{topThree[2].name}</Text>
+								<Text style={styles.topStars}>⭐ {topThree[2].stars}</Text>
+							</View>
+						) : (
+							<View style={styles.topItem}>
+								<Text style={styles.topPosition}>--</Text>
+								<Text style={styles.topName}>No user</Text>
+							</View>
+						)}
 					</View>
 				</View>
 
-				{/* Список остальных (#4..∞), ВКЛЮЧАЯ нашего userId (пускай будет на 26 месте) */}
+				{/* Остальные */}
 				<View style={styles.restContainer}>
 					<FlatList
 						data={rest}
 						keyExtractor={item => item.id}
 						renderItem={({ item }) => {
-							// Хотим подсветить нашего пользователя (не обязательно)
-							const isMe = item.id === userId
+							const isMe = currentUserId ? item.id === currentUserId : false
 							return (
 								<View style={[styles.listItem, isMe && styles.meRow]}>
 									<Text style={styles.listPosition}>{item.position}</Text>
@@ -173,25 +236,33 @@ export default function LeaderboardScreen() {
 								</View>
 							)
 						}}
-						// Чтобы последний элемент не прятался за футером
 						contentContainerStyle={{ paddingBottom: 80 }}
-						// Настраиваем "видимость"
 						onViewableItemsChanged={onViewableItemsChanged}
 						viewabilityConfig={viewabilityConfig}
 					/>
 				</View>
 
-				{/* Фиксированный футер, скрываем если пользователь виден в списке */}
-				{!userVisible && currentUser && (
+				{/* Фиксированный футер, показываем если user в базе + он не виден */}
+				{currentUser && !userVisible && !topThree.some(user => user.id === currentUserId) && (
 					<View style={styles.stickyFooter}>
 						<View style={[styles.listItem, styles.meRow]}>
-							<Text style={styles.listPosition}>{currentUser.position}</Text>
+							{/* Находим его позицию */}
+							<Text style={styles.listPosition}>
+								{mappedData.findIndex(u => u.id === currentUserId) + 1 || '--'}
+							</Text>
 							<Image
-								source={{ uri: currentUser.avatar }}
+								source={{ uri: currentUser.avatar || 'https://picsum.photos/200' }}
 								style={styles.listAvatar}
 							/>
-							<Text style={styles.listName}>{currentUser.name}</Text>
-							<Text style={styles.listStars}>⭐ {currentUser.stars}</Text>
+							<Text style={styles.listName}>{currentUser.first_name}</Text>
+							<Text style={styles.listStars}>
+								⭐{' '}
+								{activeTab === 'week'
+									? currentUser.weekly_xp
+									: activeTab === 'month'
+										? currentUser.monthly_xp
+										: currentUser.xp}
+							</Text>
 						</View>
 					</View>
 				)}
@@ -200,6 +271,7 @@ export default function LeaderboardScreen() {
 	)
 }
 
+// ----- Стили из вашего примера (без изменений) ------
 const styles = StyleSheet.create({
 	safeArea: {
 		flex: 1,
@@ -278,7 +350,6 @@ const styles = StyleSheet.create({
 	},
 	topPosition: {
 		marginTop: 4,
-
 		fontSize: 20,
 		fontWeight: '600',
 		color: '#333',
@@ -308,7 +379,6 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		alignItems: 'center',
 		padding: 12,
-		// Тень
 		elevation: 1,
 		shadowColor: '#000',
 		shadowOpacity: 0.08,
