@@ -16,6 +16,7 @@ export interface User {
 	hearts: number
 	lessons_completed: any[]
 	streak: Streak | null // ✅ Теперь это объект или `null`, если streak нет
+	xp: number
 	last_refill_at: string
 	created_at: string
 	updated_at: string

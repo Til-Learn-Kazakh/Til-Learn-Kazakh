@@ -116,7 +116,12 @@ const Home = ({ route }: { route: any }) => {
 							<View style={styles.sectionInfo}>
 								<Text style={styles.sectionText}>{level.name}</Text>
 							</View>
-							<TouchableOpacity style={styles.squareButton}>
+							<TouchableOpacity
+								onPress={() => {
+									navigation.navigate('TheoryScreen')
+								}}
+								style={styles.squareButton}
+							>
 								<Image
 									source={icons.book}
 									style={styles.bookIconSquare}

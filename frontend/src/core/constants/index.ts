@@ -25,12 +25,14 @@ import learning from '../../../public/icons/learning.png'
 import lemon from '../../../public/icons/lemon.png'
 import light from '../../../public/icons/light.png'
 import loseheart from '../../../public/icons/loseheart.png'
+import profilestreak from '../../../public/icons/profilestreak.png'
 import sound from '../../../public/icons/sound.png'
 import soundbarys from '../../../public/icons/soundbarys.png'
 import strawberry from '../../../public/icons/strawberry.png'
 import study from '../../../public/icons/study.png'
 import sunfire from '../../../public/icons/sunfire.png'
 import task from '../../../public/icons/task.png'
+import volume from '../../../public/icons/volume.png'
 import auth from '../../../public/images/auth/auth.png'
 import barys from '../../../public/images/auth/barys.mp4'
 import taskcompleted from '../../../public/images/taskcompleted.json'
@@ -74,5 +76,7 @@ export const icons = {
 	clock,
 	light,
 	accuracy,
-	completedstreak
+	completedstreak,
+	volume,
+	profilestreak,
 }

@@ -35,14 +35,16 @@ class TaskService {
 
 	async calculateXP(
 		unitId: string,
-		accuracy: number,
+		correct: number,
+		attempts: number,
 		committedTime: number,
 		mistakes: number,
 		combo: number
 	) {
 		const payload = {
 			unitId,
-			accuracy,
+			correct,
+			attempts,
 			committedTime,
 			mistakes,
 			combo,

@@ -100,7 +100,16 @@ func (ctrl *UserController) UpdateXP(c *gin.Context) {
 		return
 	}
 
-	user, unitXP, err := ctrl.Service.UpdateXP(userID.(string), request.UnitID, request.Accuracy, request.CommittedTime, request.Mistakes, request.Combo)
+	// 4 переменные!
+	user, unitXP, accuracy, err := ctrl.Service.UpdateXP(
+		userID.(string),
+		request.UnitID,
+		request.Correct, // вместо request.Accuracy
+		request.Attempts,
+		request.CommittedTime,
+		request.Mistakes,
+		request.Combo,
+	)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -108,6 +117,7 @@ func (ctrl *UserController) UpdateXP(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"xpEarned": unitXP,
+		"accuracy": accuracy,
 		"totalXP":  user.XP,
 		"message":  "XP updated successfully",
 	})

@@ -72,6 +72,13 @@ const TapAudio = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, onMis
 	// Проигрывание аудио
 	const handlePlayAudio = async () => {
 		try {
+			await Audio.setAudioModeAsync({
+				playsInSilentModeIOS: true, // Позволяет играть звук в режиме "без звука"
+				allowsRecordingIOS: false,
+				staysActiveInBackground: false,
+				shouldDuckAndroid: true,
+				playThroughEarpieceAndroid: false,
+			})
 			if (sound) {
 				await sound.unloadAsync()
 			}

@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import {
-	Dimensions,
 	FlatList,
 	Image,
 	SafeAreaView,
@@ -9,325 +8,347 @@ import {
 	TouchableOpacity,
 	View,
 } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 
-// LOCAL IMAGES
-const Aza = require('../../../../assets/Aza.jpg')
-const Bolatbek = require('../../../../assets/Bolatbek.png')
-const Raim = require('../../../../assets/Raim.jpg')
+// Демоданные, отсортированные по position
+const MOCK_DATA = [
+	{ id: '1', name: 'Roy Kapoor', stars: 19800, avatar: 'https://picsum.photos/200?1', position: 1 },
+	{ id: '2', name: 'Alicia', stars: 19750, avatar: 'https://picsum.photos/200?2', position: 2 },
+	{ id: '3', name: 'Dua', stars: 19600, avatar: 'https://picsum.photos/200?3', position: 3 },
+	{ id: '4', name: 'Deepika', stars: 18900, avatar: 'https://picsum.photos/200?4', position: 4 },
+	{ id: '5', name: 'Danish', stars: 18602, avatar: 'https://picsum.photos/200?5', position: 5 },
+	{ id: '6', name: 'Hania', stars: 18403, avatar: 'https://picsum.photos/200?6', position: 6 },
+	{ id: '7', name: 'Luke Gil', stars: 17905, avatar: 'https://picsum.photos/200?7', position: 7 },
+	{ id: '8', name: 'User8', stars: 17210, avatar: 'https://picsum.photos/200?8', position: 8 },
+	{ id: '9', name: 'User9', stars: 16888, avatar: 'https://picsum.photos/200?9', position: 9 },
+	{ id: '10', name: 'User10', stars: 16600, avatar: 'https://picsum.photos/200?10', position: 10 },
+	{ id: '11', name: 'User11', stars: 16300, avatar: 'https://picsum.photos/200?11', position: 11 },
+	{ id: '12', name: 'User12', stars: 16100, avatar: 'https://picsum.photos/200?12', position: 12 },
+	{ id: '13', name: 'User13', stars: 15900, avatar: 'https://picsum.photos/200?13', position: 13 },
+	{ id: '14', name: 'User14', stars: 15800, avatar: 'https://picsum.photos/200?14', position: 14 },
+	// Пусть ваш userId = '26'
+	{ id: '26', name: 'YOU', stars: 9999, avatar: 'https://picsum.photos/200?26', position: 26 },
+	{ id: '15', name: 'User15', stars: 15555, avatar: 'https://picsum.photos/200?15', position: 15 },
+	{ id: '16', name: 'User16', stars: 15333, avatar: 'https://picsum.photos/200?16', position: 16 },
+	// и т.д.
+]
 
-const { width } = Dimensions.get('window')
+export default function LeaderboardScreen() {
+	const [activeTab, setActiveTab] = useState<'week' | 'month' | 'All Time'>('week')
 
-// Helper function to handle local vs. remote
-function getImageSource(value: any) {
-	// If it's a number => it's a local require()
-	if (typeof value === 'number') {
-		return value
+	// ID текущего пользователя
+	const userId = '26'
+
+	// Находим объект пользователя (пусть будет и в общем списке)
+	const currentUser = MOCK_DATA.find(item => item.id === userId)
+
+	// ---------------------
+	// 1) Разделяем Top-3
+	const topThree = MOCK_DATA.slice(0, 3)
+	// Остальные (#4..∞) — включая пользователя, чтобы при скролле его место действительно встретилось
+	const rest = MOCK_DATA.slice(3)
+	// ---------------------
+
+	// Состояние: виден ли пользователь в списке
+	const [userVisible, setUserVisible] = useState(false)
+
+	// Конфигурация видимости:
+	//   itemVisiblePercentThreshold = 50 означает,
+	//   что элемент считается "visible", если 50% или более его площади
+	//   оказалось в видимой зоне FlatList.
+	const viewabilityConfig = {
+		itemVisiblePercentThreshold: 50,
 	}
-	// Otherwise => treat as a remote URI
-	return { uri: value }
-}
 
-// Example data for Weekly
-const weeklyLeaders = [
-	{
-		id: '1',
-		name: 'Isabella',
-		points: 1685,
-		avatarUri: 'https://i.pravatar.cc/100?img=10',
-	},
-	{
-		id: '2',
-		name: 'Evelyn',
-		points: 1608,
-		avatarUri: 'https://i.pravatar.cc/100?img=12',
-	},
-	{
-		id: '3',
-		name: 'Sophia',
-		points: 1580,
-		avatarUri: 'https://i.pravatar.cc/100?img=1',
-	},
-	{
-		id: '4',
-		name: 'William',
-		points: 1536,
-		avatarUri: 'https://i.pravatar.cc/100?img=2',
-	},
-	{
-		id: '5',
-		name: 'Abigail',
-		points: 1510,
-		avatarUri: 'https://i.pravatar.cc/100?img=3',
-	},
-	{
-		id: '6',
-		name: 'James',
-		points: 1500,
-		avatarUri: 'https://i.pravatar.cc/100?img=4',
-	},
-]
-
-// Example data for All Time
-const allTimeLeaders = [
-	{
-		id: '1',
-		name: 'Bolatbek',
-		points: 21500,
-		avatarUri: Bolatbek, // local image
-	},
-	{
-		id: '2',
-		name: 'Raim',
-		points: 19800,
-		avatarUri: Raim, // local image
-	},
-	{
-		id: '3',
-		name: 'Azamat',
-		points: 18350,
-		avatarUri: Aza, // local image
-	},
-	{
-		id: '4',
-		name: 'Olivia',
-		points: 17900,
-		avatarUri: 'https://i.pravatar.cc/100?img=8',
-	},
-	{
-		id: '5',
-		name: 'Ethan',
-		points: 17400,
-		avatarUri: 'https://i.pravatar.cc/100?img=9',
-	},
-]
-
-// Example internet URLs for medals
-const goldMedalIcon = 'https://cdn-icons-png.flaticon.com/512/2583/2583341.png'
-const silverMedalIcon = 'https://cdn-icons-png.flaticon.com/512/2583/2583329.png'
-const bronzeMedalIcon = 'https://cdn-icons-png.flaticon.com/512/2583/2583351.png'
-
-const LeaderboardScreen = () => {
-	const [tab, setTab] = useState('Weekly')
-
-	// Pick which array we show
-	const currentLeaders = tab === 'Weekly' ? weeklyLeaders : allTimeLeaders
-
-	// Top 3
-	const top3 = currentLeaders.slice(0, 3)
-	// The rest
-	const rest = currentLeaders.slice(3)
+	// Callback, срабатывающий при изменении списка видимых элементов
+	const onViewableItemsChanged = useRef(({ viewableItems }) => {
+		// Проверяем, есть ли среди видимых элементов наш userId
+		const isUserInView = viewableItems.some(({ item }) => item.id === userId)
+		// Обновляем стейт
+		setUserVisible(isUserInView)
+	}).current
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<Text style={styles.headerText}>Leaderboard</Text>
+		<SafeAreaView style={styles.safeArea}>
+			<View style={styles.container}>
+				{/* Заголовок */}
+				<View style={styles.headerContainer}>
+					<Text style={styles.headerTitle}>Leaderboard</Text>
+				</View>
 
-			<View style={styles.tabContainer}>
-				<TouchableOpacity
-					onPress={() => setTab('Weekly')}
-					style={[styles.tabButton, tab === 'Weekly' && styles.activeTabButton]}
-				>
-					<Text style={[styles.tabButtonText, tab === 'Weekly' && styles.activeTabButtonText]}>
-						Weekly
-					</Text>
-				</TouchableOpacity>
+				{/* Табы */}
+				<View style={styles.tabsContainer}>
+					<TouchableOpacity
+						onPress={() => setActiveTab('week')}
+						style={[styles.tabButton, activeTab === 'week' && styles.tabButtonActive]}
+					>
+						<Text style={[styles.tabText, activeTab === 'week' && styles.tabTextActive]}>Week</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						onPress={() => setActiveTab('month')}
+						style={[styles.tabButton, activeTab === 'month' && styles.tabButtonActive]}
+					>
+						<Text style={[styles.tabText, activeTab === 'month' && styles.tabTextActive]}>
+							Month
+						</Text>
+					</TouchableOpacity>
 
-				<TouchableOpacity
-					onPress={() => setTab('AllTime')}
-					style={[styles.tabButton, tab === 'AllTime' && styles.activeTabButton]}
-				>
-					<Text style={[styles.tabButtonText, tab === 'AllTime' && styles.activeTabButtonText]}>
-						All Time
-					</Text>
-				</TouchableOpacity>
-			</View>
+					<TouchableOpacity
+						onPress={() => setActiveTab('All Time')}
+						style={[styles.tabButton, activeTab === 'All Time' && styles.tabButtonActive]}
+					>
+						<Text style={[styles.tabText, activeTab === 'All Time' && styles.tabTextActive]}>
+							All Time
+						</Text>
+					</TouchableOpacity>
+				</View>
 
-			<View style={styles.top3Container}>
-				{top3[1] && (
-					<View style={[styles.podiumItem, { marginRight: 10 }]}>
-						<Image
-							source={getImageSource(top3[1].avatarUri)}
-							style={styles.avatarTop3}
+				{/* Волна + Top-3 */}
+				<View style={styles.waveContainer}>
+					<Svg
+						width='100%'
+						height='100%'
+						viewBox='0 0 1440 320'
+						style={StyleSheet.absoluteFill}
+					>
+						<Path
+							fill='#697CFF'
+							d='M0,96L30,85.3C60,75,120,53,180,64C240,75,300,117,360,144C420,171,480,181,540,170.7C600,160,660,128,720,138.7C780,149,840,203,900,213.3C960,224,1020,192,1080,192C1140,192,1200,224,1260,208C1320,192,1380,128,1410,96L1440,64L1440,320L0,320Z'
 						/>
-						<Image
-							source={{ uri: silverMedalIcon }}
-							style={styles.medalIcon}
-						/>
-						<Text style={styles.nameText}>{top3[1].name}</Text>
-						<Text style={styles.pointsText}>{top3[1].points} xp</Text>
-					</View>
-				)}
-
-				{/* 1st place */}
-				{top3[0] && (
-					<View style={[styles.podiumItem, styles.firstPlace]}>
-						<Image
-							source={getImageSource(top3[0].avatarUri)}
-							style={styles.avatarTop3}
-						/>
-						<Image
-							source={{ uri: goldMedalIcon }}
-							style={styles.medalIcon}
-						/>
-						<Text style={styles.nameText}>{top3[0].name}</Text>
-						<Text style={styles.pointsText}>{top3[0].points} xp</Text>
-					</View>
-				)}
-
-				{/* 3rd place */}
-				{top3[2] && (
-					<View style={[styles.podiumItem, { marginLeft: 10 }]}>
-						<Image
-							source={getImageSource(top3[2].avatarUri)}
-							style={styles.avatarTop3}
-						/>
-						<Image
-							source={{ uri: bronzeMedalIcon }}
-							style={styles.medalIcon}
-						/>
-						<Text style={styles.nameText}>{top3[2].name}</Text>
-						<Text style={styles.pointsText}>{top3[2].points} xp</Text>
-					</View>
-				)}
-			</View>
-
-			{/* --- The rest --- */}
-			<FlatList
-				data={rest}
-				keyExtractor={item => item.id}
-				contentContainerStyle={styles.listContent}
-				renderItem={({ item, index }) => {
-					const position = index + 4
-					return (
-						<View style={styles.itemContainer}>
-							<Text style={styles.positionText}>{position}</Text>
+					</Svg>
+					<View style={styles.topThreeWrapper}>
+						{/* #2 */}
+						<View style={styles.topItem}>
 							<Image
-								source={getImageSource(item.avatarUri)}
-								style={styles.avatar}
+								source={{ uri: topThree[1].avatar }}
+								style={styles.topAvatarSm}
 							/>
-							<View style={{ flex: 1, marginLeft: 10 }}>
-								<Text style={styles.itemName}>{item.name}</Text>
-							</View>
-							<Text style={styles.itemPoints}>{item.points} xp</Text>
+							<Text style={styles.topPosition}>2</Text>
+							<Text style={styles.topName}>{topThree[1].name}</Text>
+							<Text style={styles.topStars}>⭐ {topThree[1].stars}</Text>
 						</View>
-					)
-				}}
-			/>
+
+						{/* #1 */}
+						<View style={styles.topItemCenter}>
+							<Text style={styles.crownIcon}>👑</Text>
+							<Image
+								source={{ uri: topThree[0].avatar }}
+								style={styles.topAvatarLg}
+							/>
+							<Text style={styles.topPosition}>1</Text>
+							<Text style={styles.topName}>{topThree[0].name}</Text>
+							<Text style={styles.topStars}>⭐ {topThree[0].stars}</Text>
+						</View>
+
+						{/* #3 */}
+						<View style={styles.topItem}>
+							<Image
+								source={{ uri: topThree[2].avatar }}
+								style={styles.topAvatarSm}
+							/>
+							<Text style={styles.topPosition}>3</Text>
+							<Text style={styles.topName}>{topThree[2].name}</Text>
+							<Text style={styles.topStars}>⭐ {topThree[2].stars}</Text>
+						</View>
+					</View>
+				</View>
+
+				{/* Список остальных (#4..∞), ВКЛЮЧАЯ нашего userId (пускай будет на 26 месте) */}
+				<View style={styles.restContainer}>
+					<FlatList
+						data={rest}
+						keyExtractor={item => item.id}
+						renderItem={({ item }) => {
+							// Хотим подсветить нашего пользователя (не обязательно)
+							const isMe = item.id === userId
+							return (
+								<View style={[styles.listItem, isMe && styles.meRow]}>
+									<Text style={styles.listPosition}>{item.position}</Text>
+									<Image
+										source={{ uri: item.avatar }}
+										style={styles.listAvatar}
+									/>
+									<Text style={styles.listName}>{item.name}</Text>
+									<Text style={styles.listStars}>⭐ {item.stars}</Text>
+								</View>
+							)
+						}}
+						// Чтобы последний элемент не прятался за футером
+						contentContainerStyle={{ paddingBottom: 80 }}
+						// Настраиваем "видимость"
+						onViewableItemsChanged={onViewableItemsChanged}
+						viewabilityConfig={viewabilityConfig}
+					/>
+				</View>
+
+				{/* Фиксированный футер, скрываем если пользователь виден в списке */}
+				{!userVisible && currentUser && (
+					<View style={styles.stickyFooter}>
+						<View style={[styles.listItem, styles.meRow]}>
+							<Text style={styles.listPosition}>{currentUser.position}</Text>
+							<Image
+								source={{ uri: currentUser.avatar }}
+								style={styles.listAvatar}
+							/>
+							<Text style={styles.listName}>{currentUser.name}</Text>
+							<Text style={styles.listStars}>⭐ {currentUser.stars}</Text>
+						</View>
+					</View>
+				)}
+			</View>
 		</SafeAreaView>
 	)
 }
 
-export default LeaderboardScreen
-
 const styles = StyleSheet.create({
+	safeArea: {
+		flex: 1,
+		backgroundColor: '#697CFF',
+	},
 	container: {
 		flex: 1,
-		backgroundColor: '#E6F0FA',
+		backgroundColor: '#697CFF',
 	},
-	headerText: {
-		fontSize: 24,
-		fontWeight: '700',
-		alignSelf: 'center',
-		marginTop: 16,
-		marginBottom: 8,
-		color: '#0A84FF',
+	headerContainer: {
+		paddingVertical: 12,
+		alignItems: 'center',
 	},
-	tabContainer: {
-		flexDirection: 'row',
-		alignSelf: 'center',
-		marginBottom: 16,
-		backgroundColor: '#fff',
-		borderRadius: 20,
-		overflow: 'hidden',
-	},
-	tabButton: {
-		paddingVertical: 10,
-		paddingHorizontal: 20,
-	},
-	tabButtonText: {
-		fontSize: 16,
-		color: '#555',
-	},
-	activeTabButton: {
-		backgroundColor: '#0A84FF',
-	},
-	activeTabButtonText: {
+	headerTitle: {
 		color: '#fff',
+		fontSize: 22,
+		fontWeight: 'bold',
 	},
-
-	/* --- Podium --- */
-	top3Container: {
+	tabsContainer: {
 		flexDirection: 'row',
 		justifyContent: 'center',
-		marginBottom: 20,
 	},
-	podiumItem: {
-		width: width * 0.28,
+	tabButton: {
+		borderRadius: 20,
+		borderWidth: 1,
+		borderColor: '#fff',
+		paddingVertical: 6,
+		paddingHorizontal: 16,
+		marginHorizontal: 4,
+	},
+	tabButtonActive: {
 		backgroundColor: '#fff',
-		borderRadius: 16,
+	},
+	tabText: {
+		color: '#fff',
+		fontWeight: '600',
+	},
+	tabTextActive: {
+		color: '#697CFF',
+	},
+	waveContainer: {
+		width: '100%',
+		height: 120,
+	},
+	topThreeWrapper: {
+		position: 'absolute',
+		bottom: -40,
+		width: '100%',
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+	},
+	topItem: {
 		alignItems: 'center',
-		paddingVertical: 10,
 	},
-	firstPlace: {
-		marginTop: -20,
-		width: width * 0.3,
+	topItemCenter: {
+		alignItems: 'center',
 	},
-	avatarTop3: {
-		width: 70,
-		height: 70,
-		borderRadius: 35,
-		marginBottom: 4,
-		resizeMode: 'cover',
+	crownIcon: {
+		position: 'absolute',
+		top: -24,
+		fontSize: 24,
 	},
-	medalIcon: {
-		width: 24,
-		height: 24,
-		resizeMode: 'contain',
-		marginBottom: 2,
+	topAvatarSm: {
+		width: 60,
+		height: 60,
+		borderRadius: 30,
+		borderWidth: 2,
+		borderColor: '#fff',
 	},
-	nameText: {
-		fontSize: 16,
+	topAvatarLg: {
+		width: 80,
+		height: 80,
+		borderRadius: 40,
+		borderWidth: 2,
+		borderColor: '#fff',
+	},
+	topPosition: {
+		marginTop: 4,
+
+		fontSize: 20,
 		fontWeight: '600',
 		color: '#333',
 	},
-	pointsText: {
+	topName: {
+		fontWeight: 'bold',
+		fontSize: 16,
+		color: '#fff',
+	},
+	topStars: {
 		fontSize: 14,
-		color: '#777',
+		color: '#fff',
 	},
-
-	/* --- Others list --- */
-	listContent: {
-		paddingHorizontal: 16,
-		paddingBottom: 40,
+	restContainer: {
+		flex: 1,
+		marginTop: 60,
+		backgroundColor: '#f9f9f9',
+		borderTopLeftRadius: 20,
+		borderTopRightRadius: 20,
+		paddingTop: 8,
 	},
-	itemContainer: {
+	listItem: {
+		backgroundColor: '#fff',
+		marginHorizontal: 16,
+		marginVertical: 6,
+		borderRadius: 10,
 		flexDirection: 'row',
 		alignItems: 'center',
-		backgroundColor: '#fff',
-		borderRadius: 12,
-		marginBottom: 10,
 		padding: 12,
+		// Тень
+		elevation: 1,
+		shadowColor: '#000',
+		shadowOpacity: 0.08,
+		shadowRadius: 2,
+		shadowOffset: { width: 0, height: 1 },
 	},
-	positionText: {
+	listPosition: {
+		width: 30,
 		fontSize: 16,
 		fontWeight: '600',
-		width: 24,
+		color: '#333',
 		textAlign: 'center',
-		color: '#555',
 	},
-	avatar: {
+	listAvatar: {
 		width: 40,
 		height: 40,
 		borderRadius: 20,
-		resizeMode: 'cover',
+		marginHorizontal: 8,
 	},
-	itemName: {
-		fontSize: 16,
-		fontWeight: '500',
-		color: '#333',
-	},
-	itemPoints: {
+	listName: {
+		flex: 1,
 		fontSize: 15,
-		fontWeight: '500',
-		color: '#0A84FF',
+		color: '#222',
+	},
+	listStars: {
+		fontSize: 15,
+		fontWeight: '600',
+		color: '#697CFF',
+	},
+	meRow: {
+		backgroundColor: '#dceeff',
+	},
+	stickyFooter: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		bottom: 0,
+		paddingHorizontal: 6,
+		paddingVertical: 10,
+		marginBottom: 50,
+		backgroundColor: '#f9f9f9',
 	},
 })

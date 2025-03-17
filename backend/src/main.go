@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"diploma/src/middlewares"
+	"diploma/src/modules/analytics"
 	"diploma/src/modules/auth"
 	"diploma/src/modules/level"
 	"diploma/src/modules/streak"
@@ -48,6 +49,9 @@ func main() {
 	userService := user.NewUserService()
 	userController := user.NewUserController(userService)
 
+	analyticsService := analytics.NewAnalyticsService()
+	analyticsController := analytics.NewAnalyticsController(analyticsService)
+
 	taskService := task.NewTaskService()
 	taskController := task.NewTaskController(taskService, userService)
 
@@ -75,6 +79,7 @@ func main() {
 	task.TaskRoutes(apiRoutes, taskController)
 	user.UserRoutes(apiRoutes, userController)
 	streak.StreakRoutes(apiRoutes, streakController)
+	analytics.AnalyticsRoutes(apiRoutes, analyticsController)
 
 	log.Fatal(router.Run(":" + port))
 }

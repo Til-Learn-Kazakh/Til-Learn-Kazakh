@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
@@ -25,15 +25,15 @@ const StreakTracker = () => {
 	const todayIndex = new Date().getDay()
 	const hasStreakToday = weekStreak[todayIndex]
 
-	//Если streak уже получен сегодня → отправляем сразу в Home
-	useEffect(() => {
-		if (hasStreakToday) {
-			navigation.reset({
-				index: 0,
-				routes: [{ name: 'Home' }],
-			})
-		}
-	}, [hasStreakToday, navigation])
+	// //Если streak уже получен сегодня → отправляем сразу в Home
+	// useEffect(() => {
+	// 	if (hasStreakToday) {
+	// 		navigation.reset({
+	// 			index: 0,
+	// 			routes: [{ name: 'Home' }],
+	// 		})
+	// 	}
+	// }, [hasStreakToday, navigation])
 
 	// ✅ Handle loading state
 	if (isPending) {
