@@ -5,7 +5,9 @@ import (
 	"os"
 
 	"diploma/src/middlewares"
+	"diploma/src/modules/analytics"
 	"diploma/src/modules/auth"
+	"diploma/src/modules/leaderboard"
 	"diploma/src/modules/level"
 	"diploma/src/modules/streak"
 	"diploma/src/modules/task"
@@ -48,8 +50,15 @@ func main() {
 	userService := user.NewUserService()
 	userController := user.NewUserController(userService)
 
+	analyticsService := analytics.NewAnalyticsService()
+	analyticsController := analytics.NewAnalyticsController(analyticsService)
+
 	taskService := task.NewTaskService()
 	taskController := task.NewTaskController(taskService, userService)
+
+	leaderboardService := leaderboard.NewLeaderboardService()
+	leaderboardController := leaderboard.NewLeaderboardController(leaderboardService)
+	leaderboardService.ScheduleResetXP()
 
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
@@ -75,6 +84,8 @@ func main() {
 	task.TaskRoutes(apiRoutes, taskController)
 	user.UserRoutes(apiRoutes, userController)
 	streak.StreakRoutes(apiRoutes, streakController)
+	analytics.AnalyticsRoutes(apiRoutes, analyticsController)
+	leaderboard.LeaderboardRoutes(apiRoutes, leaderboardController)
 
 	log.Fatal(router.Run(":" + port))
 }

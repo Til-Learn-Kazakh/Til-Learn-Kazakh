@@ -1,502 +1,384 @@
-import React, { useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
-import { LinearGradient } from 'expo-linear-gradient'
+import { NavigationProp, useNavigation } from '@react-navigation/native'
 
-const Bolatbek = require('../../../../assets/Bolatbek.png')
+import { icons } from '../../../core/constants'
+import { useBottomSheet } from '../../../core/hooks/useBottomSheet'
+import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
+import { InfoBottomSheet } from '../../home/components/InfoBottomSheet'
+import { useYearlyStats } from '../hooks/analytics.hooks'
 
 const ProfileScreen = () => {
-	// Пример состояний
-	const [xp] = useState(21500)
-	const [streak] = useState(7)
-	const [hearts] = useState(3)
+	const streakCount = 0 // Здесь можно вставить реальное количество streak
+	const navigation = useNavigation<NavigationProp<any>>()
 
-	// Пример для прогресс-бара (из 2000 XP = 1 уровень)
-	const progress = xp / 50000
+	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser() // <-- тут подтягиваем юзера из запроса
+	const [selectedYearKey, setSelectedYearKey] = useState(() => new Date().getFullYear().toString())
 
-	// Обработчики нажатий
-	const handleSettingsPress = () => {
-		alert('Open Settings Screen')
-	}
+	const {
+		data: yearlyData,
+		isLoading: isYearLoading,
+		isError: isYearError,
+	} = useYearlyStats(selectedYearKey)
+
+	const bottomSheet = useBottomSheet()
+
+	const onCloseTopSheet = useCallback(() => {
+		bottomSheet.collapse()
+	}, [bottomSheet])
+
+	const topSheetContent = useMemo(
+		() => <InfoBottomSheet onClose={onCloseTopSheet} />,
+		[onCloseTopSheet]
+	)
+
+	const onOpenTopSheet = useCallback(() => {
+		bottomSheet.snapToIndex({
+			renderContent: () => topSheetContent,
+			index: 0,
+			snapPoints: ['70%', '75%'],
+		})
+	}, [bottomSheet, topSheetContent])
+
+	const joinDate = currentUser?.created_at
+		? new Date(currentUser.created_at).toLocaleDateString('ru-RU', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			})
+		: 'Неизвестно'
 
 	return (
-		<ScrollView style={styles.container}>
-			{/* Фоновый градиент в шапке (можно оставить для красоты) */}
-			<LinearGradient
-				colors={['#00AAFF', '#6495ed']}
-				style={styles.headerContainer}
-			>
-				{/* Иконка настроек (сверху справа) */}
+		<View style={styles.container}>
+			{/* Fixed Header */}
+			<View style={styles.header}>
+				<Text style={styles.headerTitle}>Профиль</Text>
 				<TouchableOpacity
-					style={styles.settingsIcon}
-					onPress={handleSettingsPress}
+					style={styles.settingsButton}
+					onPress={() => navigation.navigate('Settings')}
 				>
 					<Ionicons
-						name='settings-sharp'
-						size={24}
-						color='#fff'
+						name='settings-outline'
+						size={28}
+						color='#007AFF'
 					/>
 				</TouchableOpacity>
+			</View>
 
-				{/* Аватар и имя */}
+			<ScrollView contentContainerStyle={styles.scrollContainer}>
+				{/* Profile Section */}
 				<View style={styles.profileSection}>
-					<View style={styles.avatarWrapper}>
-						<Image
-							style={styles.avatar}
-							source={Bolatbek}
-						/>
-					</View>
+					<Image
+						source={require('../../../../assets/Raim.jpg')}
+						style={styles.avatar}
+					/>
 					<Text style={styles.username}>Bolatbek</Text>
+					<Text style={styles.userTag}>Присоединился: {joinDate}</Text>
 				</View>
 
-				{/* Статистика: XP, Streak, Hearts */}
-				<View style={styles.statsRow}>
-					<View style={styles.statItem}>
+				{/* Overview Section */}
+				<View style={styles.overviewSection}>
+					{/* Heart Item */}
+					<View style={styles.overviewItem}>
 						<Image
-							source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png' }}
-							style={styles.statIcon}
+							source={icons.heart} // Replace with your actual heart icon
+							style={styles.overviewIcon}
 						/>
-						<Text style={styles.statValue}>{xp}</Text>
-						<Text style={styles.statLabel}>XP</Text>
+						<Text style={styles.overviewValue}>{currentUser?.hearts}</Text>
+						<Text style={styles.overviewLabel}>Hearts</Text>
 					</View>
-					<View style={styles.statItem}>
+
+					{/* XP Item */}
+					<View style={styles.overviewItem}>
 						<Image
-							source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3500/3500833.png' }}
-							style={styles.statIcon}
+							source={icons.light}
+							style={styles.overviewIcon}
 						/>
-						<Text style={styles.statValue}>{streak}</Text>
-						<Text style={styles.statLabel}>Streak</Text>
+						<Text style={styles.overviewValue}>{currentUser?.xp}</Text>
+						<Text style={styles.overviewLabel}>XP</Text>
 					</View>
-					<View style={styles.statItem}>
+
+					{/* Diamond Item */}
+					<View style={styles.overviewItem}>
 						<Image
-							source={{ uri: 'https://cdn-icons-png.flaticon.com/512/833/833472.png' }}
-							style={styles.statIcon}
+							source={icons.diamond}
+							style={styles.overviewIcon}
 						/>
-						<Text style={styles.statValue}>{hearts}</Text>
-						<Text style={styles.statLabel}>Hearts</Text>
+						<Text style={styles.overviewValue}>{currentUser?.crystals}</Text>
+						<Text style={styles.overviewLabel}>Diamonds</Text>
 					</View>
 				</View>
 
-				{/* Пример прогресс-бара */}
-				<View style={styles.progressContainer}>
-					<Text style={styles.progressLabel}>Next Level</Text>
-					<View style={styles.progressBar}>
-						<View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-					</View>
-					<Text style={styles.progressXP}>{xp} / 2000 XP</Text>
-				</View>
-			</LinearGradient>
-
-			{/* Ежедневное задание (Daily Quest) */}
-			<View style={styles.questContainer}>
-				<Text style={styles.sectionTitle}>Daily Quest</Text>
-				<View style={styles.questBox}>
-					<Text style={styles.questDescription}>
-						Пройди 3 урока сегодня, чтобы получить +50 XP!
-					</Text>
-					<TouchableOpacity style={styles.questButton}>
-						<Text style={styles.questButtonText}>Начать</Text>
+				{/* Streak & Achievements Section */}
+				<View style={styles.cardsContainer}>
+					{/* Streak Card */}
+					<TouchableOpacity
+						style={styles.squareCard}
+						onPress={() => onOpenTopSheet()}
+					>
+						<Text style={styles.cardTitle}>СЕРИЯ</Text>
+						<View style={styles.streakContainer}>
+							<Image
+								source={
+									(currentUser?.streak?.current_streak ?? 0) < 1
+										? icons.profilestreak
+										: icons.sunfire
+								}
+								style={styles.streakIcon}
+							/>
+							<Text style={styles.streakCount}>{currentUser?.streak?.current_streak ?? 0}</Text>
+						</View>
 					</TouchableOpacity>
-				</View>
-			</View>
 
-			{/* 1. Карточка «СЛОВА / ПРОГРЕСС» */}
-			<View style={styles.bigCard}>
-				<View style={styles.cardHeader}>
-					<Text style={styles.cardHeaderLeft}>СЛОВА</Text>
-					<Text style={styles.cardHeaderRight}>ПРОГРЕСС</Text>
-				</View>
-
-				<View style={styles.wordsProgressRow}>
-					{/* Кнопка «Учить 0» */}
-					<View style={styles.learnButton}>
-						<Text style={styles.learnButtonText}>Учить</Text>
-						<View style={styles.learnButtonBadge}>
-							<Text style={styles.learnButtonBadgeText}>0</Text>
-						</View>
-					</View>
-
-					{/* Кнопка «Повторить» */}
-					<TouchableOpacity style={styles.repeatButton}>
-						<Text style={styles.repeatButtonText}>Повторить</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-
-			{/* --- Ряд из 2 карточек: ЧАТЫ (слева) и ДОСТИЖЕНИЯ (справа) --- */}
-			<View style={styles.rowContainer}>
-				{/* 2. Карточка «ЧАТЫ» */}
-				<View style={[styles.mediumCard, { marginRight: 10 }]}>
-					<Text style={styles.cardTitle}>ЧАТЫ</Text>
-					<View style={styles.chatsRow}>
-						<Image
-							source={{ uri: 'https://i.ibb.co/tzYzhTp/joker.jpg' }}
-							style={styles.chatAvatar}
-						/>
-						<Image
-							source={{ uri: 'https://i.ibb.co/3S33W2R/megan.jpg' }}
-							style={styles.chatAvatar}
-						/>
-						<Image
-							source={{ uri: 'https://i.ibb.co/vsvbtwt/sheldon.jpg' }}
-							style={styles.chatAvatar}
-						/>
-						<View style={styles.moreCircle}>
-							<Text style={styles.moreCircleText}>+16</Text>
+					{/* Achievements Card */}
+					<View style={styles.squareCard}>
+						<Text style={styles.cardTitle}>ДОСТИЖЕНИЯ</Text>
+						<View style={styles.cardGrid}>
+							<View style={styles.row}>
+								<Image
+									source={icons.loseheart}
+									style={styles.achievementIcon}
+								/>
+								<Image
+									source={icons.fillblank}
+									style={styles.achievementIcon}
+								/>
+							</View>
+							<View style={styles.row}>
+								<Image
+									source={icons.fillblank}
+									style={styles.achievementIcon}
+								/>
+								<View style={styles.moreCircle}>
+									<Text style={styles.moreText}>+10</Text>
+								</View>
+							</View>
 						</View>
 					</View>
 				</View>
 
-				{/* 3. Карточка «ДОСТИЖЕНИЯ» */}
-				<View style={[styles.mediumCard, { marginLeft: 10 }]}>
-					<Text style={styles.cardTitle}>ДОСТИЖЕНИЯ</Text>
-					<View style={styles.badgesRow}>
-						<Image
-							source={{ uri: 'https://i.ibb.co/RyvTBzY/matrix.png' }}
-							style={styles.badgeIcon}
-						/>
-						<Image
-							source={{ uri: 'https://i.ibb.co/FHGTcjx/badge-phone.png' }}
-							style={styles.badgeIcon}
-						/>
-						<View style={styles.moreCircle}>
-							<Text style={styles.moreCircleText}>+10</Text>
-						</View>
-					</View>
-				</View>
-			</View>
-
-			{/* 4. Итоговая карточка (Выучено слов, Пройдено уроков, Страниц прочитано) */}
-			<View style={styles.statsCard}>
-				<View style={styles.statColumn}>
-					<Text style={styles.statColumnTitle}>Выучено слов</Text>
-					<View style={styles.statColumnRow}>
+				{/* Statistics Section */}
+				<TouchableOpacity
+					onPress={() => navigation.navigate('AnalyticsScreen')}
+					style={styles.statsContainer}
+				>
+					<View style={styles.statItem}>
 						<Ionicons
-							name='cash-outline'
+							name='time-outline'
 							size={24}
-							color='#00FF99'
+							color='#009688'
 						/>
-						<Text style={styles.statColumnValue}>0</Text>
+						<Text style={styles.statValue}>
+							{yearlyData ? `${Math.floor(yearlyData.time / 60)} мин` : '-'}
+						</Text>
+						<Text style={styles.statLabel}>Время в обучении</Text>
 					</View>
-				</View>
-				<View style={styles.statColumn}>
-					<Text style={styles.statColumnTitle}>Пройдено уроков</Text>
-					<View style={styles.statColumnRow}>
+					<View style={styles.statItem}>
 						<Ionicons
 							name='school-outline'
 							size={24}
-							color='#9e7aff'
+							color='#7C4DFF'
 						/>
-						<Text style={styles.statColumnValue}>0</Text>
+						<Text style={styles.statValue}>{yearlyData ? yearlyData.lessons : '-'}</Text>
+						<Text style={styles.statLabel}>Пройдено уроков</Text>
 					</View>
-				</View>
-				<View style={styles.statColumn}>
-					<Text style={styles.statColumnTitle}>Страниц прочитано</Text>
-					<View style={styles.statColumnRow}>
+					<View style={styles.statItem}>
 						<Ionicons
-							name='book-outline'
+							name='stats-chart-outline'
 							size={24}
-							color='#ffa500'
+							color='#E91E63'
 						/>
-						<Text style={styles.statColumnValue}>8</Text>
+						<Text style={styles.statValue}>{yearlyData ? `${yearlyData.accuracy} %` : '-'}</Text>
+						<Text style={styles.statLabel}>Точность</Text>
 					</View>
-				</View>
-			</View>
-
-			{/* Небольшой отступ внизу */}
-			<View style={{ height: 40 }} />
-		</ScrollView>
+				</TouchableOpacity>
+			</ScrollView>
+		</View>
 	)
 }
 
 export default ProfileScreen
 
 const styles = StyleSheet.create({
-	// Базовый контейнер со **белым** фоном
 	container: {
 		flex: 1,
-		backgroundColor: '#fff',
+		backgroundColor: '#F5F5F5',
 	},
-
-	// Шапка с градиентом (можно оставить)
-	headerContainer: {
-		paddingHorizontal: 20,
-		paddingVertical: 40,
-		borderBottomLeftRadius: 30,
-		borderBottomRightRadius: 30,
-		position: 'relative',
+	header: {
+		flexDirection: 'row',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		paddingHorizontal: 16,
+		paddingTop: 60,
+		paddingBottom: 10,
+		backgroundColor: '#F5F5F5',
+		borderBottomColor: '#ddd',
 	},
-	settingsIcon: {
-		position: 'absolute',
-		top: 40,
-		right: 20,
-		padding: 8,
+	headerTitle: {
+		fontSize: 35,
+		fontWeight: 'bold',
+		color: '#000',
+		marginLeft: 10,
+	},
+	settingsButton: {
+		padding: 5,
+	},
+	scrollContainer: {
+		padding: 16,
+		minHeight: 800,
 	},
 	profileSection: {
+		marginTop: 20,
 		alignItems: 'center',
-	},
-	avatarWrapper: {
-		width: 100,
-		height: 100,
-		borderRadius: 50,
-		borderWidth: 3,
-		borderColor: '#fff',
-		overflow: 'hidden',
+		marginBottom: 30,
 	},
 	avatar: {
-		width: '100%',
-		height: '100%',
+		width: 110,
+		height: 110,
+		borderRadius: 60,
 	},
 	username: {
-		marginTop: 10,
-		fontSize: 22,
+		fontSize: 24,
 		fontWeight: 'bold',
-		color: '#fff',
+		marginTop: 12,
 	},
-
-	// Статистика (XP, Streak, Hearts)
-	statsRow: {
-		flexDirection: 'row',
-		justifyContent: 'space-around',
-		marginTop: 25,
-	},
-	statItem: {
-		alignItems: 'center',
-	},
-	statIcon: {
-		width: 30,
-		height: 30,
-		marginBottom: 5,
-	},
-	statValue: {
-		fontSize: 20,
-		color: '#fff',
-		fontWeight: 'bold',
-	},
-	statLabel: {
-		fontSize: 14,
-		color: '#fff',
-		marginTop: 2,
-	},
-
-	// Прогресс-бар
-	progressContainer: {
-		marginTop: 25,
-		alignItems: 'center',
-	},
-	progressLabel: {
-		color: '#fff',
-		fontWeight: '600',
-		marginBottom: 5,
-	},
-	progressBar: {
-		width: '80%',
-		height: 10,
-		backgroundColor: '#fff',
-		borderRadius: 5,
-		overflow: 'hidden',
-	},
-	progressFill: {
-		height: '100%',
-		backgroundColor: '#FFD700',
-	},
-	progressXP: {
+	userTag: {
 		marginTop: 5,
-		color: '#fff',
+		fontSize: 16,
+		color: '#777',
+		fontStyle: 'italic',
+	},
+	cardsContainer: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 25,
+	},
+	squareCard: {
+		width: '46%',
+		aspectRatio: 1,
+		backgroundColor: '#fff',
+		borderRadius: 12,
+		padding: 12,
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowRadius: 5,
+		elevation: 3,
+		alignItems: 'center',
+	},
+	overviewSection: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		padding: 16,
+		borderRadius: 12,
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowRadius: 5,
+		elevation: 3,
+		marginBottom: 25, // space below the section
 	},
 
-	// Ежедневное задание
-	questContainer: {
-		marginTop: 20,
-		paddingHorizontal: 20,
+	overviewItem: {
+		alignItems: 'center',
+		flex: 1, // so each overview item evenly spaces out
 	},
-	sectionTitle: {
+
+	overviewIcon: {
+		width: 40,
+		height: 40,
+		marginBottom: 8,
+	},
+
+	overviewValue: {
 		fontSize: 18,
-		fontWeight: '600',
-		marginBottom: 10,
-	},
-	questBox: {
-		backgroundColor: '#fff',
-		borderRadius: 10,
-		padding: 15,
-		borderColor: '#ccc',
-		borderWidth: 1,
-	},
-	questDescription: {
-		fontSize: 16,
-		marginBottom: 10,
-	},
-	questButton: {
-		backgroundColor: '#00AAFF',
-		paddingVertical: 10,
-		borderRadius: 8,
-		alignItems: 'center',
-	},
-	questButtonText: {
-		color: '#fff',
-		fontWeight: '600',
-	},
-
-	// Карточки с белым фоном (вместо тёмного)
-	bigCard: {
-		backgroundColor: '#fff',
-		marginHorizontal: 20,
-		borderRadius: 12,
-		padding: 16,
-		marginTop: 20,
-		borderWidth: 1,
-		borderColor: '#eee',
-	},
-	// Ряд для чатов и достижений
-	rowContainer: {
-		flexDirection: 'row',
-		marginHorizontal: 20,
-		marginTop: 20,
-	},
-	mediumCard: {
-		backgroundColor: '#fff',
-		borderRadius: 12,
-		padding: 16,
-		flex: 1,
-		minHeight: 160, // Чтобы придать "квадратный" вид (пример)
-		borderWidth: 1,
-		borderColor: '#eee',
-	},
-	statsCard: {
-		backgroundColor: '#fff',
-		marginHorizontal: 20,
-		borderRadius: 12,
-		padding: 16,
-		marginTop: 20,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		borderWidth: 1,
-		borderColor: '#eee',
-	},
-
-	// Заголовки в карточках
-	cardHeader: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: 12,
-	},
-	cardHeaderLeft: {
-		fontSize: 16,
-		fontWeight: '600',
-		color: '#333',
-	},
-	cardHeaderRight: {
-		fontSize: 16,
-		fontWeight: '600',
-		color: '#00AAFF',
-	},
-
-	// Кнопки «Учить 0» и «Повторить»
-	wordsProgressRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	learnButton: {
-		flexDirection: 'row',
-		backgroundColor: '#00AAFF',
-		borderRadius: 30,
-		paddingHorizontal: 20,
-		paddingVertical: 10,
-		marginRight: 12,
-		alignItems: 'center',
-	},
-	learnButtonText: {
-		color: '#fff',
-		fontWeight: '600',
-		fontSize: 16,
-		marginRight: 8,
-	},
-	learnButtonBadge: {
-		width: 24,
-		height: 24,
-		borderRadius: 12,
-		backgroundColor: '#66ccff',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	learnButtonBadgeText: {
-		color: '#fff',
 		fontWeight: 'bold',
-		fontSize: 12,
-	},
-	repeatButton: {
-		backgroundColor: '#f0f0f0',
-		borderRadius: 30,
-		paddingHorizontal: 20,
-		paddingVertical: 10,
-	},
-	repeatButtonText: {
-		color: '#888',
-		fontWeight: '600',
-		fontSize: 15,
+		color: '#000',
 	},
 
-	// ЧАТЫ
+	overviewLabel: {
+		fontSize: 12,
+		color: '#777',
+	},
+
 	cardTitle: {
-		fontSize: 16,
-		fontWeight: '600',
-		color: '#333',
+		fontSize: 14,
+		fontWeight: 'bold',
+		color: '#000',
 		marginBottom: 10,
 	},
-	chatsRow: {
+	streakContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'center',
+		marginTop: 20,
 	},
-	chatAvatar: {
+	streakIcon: {
+		width: 80,
+		height: 80,
+		marginRight: 10,
+	},
+	streakCount: {
+		fontSize: 50,
+		fontWeight: 'bold',
+		color: '#000',
+	},
+	cardGrid: {
+		width: '100%',
+		justifyContent: 'center',
+	},
+	row: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: 5,
+	},
+	achievementIcon: {
 		width: 50,
 		height: 50,
-		borderRadius: 25,
-		marginRight: 8,
+		margin: 4,
 	},
 	moreCircle: {
 		width: 50,
 		height: 50,
 		borderRadius: 25,
-		backgroundColor: '#ccc',
+		backgroundColor: '#E0E0E0',
 		alignItems: 'center',
 		justifyContent: 'center',
+		margin: 4,
 	},
-	moreCircleText: {
-		color: '#444',
-		fontWeight: '600',
-	},
-
-	// ДОСТИЖЕНИЯ
-	badgesRow: {
-		flexDirection: 'row',
-		alignItems: 'center',
-	},
-	badgeIcon: {
-		width: 50,
-		height: 50,
-		marginRight: 12,
-		borderRadius: 10,
-	},
-
-	// Карточка со статистикой (Выучено слов, Уроков, Страниц)
-	statColumn: {
-		alignItems: 'center',
-		flex: 1,
-	},
-	statColumnTitle: {
-		color: '#777',
+	moreText: {
 		fontSize: 14,
-		marginBottom: 6,
+		fontWeight: 'bold',
+		color: '#666',
 	},
-	statColumnRow: {
+	statsContainer: {
 		flexDirection: 'row',
+		justifyContent: 'space-between',
 		alignItems: 'center',
+		width: '100%',
+		backgroundColor: '#fff',
+		padding: 16,
+		borderRadius: 12,
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowRadius: 5,
+		elevation: 3,
 	},
-	statColumnValue: {
-		marginLeft: 6,
-		color: '#333',
-		fontWeight: '600',
-		fontSize: 16,
+	statItem: {
+		alignItems: 'center',
+		flex: 1, // Равномерное распределение по ширине
+	},
+	statValue: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		marginTop: 5,
+		textAlign: 'center', // Выравнивание по центру
+	},
+	statLabel: {
+		fontSize: 12,
+		color: '#777',
+		textAlign: 'center', // Выравнивание по центру
 	},
 })

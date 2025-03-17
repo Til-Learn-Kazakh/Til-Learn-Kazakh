@@ -13,6 +13,9 @@ const LessonCompleteScreen = ({ route }: any) => {
 		accuracy: 0,
 		committedTime: '0:00',
 	}
+
+	console.log('xpEarned', xpEarned)
+
 	const navigation = useNavigation<NavigationProp<any>>()
 
 	return (

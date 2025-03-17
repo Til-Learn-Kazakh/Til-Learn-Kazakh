@@ -87,6 +87,13 @@ const TranslateAudio = ({
 	// Аудио
 	const handlePlayAudio = async () => {
 		try {
+			await Audio.setAudioModeAsync({
+				playsInSilentModeIOS: true, // Позволяет играть звук в режиме "без звука"
+				allowsRecordingIOS: false,
+				staysActiveInBackground: false,
+				shouldDuckAndroid: true,
+				playThroughEarpieceAndroid: false,
+			})
 			if (sound) await sound.unloadAsync()
 			const { sound: newSound } = await Audio.Sound.createAsync({
 				uri: `${imageserver}${task.audio_path}`,

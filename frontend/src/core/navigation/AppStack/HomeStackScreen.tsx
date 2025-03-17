@@ -7,6 +7,7 @@ import { InfoPage } from '../../../modules/home/components/InfoPage'
 import LessonCompleteScreen from '../../../modules/progress/components/LessonCompleteScreen'
 import StreakTracker from '../../../modules/progress/components/StreakTracker'
 import TaskScreen from '../../../modules/task/main/components/TaskScreen'
+import TheoryScreen from '../../../modules/theory/components/TheoryScreen'
 
 const HomeStack = createNativeStackNavigator()
 
@@ -47,6 +48,11 @@ const HomeStackScreen = ({ route, navigation }: { route: any; navigation: any })
 				name='StreakTracker'
 				component={StreakTracker}
 			/>
+			<HomeStack.Screen
+				name='TheoryScreen'
+				component={TheoryScreen}
+			/>
+
 		</HomeStack.Navigator>
 	)
 }

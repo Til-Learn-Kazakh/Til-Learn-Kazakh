@@ -37,10 +37,10 @@ func (s *StreakService) UpdateStreak(userID string) error {
 		// ✅ Создаем новый streak, если его нет
 		streak = Streak{
 			UserID:        objectID,
-			CurrentStreak: 1,
-			MaxStreak:     1,
+			CurrentStreak: 0,
+			MaxStreak:     0,
 			LastActive:    time.Now(),
-			StreakDays:    []string{time.Now().Format("2006-01-02")},
+			StreakDays:    []string{},
 		}
 		_, err = s.collection.InsertOne(ctx, streak)
 		return err
@@ -48,21 +48,22 @@ func (s *StreakService) UpdateStreak(userID string) error {
 		return err
 	}
 
-	// ✅ Проверяем последний активный день
+	// ✅ Проверяем дату streak
 	today := time.Now().Format("2006-01-02")
 	yesterday := time.Now().AddDate(0, 0, -1).Format("2006-01-02")
-	lastActiveDate := streak.LastActive.Format("2006-01-02")
 
-	if lastActiveDate == today {
-		// 🔹 Уже обновляли streak сегодня, ничего не делаем
+	// ✅ Если `today` уже есть в `streak_days`, ничего не делаем
+	if contains(streak.StreakDays, today) {
 		return nil
-	} else if lastActiveDate == yesterday {
-		// 🔹 Продолжаем streak
+	}
+
+	// ✅ Если streak был вчера, продолжаем, иначе сбрасываем
+	lastActiveDate := streak.LastActive.Format("2006-01-02")
+	if lastActiveDate == yesterday {
 		streak.CurrentStreak += 1
 	} else {
-		// 🔹 Сброс streak, если был разрыв
 		streak.CurrentStreak = 1
-		streak.StreakDays = []string{}
+		streak.StreakDays = []string{} // Очищаем streak_days при сбросе
 	}
 
 	// ✅ Обновляем максимальный streak
@@ -83,6 +84,16 @@ func (s *StreakService) UpdateStreak(userID string) error {
 		},
 	})
 	return err
+}
+
+// ✅ Вспомогательная функция, проверяющая, есть ли уже дата в `streak_days`
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *StreakService) GetUserStreak(userID string) (*StreakResponseDTO, error) {

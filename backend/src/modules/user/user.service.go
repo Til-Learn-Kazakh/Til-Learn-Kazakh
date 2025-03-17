@@ -3,10 +3,12 @@ package user
 import (
 	"context"
 	"diploma/src/database"
+	"diploma/src/modules/analytics"
 	"diploma/src/modules/auth"
 	"diploma/src/modules/streak"
 	"errors"
 	"fmt"
+	"math"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -68,7 +70,40 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 		return nil, errors.New("user not found")
 	}
 
+	if user.Streak != nil {
+		err := s.checkAndResetStreak(&user)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &user, nil
+}
+
+func (*UserService) checkAndResetStreak(user *auth.User) error {
+	today := time.Now()
+	lastActive := user.Streak.LastActive
+	daysSinceLastActive := int(today.Sub(lastActive).Hours() / 24)
+
+	if daysSinceLastActive > 1 {
+		// 🔹 Если пропущен день, сбрасываем streak в коллекции `Streak`
+		user.Streak.CurrentStreak = 0
+
+		_, err := database.GetCollection(database.Client, "Streak").UpdateOne(
+			context.Background(),
+			bson.M{"userId": user.ID},
+			bson.M{
+				"$set": bson.M{
+					"current_streak": 0,
+				},
+			},
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // RefillHearts выполняет автоматическое восстановление сердец,
@@ -162,8 +197,16 @@ func (s *UserService) DecreaseUserHeart(userID primitive.ObjectID) error {
 	return nil
 }
 
-func (*UserService) CalculateXP(accuracy float64, committedTime, mistakes, combo int) int {
+func (*UserService) CalculateXP(correct, attempts, committedTime, mistakes, combo int) (xp, accuracy int) {
 	baseXP := 10
+
+	// Считаем accuracy "на лету"
+	var accuracyPercent int
+	if attempts > 0 {
+		accuracyPercent = int(math.Round(float64(correct) / float64(attempts) * 100))
+	} else {
+		accuracyPercent = 0
+	}
 
 	// Дополнительный XP за отсутствие ошибок
 	if mistakes == 0 {
@@ -179,7 +222,7 @@ func (*UserService) CalculateXP(accuracy float64, committedTime, mistakes, combo
 		}
 	}
 
-	// Испытание на время (добавляем XP, а не заменяем!)
+	// Испытание на время
 	if committedTime < 45 {
 		baseXP += 7
 	} else if committedTime < 80 {
@@ -188,28 +231,29 @@ func (*UserService) CalculateXP(accuracy float64, committedTime, mistakes, combo
 		baseXP += 2
 	}
 
-	//  Новый блок: Добавляем XP за точность (accuracy)
-	if accuracy >= 90 {
+	// Добавляем XP за точность
+	switch {
+	case accuracyPercent >= 90:
 		baseXP += 5
-	} else if accuracy >= 75 {
+	case accuracyPercent >= 75:
 		baseXP += 3
-	} else if accuracy >= 50 {
+	case accuracyPercent >= 50:
 		baseXP += 1
 	}
 
-	return baseXP
+	return baseXP, accuracyPercent
 }
 
-func (s *UserService) UpdateXP(userID, unitID string, accuracy float64, committedTime, mistakes, combo int) (*auth.User, int, error) {
+func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committedTime, mistakes, combo int) (user *auth.User, xp, accuracy int, err error) {
 	unitObjectID, err := primitive.ObjectIDFromHex(unitID)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
 	}
 
 	// Получаем пользователя
-	user, err := s.GetUserByID(userID)
+	user, err = s.GetUserByID(userID)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
 	}
 
 	//  Проверяем, проходил ли он этот `unitId` раньше
@@ -221,33 +265,55 @@ func (s *UserService) UpdateXP(userID, unitID string, accuracy float64, committe
 		}
 	}
 
-	//  Если unit уже был пройден, не даем XP, но позволяем сохранить прохождение
-	unitXP := 0
-	if !unitAlreadyCompleted {
-		unitXP = s.CalculateXP(accuracy, committedTime, mistakes, combo)
-		user.XP += unitXP
-	}
+	unitXP, accuracy := s.CalculateXP(correct, attempts, committedTime, mistakes, combo)
 
-	// ✅ Добавляем `unitId` в `LessonsCompleted`, если его еще нет
-	if !unitAlreadyCompleted {
+	//  Если unit уже был пройден, не даем XP, но позволяем сохранить прохождение
+	if unitAlreadyCompleted {
+		unitXP = 0
+	} else {
+		user.XP += unitXP
+		user.WeeklyXP += unitXP
+		user.MonthlyXP += unitXP
+		fmt.Println("user.WeeklyXP", user.MonthlyXP)
 		user.LessonsCompleted = append(user.LessonsCompleted, unitObjectID)
+
+		analyticsSvc := analytics.NewAnalyticsService()
+		dateStr := time.Now().Format("2006-01-02")
+
+		err = analyticsSvc.UpdateStats(
+			userID,
+			dateStr,
+			correct,
+			attempts, // превращаем float64 -> int, или пересчитываем
+			mistakes,
+			committedTime,
+			/* lessons= */ 1,
+			unitXP,
+		)
+		if err != nil {
+			return nil, 0, 0, err
+		}
 	}
 
 	_, err = s.Collection.UpdateOne(
 		context.Background(),
 		bson.M{"_id": user.ID},
 		bson.M{
-			"$set": bson.M{"xp": user.XP, "lessons_completed": user.LessonsCompleted},
+			"$set": bson.M{"xp": user.XP,
+				"weekly_xp":         user.WeeklyXP,
+				"monthly_xp":        user.MonthlyXP,
+				"lessons_completed": user.LessonsCompleted,
+			},
 		},
 	)
 
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, 0, err
 	}
 
 	// ✅ Вызываем UpdateStreak (streak обновляется всегда)
 	streakService := streak.NewStreakService()
 	_ = streakService.UpdateStreak(userID)
 
-	return user, unitXP, nil
+	return user, unitXP, accuracy, nil
 }

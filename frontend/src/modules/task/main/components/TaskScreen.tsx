@@ -71,9 +71,12 @@ const TaskScreen = ({ route }: any) => {
 			try {
 				setIsFinished(true) // Блокируем ререндер последнего задания
 				// ✅ Отправляем данные через `taskService.calculateXP()`
+				const correct = correctAnswers
+				const attempts = totalTasks
 				const responseData = await taskService.calculateXP(
 					unitId,
-					accuracy,
+					correct,
+					attempts,
 					committedTime,
 					mistakes,
 					maxCombo
@@ -85,7 +88,7 @@ const TaskScreen = ({ route }: any) => {
 						{
 							name: 'LessonCompleteScreen',
 							params: {
-								accuracy,
+								accuracy: responseData.accuracy,
 								committedTime: formattedTime,
 								xpEarned: responseData.xpEarned,
 							},
