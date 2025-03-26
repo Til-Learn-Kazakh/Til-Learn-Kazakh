@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import { AVPlaybackSource, Audio } from 'expo-av'
 
+import { usePreferences } from '../../../../settings/hooks/preferences.context'
+
 interface FooterProps {
 	isDisabled: boolean
 	onPress: () => void
@@ -26,6 +28,7 @@ const Footer = ({
 	bottomSheetRef,
 }: FooterProps) => {
 	const insets = useSafeAreaInsets()
+	const { preferences } = usePreferences() // 👈 вот здесь получаем настройки
 
 	// Определяем стили в зависимости от правильности ответа
 	let feedbackMessage = ''
@@ -48,22 +51,23 @@ const Footer = ({
 		soundFile = require('../../../../../../public/sound/wrong.mp3')
 	}
 
+
 	useEffect(() => {
 		const playSound = async () => {
-			if (isSuccess !== null && soundFile) {
+			if (isSuccess !== null && soundFile && preferences.soundEffects) {
 				const { sound } = await Audio.Sound.createAsync(soundFile)
 				await sound.playAsync()
 			}
 		}
 
-		if (isSuccess === true) {
+		if (isSuccess === true && preferences.vibration) {
 			Vibration.vibrate(200) // Легкая вибрация при правильном ответе
-		} else if (isSuccess === false) {
+		} else if (isSuccess === false && preferences.vibration) {
 			Vibration.vibrate(500) // Длинная вибрация при ошибке
 		}
 
 		playSound()
-	}, [isSuccess])
+	}, [isSuccess, preferences])
 
 	const handleCheckPress = () => {
 		if (hearts === 0) {

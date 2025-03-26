@@ -89,6 +89,8 @@ const BottomTabNavigation = ({ route }: { route: any }) => {
 						routeName === 'TaskScreen' ||
 						routeName === 'LessonCompleteScreen' ||
 						routeName === 'StreakTracker'
+					// routeName === 'PasswordChange' ||
+					// routeName === 'ChangeProfile'
 
 					return {
 						// Возвращаем нужные настройки для таб-бара
@@ -163,28 +165,53 @@ const BottomTabNavigation = ({ route }: { route: any }) => {
 			<Tab.Screen
 				name='ProfileStack'
 				component={ProfileStackScreen}
-				options={{
-					tabBarLabel: 'Profile',
-					tabBarIcon: ({ color, size }) => (
-						<Ionicons
-							name='person-outline'
-							size={size}
-							color={color}
-						/>
-					),
-					tabBarButton: props => (
-						<CustomTabBarButton
-							{...props}
-							onPress={() => {
-								navigation.navigate('AppStack', {
-									screen: 'ProfileStack',
-									params: {
-										screen: 'Profile',
-									},
-								})
-							}}
-						/>
-					),
+				options={({ route }) => {
+					const routeName = getFocusedRouteNameFromRoute(route) ?? 'Profile'
+
+					// Проверяем, нужно ли скрыть таббар
+					const isTabBarHidden =
+						routeName === 'PasswordChange' ||
+						routeName === 'ChangeProfile' ||
+						routeName === 'AvatarPickerPage'
+
+					return {
+						// Возвращаем нужные настройки для таб-бара
+						tabBarStyle: isTabBarHidden
+							? { display: 'none' }
+							: {
+									position: 'absolute',
+									bottom: 0,
+									right: 0,
+									left: 0,
+									elevation: 0,
+									height: 85,
+									borderTopColor: COLORS.GRAY2,
+									borderTopWidth: 1,
+									backgroundColor: '#fff',
+								},
+
+						tabBarLabel: 'Profile',
+						tabBarIcon: ({ color, size }) => (
+							<Ionicons
+								name='person-outline'
+								size={size}
+								color={color}
+							/>
+						),
+						tabBarButton: props => (
+							<CustomTabBarButton
+								{...props}
+								onPress={() => {
+									navigation.navigate('AppStack', {
+										screen: 'ProfileStack',
+										params: {
+											screen: 'Profile',
+										},
+									})
+								}}
+							/>
+						),
+					}
 				}}
 			/>
 		</Tab.Navigator>

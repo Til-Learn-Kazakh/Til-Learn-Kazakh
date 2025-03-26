@@ -1,0 +1,23 @@
+{
+	"support": {
+		"title": "Support",
+		"email": "Your email",
+		"message": "Your message",
+		"send": "Send",
+		"attach_photo": "Attach photo",
+		"success": "Message sent!",
+		"failed": "Failed to send message",
+		"no_access_title": "No access",
+		"no_access_desc": "Photo permission denied. You can enable it in settings.",
+		"sending": "Sending..."
+	},
+	"error": {
+		"title": "Error",
+		"fill_all_fields": "Please fill in all fields"
+	},
+	"success": {
+		"title": "Success"
+	},
+	"cancel": "Cancel",
+	"open_settings": "Open Settings"
+}

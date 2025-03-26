@@ -43,16 +43,9 @@ class AuthService {
 			})
 	}
 
-	async logout(config?: AxiosRequestConfig) {
-		return axiosWithAuth
-			.get<void>(`${this.url}/logout`, config)
-			.then(async resp => {
-				// Удаляем токены из SecureStore
-				await SecureStore.deleteItemAsync('token')
-				await SecureStore.deleteItemAsync('refresh_token')
-				return resp.data
-			})
-			.catch(e => console.error(e))
+	async logout() {
+		await SecureStore.deleteItemAsync('token')
+		await SecureStore.deleteItemAsync('refresh_token')
 	}
 
 	async getCurrent(config?: AxiosRequestConfig) {

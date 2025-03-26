@@ -1,29 +1,36 @@
 {
-	"expo": {
-		"name": "Diploma",
-		"slug": "Diploma",
-		"version": "1.0.0",
-		"orientation": "portrait",
-		"icon": "./assets/barys.png",
-		"userInterfaceStyle": "light",
-		"newArchEnabled": true,
-		"splash": {
-			"image": "./assets/barys.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#ffffff"
-		},
-		"ios": {
-			"supportsTablet": true
-		},
-		"android": {
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/barys.png",
-				"backgroundColor": "#ffffff"
-			}
-		},
-		"web": {
-			"favicon": "./assets/barys.png"
-		},
-		"plugins": ["expo-secure-store"]
-	}
+  "expo": {
+    "name": "Diploma",
+    "slug": "Diploma",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/barys.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/barys.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Мы хотим получить доступ к фотографиям, чтобы прикрепить их к сообщению.",
+        "NSCameraUsageDescription": "Этому приложению необходим доступ к камере, чтобы делать фотографии для профиля и продуктов. Ваши данные будут использоваться для улучшения вашего пользовательского опыта."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/barys.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/barys.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-localization"
+    ]
+  }
 }
