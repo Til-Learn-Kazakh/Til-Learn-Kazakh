@@ -19,6 +19,7 @@ export interface User {
 	weekly_xp: number
 	monthly_xp: number
 	streak: Streak | null // ✅ Теперь это объект или `null`, если streak нет
+	pending_rewards:any
 	xp: number
 	last_refill_at: string
 	created_at: string

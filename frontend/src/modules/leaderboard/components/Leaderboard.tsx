@@ -10,10 +10,15 @@ import {
 } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 
+import { Ionicons } from '@expo/vector-icons'
 // пример
 
+import { NavigationProp, useNavigation } from '@react-navigation/native'
+
+import { icons } from '../../../core/constants'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
 import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
+import { avatars } from '../../profile/components/AvatarPickerPage'
 import {
 	useAllTimeLeaderboard,
 	useMonthlyLeaderboard,
@@ -21,13 +26,10 @@ import {
 } from '../hooks/leaderboard.hooks'
 
 export default function LeaderboardScreen() {
-	// Табы: week | month | All Time
 	const [activeTab, setActiveTab] = useState<'week' | 'month' | 'All Time'>('week')
-
-	// Получаем данные текущего юзера
+	const navigation = useNavigation<NavigationProp<any>>()
 	const { data: currentUser } = useCurrentUser()
-
-	// В зависимости от tab, получаем разные данные
+	const selectedAvatar = avatars.find(a => a.id === currentUser?.avatar)
 	const { data: weeklyData, isLoading: isLoadingWeek, error: weekError } = useWeeklyLeaderboard()
 
 	const {
@@ -38,7 +40,6 @@ export default function LeaderboardScreen() {
 
 	const { data: allTimeData, isLoading: isLoadingAll, error: allError } = useAllTimeLeaderboard()
 
-	// Выбираем массив для текущего таба
 	let rawData: any[] = []
 	let isLoading = false
 	let error: any = null
@@ -57,47 +58,30 @@ export default function LeaderboardScreen() {
 		error = allError
 	}
 
-	// Если бэкенд возвращает ( _id, first_name, weekly_xp, monthly_xp, xp, avatar? )
-	// Нам нужно привести к единому виду:
-	// {
-	//   id: string
-	//   name: string
-	//   stars: number   <-- например weekly_xp / monthly_xp / xp
-	//   avatar: string
-	//   position: number
-	// }
-	// Ниже - пример маппинга:
 	const mappedData = rawData.map((user, idx) => {
-		const rank = idx + 1 // место в общем списке, т.к. отсортированы
+		const rank = idx + 1
+		const matchedAvatar = avatars.find(a => a.id === user?.avatar) ?? null
+
 		return {
 			id: user._id,
 			name: user.first_name || 'Unknown',
 			stars:
 				activeTab === 'week' ? user.weekly_xp : activeTab === 'month' ? user.monthly_xp : user.xp, // all-time
-			avatar: user.avatar || 'https://picsum.photos/200', // если у вас есть поле user.avatar
+			avatar: matchedAvatar ? matchedAvatar.img : icons.parrot,
 			position: rank,
 		}
 	})
-
-	// Делим на topThree / rest
 	const topThree = mappedData.slice(0, 3)
 	const rest = mappedData.slice(3)
-
-	// Состояние: виден ли текущий пользователь?
 	const [userVisible, setUserVisible] = useState(false)
-
-	// Если в базе нет currentUser или user._id не совпадает
-	// возможно, не показываем футер
 	const currentUserId = currentUser?.id
 
-	// Callback "какие items видны"
 	const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
 		if (!currentUserId) return
 		const isUserInView = viewableItems.some(({ item }: any) => item.id === currentUserId)
 		setUserVisible(isUserInView)
 	}).current
 
-	// viewabilityConfig
 	const viewabilityConfig = { itemVisiblePercentThreshold: 50 }
 
 	if (isLoading) {
@@ -115,12 +99,22 @@ export default function LeaderboardScreen() {
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<View style={styles.container}>
-				{/* Заголовок */}
 				<View style={styles.headerContainer}>
 					<Text style={styles.headerTitle}>Leaderboard</Text>
+					<TouchableOpacity
+						style={styles.rightButton}
+						onPress={() => {
+							navigation.navigate('InfoLeaderboardPage')
+						}}
+					>
+						<Ionicons
+							name='information-circle-outline'
+							size={24}
+							color='#fff'
+						/>
+					</TouchableOpacity>
 				</View>
 
-				{/* Табы */}
 				<View style={styles.tabsContainer}>
 					<TouchableOpacity
 						onPress={() => setActiveTab('week')}
@@ -164,7 +158,7 @@ export default function LeaderboardScreen() {
 						{topThree[1] ? (
 							<View style={styles.topItem}>
 								<Image
-									source={{ uri: topThree[1].avatar }}
+									source={topThree[1].avatar}
 									style={styles.topAvatarSm}
 								/>
 								<Text style={styles.topPosition}>2</Text>
@@ -183,7 +177,7 @@ export default function LeaderboardScreen() {
 							<View style={styles.topItemCenter}>
 								<Text style={styles.crownIcon}>👑</Text>
 								<Image
-									source={{ uri: topThree[0].avatar }}
+									source={topThree[0].avatar}
 									style={styles.topAvatarLg}
 								/>
 								<Text style={styles.topPosition}>1</Text>
@@ -201,7 +195,7 @@ export default function LeaderboardScreen() {
 						{topThree[2] ? (
 							<View style={styles.topItem}>
 								<Image
-									source={{ uri: topThree[2].avatar }}
+									source={topThree[2].avatar}
 									style={styles.topAvatarSm}
 								/>
 								<Text style={styles.topPosition}>3</Text>
@@ -228,7 +222,7 @@ export default function LeaderboardScreen() {
 								<View style={[styles.listItem, isMe && styles.meRow]}>
 									<Text style={styles.listPosition}>{item.position}</Text>
 									<Image
-										source={{ uri: item.avatar }}
+										source={item.avatar}
 										style={styles.listAvatar}
 									/>
 									<Text style={styles.listName}>{item.name}</Text>
@@ -242,7 +236,6 @@ export default function LeaderboardScreen() {
 					/>
 				</View>
 
-				{/* Фиксированный футер, показываем если user в базе + он не виден */}
 				{currentUser && !userVisible && !topThree.some(user => user.id === currentUserId) && (
 					<View style={styles.stickyFooter}>
 						<View style={[styles.listItem, styles.meRow]}>
@@ -251,7 +244,7 @@ export default function LeaderboardScreen() {
 								{mappedData.findIndex(u => u.id === currentUserId) + 1 || '--'}
 							</Text>
 							<Image
-								source={{ uri: currentUser.avatar || 'https://picsum.photos/200' }}
+								source={selectedAvatar?.img || icons.parrot}
 								style={styles.listAvatar}
 							/>
 							<Text style={styles.listName}>{currentUser.first_name}</Text>
@@ -282,13 +275,24 @@ const styles = StyleSheet.create({
 		backgroundColor: '#697CFF',
 	},
 	headerContainer: {
-		paddingVertical: 12,
+		flexDirection: 'row',
 		alignItems: 'center',
+		justifyContent: 'space-between', // чтобы текст по центру, иконки с краёв
+		paddingHorizontal: 16,
+		paddingVertical: 8,
+		marginTop: 10,
+	},
+	rightButton: {
+		width: 40,
+		alignItems: 'flex-end',
 	},
 	headerTitle: {
+		flex: 1, // позволяет занять всю оставшуюся ширину
+		textAlign: 'center', // выравниваем текст по центру
 		color: '#fff',
 		fontSize: 22,
 		fontWeight: 'bold',
+		marginLeft: 40,
 	},
 	tabsContainer: {
 		flexDirection: 'row',
@@ -371,6 +375,7 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 20,
 		paddingTop: 8,
 	},
+
 	listItem: {
 		backgroundColor: '#fff',
 		marginHorizontal: 16,

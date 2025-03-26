@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,75 @@ func (ctrl *UserController) GetCurrentUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, user)
+}
+
+func (ctrl *UserController) UpdateUserProfileHandler(c *gin.Context) {
+	userID, exists := c.Get("uid")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var dto UpdateUserDto
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedUser, err := ctrl.Service.UpdateUserProfile(c.Request.Context(), userID.(string), dto)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, updatedUser)
+}
+
+func (ctrl *UserController) UpdateUserAvatarHandler(c *gin.Context) {
+	userID, exists := c.Get("uid")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var body struct {
+		Avatar string `json:"avatar"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	fmt.Println("body.Avatar", body.Avatar)
+	updatedUser, err := ctrl.Service.UpdateUserAvatar(c.Request.Context(), userID.(string), body.Avatar)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, updatedUser)
+}
+
+func (ctrl *UserController) ChangePasswordHandler(c *gin.Context) {
+	userID, exists := c.Get("uid")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var dto ChangePasswordDto
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := ctrl.Service.ChangePassword(c.Request.Context(), userID.(string), dto)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "Пароль успешно изменён"})
 }
 
 func (ctrl *UserController) RefillHeartsWithCrystals(c *gin.Context) {

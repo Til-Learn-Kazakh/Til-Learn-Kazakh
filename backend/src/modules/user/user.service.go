@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"diploma/src/database"
+	"diploma/src/modules/achievements"
 	"diploma/src/modules/analytics"
 	"diploma/src/modules/auth"
 	"diploma/src/modules/streak"
@@ -14,6 +15,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -80,12 +82,104 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 	return &user, nil
 }
 
+func (s *UserService) UpdateUserProfile(ctx context.Context, userID string, dto UpdateUserDto) (*auth.User, error) {
+	objectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objectID}
+	update := bson.M{
+		"$set": bson.M{
+			"first_name": dto.FirstName,
+			"last_name":  dto.LastName,
+			"email":      dto.Email,
+		},
+	}
+
+	result := s.Collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
+	var updatedUser auth.User
+	if err := result.Decode(&updatedUser); err != nil {
+		return nil, err
+	}
+
+	return &updatedUser, nil
+}
+
+func (s *UserService) UpdateUserAvatar(ctx context.Context, userID, avatar string) (*auth.User, error) {
+	objectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := bson.M{"_id": objectID}
+	update := bson.M{
+		"$set": bson.M{
+			"avatar": avatar, // сохраняем строку
+		},
+	}
+
+	opts := options.FindOneAndUpdate().
+		SetReturnDocument(options.After)
+
+	result := s.Collection.FindOneAndUpdate(ctx, filter, update, opts)
+	if result.Err() != nil {
+		return nil, result.Err()
+	}
+
+	var updatedUser auth.User
+	if err := result.Decode(&updatedUser); err != nil {
+		return nil, err
+	}
+
+	return &updatedUser, nil
+}
+
+func (s *UserService) ChangePassword(ctx context.Context, userID string, dto ChangePasswordDto) error {
+	objectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return err
+	}
+
+	var user auth.User
+	err = s.Collection.FindOne(ctx, bson.M{"_id": objectID}).Decode(&user)
+	if err != nil {
+		return err
+	}
+
+	// Проверка старого пароля
+	isValid, _ := auth.VerifyPassword(dto.OldPassword, user.Password)
+	if !isValid {
+		return errors.New("старый пароль введён неверно")
+	}
+
+	// Хеширование нового пароля
+	hashedPassword := auth.HashPassword(dto.NewPassword)
+
+	if dto.NewPassword != dto.ConfirmPassword {
+		return errors.New("новый пароль и подтверждение не совпадают")
+	}
+
+	// Обновление пароля
+	_, err = s.Collection.UpdateOne(
+		ctx,
+		bson.M{"_id": objectID},
+		bson.M{"$set": bson.M{"password": hashedPassword}},
+	)
+
+	return err
+}
+
 func (*UserService) checkAndResetStreak(user *auth.User) error {
 	today := time.Now()
 	lastActive := user.Streak.LastActive
 	daysSinceLastActive := int(today.Sub(lastActive).Hours() / 24)
 
-	if daysSinceLastActive > 1 {
+	if daysSinceLastActive >= 1 {
 		// 🔹 Если пропущен день, сбрасываем streak в коллекции `Streak`
 		user.Streak.CurrentStreak = 0
 
@@ -271,10 +365,12 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 	if unitAlreadyCompleted {
 		unitXP = 0
 	} else {
+		if mistakes == 0 {
+			user.PerfectLessonsCount += 1
+		}
 		user.XP += unitXP
 		user.WeeklyXP += unitXP
 		user.MonthlyXP += unitXP
-		fmt.Println("user.WeeklyXP", user.MonthlyXP)
 		user.LessonsCompleted = append(user.LessonsCompleted, unitObjectID)
 
 		analyticsSvc := analytics.NewAnalyticsService()
@@ -300,9 +396,10 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 		bson.M{"_id": user.ID},
 		bson.M{
 			"$set": bson.M{"xp": user.XP,
-				"weekly_xp":         user.WeeklyXP,
-				"monthly_xp":        user.MonthlyXP,
-				"lessons_completed": user.LessonsCompleted,
+				"weekly_xp":             user.WeeklyXP,
+				"monthly_xp":            user.MonthlyXP,
+				"lessons_completed":     user.LessonsCompleted,
+				"perfect_lessons_count": user.PerfectLessonsCount,
 			},
 		},
 	)
@@ -314,6 +411,14 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 	// ✅ Вызываем UpdateStreak (streak обновляется всегда)
 	streakService := streak.NewStreakService()
 	_ = streakService.UpdateStreak(userID)
+
+	achievementsSvc := achievements.NewAchievementsService()
+	err = achievementsSvc.CheckAndGrantAchievements(context.Background(), user)
+	if err != nil {
+		fmt.Printf("[UpdateXP] ❌ Error checking achievements: %v\n", err)
+	} else {
+		fmt.Println("[UpdateXP] ✅ Achievements checked.")
+	}
 
 	return user, unitXP, accuracy, nil
 }

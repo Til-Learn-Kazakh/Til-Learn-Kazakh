@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"diploma/src/middlewares"
+	"diploma/src/modules/achievements"
 	"diploma/src/modules/analytics"
 	"diploma/src/modules/auth"
 	"diploma/src/modules/leaderboard"
@@ -60,6 +61,9 @@ func main() {
 	leaderboardController := leaderboard.NewLeaderboardController(leaderboardService)
 	leaderboardService.ScheduleResetXP()
 
+	achievementsService := achievements.NewAchievementsService()
+	achievementsController := achievements.NewAchievementsController(achievementsService)
+
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.12:19000"},
@@ -86,6 +90,7 @@ func main() {
 	streak.StreakRoutes(apiRoutes, streakController)
 	analytics.AnalyticsRoutes(apiRoutes, analyticsController)
 	leaderboard.LeaderboardRoutes(apiRoutes, leaderboardController)
+	achievements.AchievementsRoutes(apiRoutes, achievementsController)
 
 	log.Fatal(router.Run(":" + port))
 }

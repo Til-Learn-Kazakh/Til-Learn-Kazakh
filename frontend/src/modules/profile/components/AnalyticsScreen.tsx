@@ -62,14 +62,30 @@ const AnalyticsScreen: React.FC = () => {
 		const dateStr = dayObj.dateString
 		if (!markedDays[dateStr]) return
 		setMarkedDays(prev => {
-			const curColor = prev[dateStr].selectedColor
-			const newColor = curColor === 'red' ? 'black' : 'red'
-			return {
-				...prev,
-				[dateStr]: { selected: true, selectedColor: newColor },
+			const newMap = { ...prev }
+
+			// Сначала находим, есть ли уже красная дата
+			let redKey: string | null = null
+			for (const k in newMap) {
+				if (newMap[k].selectedColor === 'red') {
+					redKey = k
+					break
+				}
 			}
+			if (redKey) {
+				newMap[redKey] = { selected: true, selectedColor: 'black' }
+			}
+
+			if (redKey === dateStr) {
+				newMap[dateStr] = { selected: true, selectedColor: 'black' }
+				setSelectedCalendarDay(null)
+			} else {
+				newMap[dateStr] = { selected: true, selectedColor: 'red' }
+				setSelectedCalendarDay(dateStr)
+			}
+
+			return newMap
 		})
-		setSelectedCalendarDay(prev => (prev === dateStr ? null : dateStr))
 	}
 
 	const handleMonthChange = (date: any) => {
@@ -195,7 +211,7 @@ const AnalyticsScreen: React.FC = () => {
 		)
 	}
 
-	// -------------------- Вкладка "Год" --------------------
+	// ---- YEAR TAB ----
 	const [selectedYearModal, setSelectedYearModal] = useState(false)
 	const [selectedYearKey, setSelectedYearKey] = useState('2025')
 	const [selectedMonthIndex, setSelectedMonthIndex] = useState<number | null>(null)
@@ -215,7 +231,6 @@ const AnalyticsScreen: React.FC = () => {
 		isLoading: isBarMonthLoading,
 		isError: isBarMonthError,
 	} = useMonthlyStats(selectedBarMonthKey ?? '')
-
 	const {
 		data: yearlyData,
 		isLoading: isYearLoading,
@@ -388,7 +403,6 @@ const AnalyticsScreen: React.FC = () => {
 		)
 	}
 
-	// Переключатель вкладок
 	let content
 	if (activeTab === 'month') {
 		content = renderMonthTab()
@@ -418,7 +432,7 @@ const AnalyticsScreen: React.FC = () => {
 				<TouchableOpacity
 					style={styles.headerRight}
 					onPress={() => {
-						// к примеру, открыть модалку help
+						// открыть InfoAnalyticsPage
 						navigation.navigate('InfoAnalyticsPage')
 					}}
 				>
@@ -450,7 +464,7 @@ const AnalyticsScreen: React.FC = () => {
 
 			<ScrollView style={{ padding: 16 }}>{content}</ScrollView>
 
-			{/* Модалка года (если нужно) */}
+			{/* Модалка выбора года */}
 			<Modal
 				transparent
 				visible={selectedYearModal}
@@ -509,7 +523,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		borderBottomWidth: 1,
 		borderBottomColor: '#EEE',
-		marginTop: 45, // или SafeAreaView / etc
+		marginTop: 45,
 		marginBottom: 20,
 	},
 	headerLeft: {

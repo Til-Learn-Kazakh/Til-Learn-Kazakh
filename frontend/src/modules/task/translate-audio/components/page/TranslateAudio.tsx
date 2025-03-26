@@ -6,6 +6,7 @@ import { Audio } from 'expo-av'
 
 import { imageserver } from '../../../../../core/config/environment.config'
 import { CURRENT_USER_QUERY_KEY } from '../../../../auth/hooks/user-current-user.hook'
+import { usePreferences } from '../../../../settings/hooks/preferences.context'
 import { taskService } from '../../../main/services/task.service'
 import Footer from '../footer/Footer'
 import WordList from '../wordList/WordList'
@@ -57,6 +58,7 @@ const TranslateAudio = ({
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const [sound, setSound] = useState<Audio.Sound | null>(null)
 	const queryClient = useQueryClient() // Получаем queryClient
+	const { preferences } = usePreferences()
 
 	// Мутация
 	const { mutate } = useMutation({
@@ -86,6 +88,7 @@ const TranslateAudio = ({
 
 	// Аудио
 	const handlePlayAudio = async () => {
+		if (!preferences.soundEffects) return
 		try {
 			await Audio.setAudioModeAsync({
 				playsInSilentModeIOS: true, // Позволяет играть звук в режиме "без звука"

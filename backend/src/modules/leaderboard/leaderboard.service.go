@@ -42,6 +42,7 @@ func (s *LeaderboardService) getLeaderboard(ctx context.Context, xpField string,
 		SetProjection(bson.M{
 			"_id":        1,
 			"first_name": 1,
+			"avatar":     1,
 			xpField:      1,
 		})
 

@@ -10,12 +10,15 @@ import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
 import { InfoBottomSheet } from '../../home/components/InfoBottomSheet'
 import { useYearlyStats } from '../hooks/analytics.hooks'
 
+import { avatars } from './AvatarPickerPage'
+
 const ProfileScreen = () => {
 	const streakCount = 0 // Здесь можно вставить реальное количество streak
 	const navigation = useNavigation<NavigationProp<any>>()
 
 	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser() // <-- тут подтягиваем юзера из запроса
 	const [selectedYearKey, setSelectedYearKey] = useState(() => new Date().getFullYear().toString())
+	const selectedAvatar = avatars.find(a => a.id === currentUser?.avatar)
 
 	const {
 		data: yearlyData,
@@ -70,11 +73,17 @@ const ProfileScreen = () => {
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
 				{/* Profile Section */}
 				<View style={styles.profileSection}>
-					<Image
-						source={require('../../../../assets/Raim.jpg')}
-						style={styles.avatar}
-					/>
-					<Text style={styles.username}>Bolatbek</Text>
+					<TouchableOpacity
+						onPress={() => {
+							navigation.navigate('AvatarPickerPage', { selectedAvatarId: currentUser?.avatar })
+						}}
+					>
+						<Image
+							source={selectedAvatar?.img || icons.parrot}
+							style={styles.avatar}
+						/>
+					</TouchableOpacity>
+					<Text style={styles.username}>{currentUser?.first_name}</Text>
 					<Text style={styles.userTag}>Присоединился: {joinDate}</Text>
 				</View>
 
@@ -133,7 +142,10 @@ const ProfileScreen = () => {
 					</TouchableOpacity>
 
 					{/* Achievements Card */}
-					<View style={styles.squareCard}>
+					<TouchableOpacity
+						onPress={() => navigation.navigate('AchievementsScreen')}
+						style={styles.squareCard}
+					>
 						<Text style={styles.cardTitle}>ДОСТИЖЕНИЯ</Text>
 						<View style={styles.cardGrid}>
 							<View style={styles.row}>
@@ -156,7 +168,7 @@ const ProfileScreen = () => {
 								</View>
 							</View>
 						</View>
-					</View>
+					</TouchableOpacity>
 				</View>
 
 				{/* Statistics Section */}
