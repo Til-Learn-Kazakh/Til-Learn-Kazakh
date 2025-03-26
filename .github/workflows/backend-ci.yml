@@ -63,10 +63,6 @@ jobs:
         run: |
           make fmt
 
-      # 8. Run linter
-      - name: Run golangci-lint with verbose output
-        run: golangci-lint run --verbose
-
       # 8.1 Run linter
       - name: Run linter
         run: |
