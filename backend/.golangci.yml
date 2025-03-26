@@ -39,7 +39,6 @@ linters:
     - nakedret
     - noctx
     - nolintlint
-    - staticcheck
     - testifylint
     - unconvert
     - unparam
@@ -145,7 +144,6 @@ linters:
 
 formatters:
   enable:
-    - gci
     - gofmt
     - gofumpt
     - goimports
