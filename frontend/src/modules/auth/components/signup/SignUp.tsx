@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { ReactNativeModal } from 'react-native-modal'
 
@@ -19,14 +20,12 @@ import OAuth from '../OAuth/OAuth'
 
 import { SignupFormData, signupFormSchema } from './signup-form-types'
 
-// type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamList>
-
 const SignUp = () => {
 	const queryClient = useQueryClient()
 	const [showSuccessModal, setShowSuccessModal] = useState(false)
 	const navigation = useNavigation<NavigationProp<any>>()
+	const { t } = useTranslation()
 
-	// Инициализация формы
 	const {
 		control,
 		handleSubmit,
@@ -36,20 +35,18 @@ const SignUp = () => {
 		mode: 'onSubmit',
 	})
 
-	// Инициализация useMutation для регистрации
 	const { mutate, isPending } = useMutation({
 		mutationFn: (dto: SignupDTO) => authService.signup(dto),
 		onSuccess: () => {
 			setShowSuccessModal(true)
 		},
 		onError: () => {
-			toast.error('Ошибка при регистрации')
+			toast.error(t('AUTHORIZATION.SIGNUP.ERROR'))
 		},
 	})
 
 	const handleBrowseHome = () => {
 		setShowSuccessModal(false)
-
 		queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 	}
 	const onSubmit = (values: SignupFormData) => {
@@ -69,41 +66,37 @@ const SignUp = () => {
 		>
 			<View style={styles.innerContainer}>
 				<View style={styles.imageWrapper}>
-					{/* <Image
-						source={images.auth}
-						style={styles.image}
-					/> */}
-					<Text style={styles.title}>Let's Get Started</Text>
-					<Text style={styles.subtitle}>Create your account below</Text>
+					<Text style={styles.title}>{t('AUTHORIZATION.SIGNUP.TITLE')}</Text>
+					<Text style={styles.subtitle}>{t('AUTHORIZATION.SIGNUP.SUBTITLE')}</Text>
 				</View>
 				<View style={styles.formWrapper}>
 					<InputField
-						label='First Name'
-						placeholder='Enter first name'
+						label={t('AUTHORIZATION.SIGNUP.FIRST_NAME_LABEL')}
+						placeholder={t('AUTHORIZATION.SIGNUP.FIRST_NAME_PLACEHOLDER')}
 						icon={icons.person}
 						name='firstName'
 						control={control}
 						errorMessage={errors.firstName?.message}
 					/>
 					<InputField
-						label='Last Name'
-						placeholder='Enter last name'
+						label={t('AUTHORIZATION.SIGNUP.LAST_NAME_LABEL')}
+						placeholder={t('AUTHORIZATION.SIGNUP.LAST_NAME_PLACEHOLDER')}
 						icon={icons.person}
 						name='lastName'
 						control={control}
 						errorMessage={errors.lastName?.message}
 					/>
 					<InputField
-						label='Email'
-						placeholder='Enter email'
+						label={t('AUTHORIZATION.SIGNUP.EMAIL_LABEL')}
+						placeholder={t('AUTHORIZATION.SIGNUP.EMAIL_PLACEHOLDER')}
 						icon={icons.email}
 						name='email'
 						control={control}
 						errorMessage={errors.email?.message}
 					/>
 					<InputField
-						label='Password'
-						placeholder='Enter password'
+						label={t('AUTHORIZATION.SIGNUP.PASSWORD_LABEL')}
+						placeholder={t('AUTHORIZATION.SIGNUP.PASSWORD_PLACEHOLDER')}
 						icon={icons.lock}
 						secureTextEntry
 						name='password'
@@ -111,20 +104,21 @@ const SignUp = () => {
 						errorMessage={errors.password?.message}
 					/>
 					<CustomButton
-						title={isPending ? 'Signing Up...' : 'Sign Up'}
+						title={
+							isPending ? t('AUTHORIZATION.SIGNUP.SIGNING_UP') : t('AUTHORIZATION.SIGNUP.SIGN_UP')
+						}
 						onPress={handleSubmit(onSubmit)}
 						style={styles.signUpButton}
 						disabled={isPending}
 					/>
 					<OAuth />
 					<TouchableOpacity
-						onPress={() => {
-							navigation.navigate('Login')
-						}}
+						onPress={() => navigation.navigate('Login')}
 						style={styles.link}
 					>
 						<Text style={styles.link}>
-							Already have an account? <Text style={styles.linkHighlight}>Log In</Text>
+							{t('AUTHORIZATION.SIGNUP.ALREADY_HAVE_ACCOUNT')}{' '}
+							<Text style={styles.linkHighlight}>{t('AUTHORIZATION.SIGNUP.LOG_IN')}</Text>
 						</Text>
 					</TouchableOpacity>
 				</View>
@@ -136,10 +130,10 @@ const SignUp = () => {
 							autoPlay
 							loop={false}
 						/>
-						<Text style={styles.successTitle}>Created</Text>
-						<Text style={styles.successText}>You have successfully created your account.</Text>
+						<Text style={styles.successTitle}>{t('AUTHORIZATION.SIGNUP.SUCCESS_TITLE')}</Text>
+						<Text style={styles.successText}>{t('AUTHORIZATION.SIGNUP.SUCCESS_TEXT')}</Text>
 						<CustomButton
-							title='Browse Home'
+							title={t('AUTHORIZATION.SIGNUP.BROWSE_HOME')}
 							onPress={handleBrowseHome}
 							style={styles.browseButton}
 						/>
@@ -164,10 +158,6 @@ const styles = StyleSheet.create({
 		width: '100%',
 		height: 150,
 	},
-	image: {
-		width: '100%',
-		height: '100%',
-	},
 	title: {
 		textAlign: 'center',
 		fontSize: 32,
@@ -185,7 +175,6 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 		fontFamily: 'JakartaRegular',
 	},
-
 	formWrapper: {
 		padding: 20,
 	},
@@ -208,21 +197,6 @@ const styles = StyleSheet.create({
 		padding: 20,
 		borderRadius: 20,
 		minHeight: 300,
-	},
-	modalTitle: {
-		fontSize: 24,
-		fontFamily: 'JakartaExtraBold',
-		marginBottom: 10,
-	},
-	modalText: {
-		fontFamily: 'Jakarta',
-		marginBottom: 20,
-	},
-	successImage: {
-		width: 110,
-		height: 110,
-		alignSelf: 'center',
-		marginVertical: 20,
 	},
 	successTitle: {
 		fontSize: 24,

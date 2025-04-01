@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -21,8 +22,8 @@ const Login = () => {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const navigation = useNavigation<NavigationProp<any>>()
 	const queryClient = useQueryClient()
+	const { t } = useTranslation()
 
-	// Инициализация формы
 	const {
 		control,
 		handleSubmit,
@@ -32,16 +33,14 @@ const Login = () => {
 		mode: 'onSubmit',
 	})
 
-	// Инициализация useMutation для логина
 	const { mutate } = useMutation({
 		mutationFn: (dto: LoginDTO) => authService.login(dto),
 		onSuccess: () => {
-			toast.success('Добро пожаловать!')
+			toast.success(t('AUTHORIZATION.LOGIN.WELCOME'))
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 		},
-
 		onError: () => {
-			toast.error('Неверный email или пароль.')
+			toast.error(t('AUTHORIZATION.LOGIN.INVALID_CREDENTIALS'))
 		},
 	})
 
@@ -63,21 +62,21 @@ const Login = () => {
 		>
 			<View style={styles.innerContainer}>
 				<View style={styles.imageWrapper}>
-					<Text style={styles.title}>Welcome Back</Text>
-					<Text style={styles.subtitle}>Log in to your account</Text>
+					<Text style={styles.title}>{t('AUTHORIZATION.LOGIN.TITLE')}</Text>
+					<Text style={styles.subtitle}>{t('AUTHORIZATION.LOGIN.SUBTITLE')}</Text>
 				</View>
 				<View style={styles.formWrapper}>
 					<InputField
-						label='Email'
-						placeholder='Enter email'
+						label={t('AUTHORIZATION.LOGIN.EMAIL_LABEL')}
+						placeholder={t('AUTHORIZATION.LOGIN.EMAIL_PLACEHOLDER')}
 						icon={icons.email}
 						name='email'
 						control={control}
 						errorMessage={errors.email?.message}
 					/>
 					<InputField
-						label='Password'
-						placeholder='Enter password'
+						label={t('AUTHORIZATION.LOGIN.PASSWORD_LABEL')}
+						placeholder={t('AUTHORIZATION.LOGIN.PASSWORD_PLACEHOLDER')}
 						icon={icons.lock}
 						secureTextEntry
 						name='password'
@@ -85,7 +84,9 @@ const Login = () => {
 						errorMessage={errors.password?.message}
 					/>
 					<CustomButton
-						title={isSubmitting ? 'Logging In...' : 'Log In'}
+						title={
+							isSubmitting ? t('AUTHORIZATION.LOGIN.LOGGING_IN') : t('AUTHORIZATION.LOGIN.LOG_IN')
+						}
 						onPress={handleSubmit(onSubmit)}
 						style={styles.loginButton}
 						disabled={isSubmitting}
@@ -98,7 +99,8 @@ const Login = () => {
 						style={styles.link}
 					>
 						<Text>
-							Don't have an account? <Text style={styles.linkHighlight}>Sign Up</Text>
+							{t('AUTHORIZATION.LOGIN.NO_ACCOUNT')}{' '}
+							<Text style={styles.linkHighlight}>{t('AUTHORIZATION.LOGIN.SIGN_UP')}</Text>
 						</Text>
 					</TouchableOpacity>
 				</View>
@@ -108,19 +110,9 @@ const Login = () => {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#fff',
-	},
-	innerContainer: {
-		flex: 1,
-		backgroundColor: '#fff',
-	},
-	imageWrapper: {
-		position: 'relative',
-		width: '100%',
-		height: 150,
-	},
+	container: { flex: 1, backgroundColor: '#fff' },
+	innerContainer: { flex: 1, backgroundColor: '#fff' },
+	imageWrapper: { position: 'relative', width: '100%', height: 150 },
 	title: {
 		textAlign: 'center',
 		fontSize: 32,
@@ -138,12 +130,8 @@ const styles = StyleSheet.create({
 		marginTop: 8,
 		fontFamily: 'JakartaRegular',
 	},
-	formWrapper: {
-		padding: 20,
-	},
-	loginButton: {
-		marginTop: 20,
-	},
+	formWrapper: { padding: 20 },
+	loginButton: { marginTop: 20 },
 	link: {
 		textAlign: 'center',
 		marginTop: 20,
@@ -151,10 +139,7 @@ const styles = StyleSheet.create({
 		color: '#aaa',
 		alignItems: 'center',
 	},
-	linkHighlight: {
-		fontSize: 17,
-		color: '#0286FF',
-	},
+	linkHighlight: { fontSize: 17, color: '#0286FF' },
 })
 
 export default Login

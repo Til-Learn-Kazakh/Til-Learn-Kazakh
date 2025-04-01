@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native'
 
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet'
@@ -6,15 +7,16 @@ import { NavigationProp, useNavigation } from '@react-navigation/native'
 
 import { icons } from '../../../../../core/constants'
 
-export const CloseBottomsheet = ({ onClose }: any) => {
+export const CloseBottomsheet = ({ onClose }: { onClose: () => void }) => {
 	const navigation = useNavigation<NavigationProp<any>>()
+	const { t } = useTranslation()
 
 	const onCloseClick = useCallback(() => {
 		onClose()
 	}, [onClose])
 
 	const onEndSession = useCallback(() => {
-		onClose() 
+		onClose()
 		navigation.reset({
 			index: 0,
 			routes: [{ name: 'Home' }],
@@ -23,28 +25,28 @@ export const CloseBottomsheet = ({ onClose }: any) => {
 
 	return (
 		<BottomSheetScrollView contentContainerStyle={styles.container}>
-			{/* Картинка */}
+			{/* Image */}
 			<Image
 				source={icons.loseheart}
 				style={styles.image}
 			/>
 
-			{/* Текст */}
-			<Text style={styles.title}>Wait, don’t go!</Text>
-			<Text style={styles.subtitle}>You'll lose your progress if you quit now</Text>
+			{/* Localized Texts */}
+			<Text style={styles.title}>{t('TASK.CLOSE_BOTTOMSHEET.TITLE')}</Text>
+			<Text style={styles.subtitle}>{t('TASK.CLOSE_BOTTOMSHEET.SUBTITLE')}</Text>
 
-			{/* Кнопки */}
+			{/* Buttons */}
 			<TouchableOpacity
 				style={styles.keepLearningButton}
 				onPress={onCloseClick}
 			>
-				<Text style={styles.keepLearningText}>KEEP LEARNING</Text>
+				<Text style={styles.keepLearningText}>{t('TASK.CLOSE_BOTTOMSHEET.KEEP_LEARNING')}</Text>
 			</TouchableOpacity>
 			<TouchableOpacity
 				style={styles.endSessionButton}
 				onPress={onEndSession}
 			>
-				<Text style={styles.endSessionText}>END SESSION</Text>
+				<Text style={styles.endSessionText}>{t('TASK.CLOSE_BOTTOMSHEET.END_SESSION')}</Text>
 			</TouchableOpacity>
 		</BottomSheetScrollView>
 	)

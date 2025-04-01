@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
@@ -6,6 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import { LinearGradient } from 'expo-linear-gradient'
 
 const InfoLeaderboardPage: React.FC = () => {
+	const { t } = useTranslation()
 	const navigation = useNavigation()
 
 	return (
@@ -13,9 +15,9 @@ const InfoLeaderboardPage: React.FC = () => {
 			colors={['#697CFF', '#7646fc']}
 			style={styles.container}
 		>
-			{/* Шапка */}
+			{/* Header */}
 			<View style={styles.header}>
-				{/* Кнопка «назад» слева */}
+				{/* Back Button */}
 				<TouchableOpacity
 					onPress={() => navigation.goBack()}
 					style={styles.iconButton}
@@ -26,44 +28,30 @@ const InfoLeaderboardPage: React.FC = () => {
 						color='#FFF'
 					/>
 				</TouchableOpacity>
-
-				{/* Заголовок */}
-				<Text style={styles.title}>О Рейтинге</Text>
-
-				{/* Пустая вьюшка справа, чтобы заголовок был по центру */}
+				{/* Title */}
+				<Text style={styles.title}>{t('LEADERBOARD.INFO.TITLE')}</Text>
+				{/* Placeholder for alignment */}
 				<View />
 			</View>
 
-			{/* Основной контент */}
+			{/* Main Content */}
 			<View style={styles.content}>
-				{/* Блок про недельный рейтинг */}
+				{/* Weekly Ranking Card */}
 				<View style={styles.card}>
-					<Text style={styles.sectionTitle}>Недельный рейтинг</Text>
-					<Text style={styles.text}>
-						Каждое воскресенье в 00:00 очки WeeklyXP у всех пользователей{' '}
-						<Text style={{ fontWeight: 'bold' }}>обнуляются</Text>, и начинается новый отсчёт на
-						неделю.
-					</Text>
+					<Text style={styles.sectionTitle}>{t('LEADERBOARD.INFO.WEEKLY_RANKING.TITLE')}</Text>
+					<Text style={styles.text}>{t('LEADERBOARD.INFO.WEEKLY_RANKING.DESCRIPTION')}</Text>
 				</View>
 
-				{/* Блок про месячный рейтинг */}
+				{/* Monthly Ranking Card */}
 				<View style={styles.card}>
-					<Text style={styles.sectionTitle}>Месячный рейтинг</Text>
-					<Text style={styles.text}>
-						Первого числа каждого месяца очки MonthlyXP у всех пользователей{' '}
-						<Text style={{ fontWeight: 'bold' }}>обнуляются</Text>, и начинается новый отсчёт на
-						месяц.
-					</Text>
+					<Text style={styles.sectionTitle}>{t('LEADERBOARD.INFO.MONTHLY_RANKING.TITLE')}</Text>
+					<Text style={styles.text}>{t('LEADERBOARD.INFO.MONTHLY_RANKING.DESCRIPTION')}</Text>
 				</View>
 
-				{/* Зачем обнулять */}
+				{/* Why Reset Card */}
 				<View style={styles.card}>
-					<Text style={styles.sectionTitle}>Зачем это нужно?</Text>
-					<Text style={styles.text}>
-						Мы даём всем одинаковые условия для соревнования – это помогает поддерживать интерес и
-						мотивацию. Еженедельный и ежемесячный «сброс» делает гонку за очками более честной и
-						увлекательной.
-					</Text>
+					<Text style={styles.sectionTitle}>{t('LEADERBOARD.INFO.WHY_RESET.TITLE')}</Text>
+					<Text style={styles.text}>{t('LEADERBOARD.INFO.WHY_RESET.DESCRIPTION')}</Text>
 				</View>
 			</View>
 		</LinearGradient>
@@ -94,7 +82,7 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		fontWeight: 'bold',
 		color: '#FFF',
-		alignItems: 'center',
+		textAlign: 'center',
 	},
 	content: {
 		marginTop: 10,
@@ -104,7 +92,6 @@ const styles = StyleSheet.create({
 		borderRadius: 12,
 		padding: 16,
 		marginBottom: 16,
-		// Тень
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 4 },
 		shadowOpacity: 0.2,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import FeatherIcon from '@expo/vector-icons/Feather'
@@ -20,6 +21,7 @@ const ChangeProfile = () => {
 	const [isSaving, setIsSaving] = useState(false)
 	const navigation = useNavigation<NavigationProp<any>>()
 	const { data } = useCurrentUser()
+	const { t } = useTranslation()
 
 	const {
 		control,
@@ -40,12 +42,12 @@ const ChangeProfile = () => {
 	const { mutate } = useMutation({
 		mutationFn: (dto: UpdateProfileDto) => profileService.updateProfile(dto),
 		onSuccess: () => {
-			toast.success('Профиль обновлён')
+			toast.success(t('SETTINGS.CHANGE_PROFILE.SUCCESS'))
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 			navigation.goBack()
 		},
 		onError: () => {
-			toast.error('Ошибка при обновлении профиля')
+			toast.error(t('SETTINGS.CHANGE_PROFILE.ERROR'))
 		},
 	})
 
@@ -76,7 +78,7 @@ const ChangeProfile = () => {
 						color='#888'
 					/>
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Profile</Text>
+				<Text style={styles.headerTitle}>{t('SETTINGS.CHANGE_PROFILE.TITLE')}</Text>
 			</View>
 			<View style={styles.divider} />
 
@@ -85,42 +87,38 @@ const ChangeProfile = () => {
 				style={styles.container}
 			>
 				<View style={styles.innerContainer}>
-					{/* ===== Header с кнопкой назад ===== */}
-
-					{/* <Text style={styles.subtitle}>Измени данные ниже</Text> */}
-
 					<View style={styles.formWrapper}>
 						<InputField
-							label='First Name'
-							placeholder='Enter first name'
+							label={t('SETTINGS.CHANGE_PROFILE.FIRST_NAME')}
+							placeholder={t('SETTINGS.CHANGE_PROFILE.FIRST_NAME_PLACEHOLDER')}
 							icon={icons.person}
 							name='firstName'
 							control={control}
 							errorMessage={errors.firstName?.message}
 						/>
 						<InputField
-							label='Last Name'
-							placeholder='Enter last name'
+							label={t('SETTINGS.CHANGE_PROFILE.LAST_NAME')}
+							placeholder={t('SETTINGS.CHANGE_PROFILE.LAST_NAME_PLACEHOLDER')}
 							icon={icons.person}
 							name='lastName'
 							control={control}
 							errorMessage={errors.lastName?.message}
 						/>
 						<InputField
-							label='Email'
-							placeholder='Введите email'
+							label={t('SETTINGS.CHANGE_PROFILE.EMAIL')}
+							placeholder={t('SETTINGS.CHANGE_PROFILE.EMAIL_PLACEHOLDER')}
 							icon={icons.email}
 							name='email'
 							control={control}
 							errorMessage={errors.email?.message}
 						/>
 
-						{/* ===== Нередактируемый пароль с переходом ===== */}
+						{/* Non-editable password input with navigation */}
 						<TouchableOpacity onPress={() => navigation.navigate('PasswordChange')}>
 							<View pointerEvents='none'>
 								<InputField
-									label='Password'
-									placeholder='Change password'
+									label={t('SETTINGS.CHANGE_PROFILE.PASSWORD')}
+									placeholder={t('SETTINGS.CHANGE_PROFILE.PASSWORD_PLACEHOLDER')}
 									icon={icons.lock}
 									secureTextEntry
 									name='password'
@@ -131,7 +129,9 @@ const ChangeProfile = () => {
 						</TouchableOpacity>
 
 						<CustomButton
-							title={isSaving ? 'Сохраняю...' : 'Сохранить'}
+							title={
+								isSaving ? t('SETTINGS.CHANGE_PROFILE.SAVING') : t('SETTINGS.CHANGE_PROFILE.SAVE')
+							}
 							onPress={handleSubmit(onSubmit)}
 							style={styles.saveButton}
 							disabled={isSaving}
@@ -169,27 +169,16 @@ const styles = StyleSheet.create({
 		position: 'relative',
 		top: 0,
 	},
-	backButton: {
-		marginRight: 10,
-	},
 	backIcon: {
 		position: 'absolute',
 		left: 16,
 		paddingTop: 50,
 	},
-
 	headerTitle: {
 		fontSize: 22,
 		fontWeight: '600',
 		color: '#444',
 		fontFamily: 'JakartaBold',
-	},
-	subtitle: {
-		textAlign: 'center',
-		fontSize: 16,
-		color: '#666',
-		marginTop: 10,
-		fontFamily: 'JakartaRegular',
 	},
 	formWrapper: {
 		padding: 20,

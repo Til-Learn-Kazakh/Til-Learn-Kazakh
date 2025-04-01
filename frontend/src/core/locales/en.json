@@ -1,23 +1,308 @@
 {
-	"support": {
-		"title": "Support",
-		"email": "Your email",
-		"message": "Your message",
-		"send": "Send",
-		"attach_photo": "Attach photo",
-		"success": "Message sent!",
-		"failed": "Failed to send message",
-		"no_access_title": "No access",
-		"no_access_desc": "Photo permission denied. You can enable it in settings.",
-		"sending": "Sending..."
+	"ERROR": {
+		"TITLE": "Error",
+		"FILL_ALL_FIELDS": "Please fill in all fields"
 	},
-	"error": {
-		"title": "Error",
-		"fill_all_fields": "Please fill in all fields"
+	"SUCCESS": {
+		"TITLE": "Success"
 	},
-	"success": {
-		"title": "Success"
+	"WARNING": "Warning",
+	"INFORMATION": "Information",
+	"LESSONS": "Lessons",
+	"SKIP": "Skip",
+	"NEXT": "Next",
+	"GET_STARTED": "Get Started",
+	"CANCEL": "Cancel",
+	"OPEN_SETTINGS": "Open Settings",
+	"SETTINGS": {
+		"TITLE": "Settings",
+		"SUBTITLE": "Application settings",
+		"PARAMETERS": {
+			"TITLE": "Parameters",
+			"LANGUAGE": "Language",
+			"NOTIFICATIONS": "Notifications",
+			"SOUND_EFFECTS": "Sound Effects",
+			"VIBRATION": "Vibration"
+		},
+		"PROFILE": "Profile",
+		"SOCIAL_PLATFORMS": {
+			"TITLE": "TIL on Social Media",
+			"DISCORD": "Discord",
+			"INSTAGRAM": "Instagram",
+			"TELEGRAM": "Telegram"
+		},
+		"SUPPORT": {
+			"TITLE": "Support",
+			"EMAIL": "Your email",
+			"MESSAGE": "Your message",
+			"SEND": "Send",
+			"ATTACH_PHOTO": "Attach photo",
+			"SUCCESS": "Message sent!",
+			"FAILED": "Failed to send message",
+			"NO_ACCESS_TITLE": "No access",
+			"NO_ACCESS_DESC": "Photo permission denied. You can enable it in settings.",
+			"SENDING": "Sending...",
+			"BACK": "Back",
+			"REMOVE_PHOTO": "Remove photo",
+			"SECTION": "Support",
+			"CONTACT": "Contact Support"
+		},
+		"LOGOUT": "Logout",
+		"TERMS": "Terms of Service",
+		"AND": "and",
+		"PRIVACY": "Privacy Policy",
+		"DELETE_ACCOUNT": "Delete Account",
+		"CHANGE_PROFILE": {
+			"TITLE": "Profile",
+			"FIRST_NAME": "First Name",
+			"FIRST_NAME_PLACEHOLDER": "Enter first name",
+			"LAST_NAME": "Last Name",
+			"LAST_NAME_PLACEHOLDER": "Enter last name",
+			"EMAIL": "Email",
+			"EMAIL_PLACEHOLDER": "Enter email",
+			"PASSWORD": "Password",
+			"PASSWORD_PLACEHOLDER": "Change password",
+			"SAVE": "Save",
+			"SAVING": "Saving...",
+			"SUCCESS": "Profile updated successfully",
+			"ERROR": "Error updating profile",
+			"PASSWORD_CHANGE": {
+				"TITLE": "Password",
+				"OLD_PASSWORD": "Old password",
+				"NEW_PASSWORD": "New password",
+				"CONFIRM_PASSWORD": "Confirm password",
+				"SAVE": "Save",
+				"SAVING": "Saving...",
+				"SUCCESS": "Password updated successfully",
+				"ERROR": "Error changing password"
+			}
+		},
+		"LANGUAGE_PAGE": {
+			"TITLE": "Language"
+		}
 	},
-	"cancel": "Cancel",
-	"open_settings": "Open Settings"
+	"PROFILE": {
+		"HEADER_TITLE": "Profile",
+		"JOINED": "Joined: ",
+		"JOINED_UNKNOWN": "Unknown",
+		"HEARTS": "Hearts",
+		"XP": "XP",
+		"DIAMONDS": "Diamonds",
+		"STREAK": "Streak",
+		"ACHIEVEMENTS": "Achievements",
+		"TIME_LEARNING": "Time Learning",
+		"LESSONS_COMPLETED": "Lessons Completed",
+		"ACCURACY": "Accuracy",
+		"MIN": "min",
+		"MONTH_SWIPE": "Month (Swipe)",
+		"YEAR": "Year",
+		"INFO_ANALYTICS": {
+			"TITLE": "About Analytics",
+			"HOW_IT_WORKS_TITLE": "How Analytics Works",
+			"HOW_IT_WORKS_CONTENT": "In this section you can view your statistics for the day, month and year. The calendar shows the days when lessons were completed. You can tap on days to view detailed information.",
+			"HOW_TO_READ_DATA_TITLE": "How to Interpret Data",
+			"HOW_TO_READ_DATA_CONTENT": "- SERIES: Number of consecutive days without skipping.\n- ACCURACY: Percentage of correct answers.\n- TIME: Minutes spent learning.\n- XP: Earned experience points.\n- ERRORS: Number of mistakes made.",
+			"WHY_TRACK_STATS_TITLE": "Why Track Your Statistics?",
+			"WHY_TRACK_STATS_CONTENT": "Regular progress helps in retaining material better. Keep track of your streak and don't skip days!"
+		},
+		"AVATAR_CHANGE": {
+			"HEADER_TITLE": "Change Avatar",
+			"CANCEL": "Cancel",
+			"SAVE": "Save",
+			"AVATAR_UPDATED_SUCCESS": "Avatar updated successfully!",
+			"AVATAR_UPDATE_FAILED": "Failed to update avatar. Please try again."
+		},
+		"ANALYTICS": {
+			"HEADER_TITLE": "Analytics",
+			"MONTH_TAB": "Month",
+			"YEAR_TAB": "Year",
+			"NO_DATA": "No data for {{data}}",
+			"DAY_STATS": "Day Stats",
+			"MONTH_STATS": "Overall Month Stats",
+			"YEAR_STATS": "Overall Year Stats",
+			"SELECT_YEAR": "Select Year",
+			"STREAK": "Streak",
+			"ACCURACY": "Accuracy",
+			"TIME": "min",
+			"XP": "XP",
+			"LESSONS": "Lessons",
+			"MISTAKES": "Mistakes",
+			"CANCEL": "Cancel"
+		}
+	},
+	"PROGRESS": {
+		"STREAK": {
+			"TITLE": "Day {{day}} of your streak",
+			"SUBTITLE": "starts tomorrow!",
+			"TIP": "Tip: Your streak will reset if you don't practice tomorrow. Watch out!",
+			"CONTINUE": "CONTINUE"
+		},
+		"LESSON_COMPLETE": {
+			"TITLE": "Lesson complete!",
+			"TOTAL_XP": "TOTAL XP",
+			"ACCURACY_LABEL": "GREAT",
+			"COMMITTED_LABEL": "TIME SPENT",
+			"CLAIM": "CLAIM XP"
+		}
+	},
+	"ACHIEVEMENTS": {
+		"MODAL": {
+			"TITLE": "ACHIEVEMENT UNLOCKED!",
+			"CLAIM": "Claim +{{reward}}",
+			"CLAIMING": "Claiming...",
+			"CLOSE": "Close",
+			"ERROR": "Error claiming reward."
+		},
+		"SCREEN": {
+			"LOADING": "Loading...",
+			"ERROR": "Error loading achievements",
+			"BACK": "Back",
+			"TITLE": "Achievements"
+		}
+	},
+	"STREAK_BOTTOM": {
+		"STREAK": {
+			"LABEL": "days streak",
+			"RECORD": "Record Streak: {{max}} days"
+		},
+		"INFO_STREAK": {
+			"TITLE": "The winning streak shows how many days you've been practicing without a break",
+			"SUBTITLE": "To continue your streak, you can:",
+			"ACTION_LESSON": "Take a lesson",
+			"ACTION_WORDS": "Learn words",
+			"ACTION_TASK": "Complete an assignment",
+			"ACTION_SERIES": "Keep your streak going",
+			"HINT": "For any of these actions, you also earn experience points and can compete for the top spot in the league.",
+			"CLOSE": "Close"
+		}
+	},
+	"HOME": {
+		"HEARTS": {
+			"FULL": "You have full hearts!",
+			"NEXT": "Next heart in ",
+			"FULL_BUTTON": "FULL HEARTS",
+			"REFILL_BUTTON": "REFILL HEARTS",
+			"PRICE": "500"
+		},
+		"LESSON_PROGRESS_TEXT": "{{progress}}% completed"
+	},
+	"LEADERBOARD": {
+		"HEADER_TITLE": "Leaderboard",
+		"TABS": {
+			"WEEK": "Week",
+			"MONTH": "Month",
+			"ALL_TIME": "All Time"
+		},
+		"ERROR_LOADING": "Error loading {{tab}} Leaderboard",
+		"NO_USER": "No user",
+		"INFO": {
+			"TITLE": "About the Leaderboard",
+			"WEEKLY_RANKING": {
+				"TITLE": "Weekly Ranking",
+				"DESCRIPTION": "Every Sunday at 00:00, the WeeklyXP points for all users are reset, starting a new week ranking."
+			},
+			"MONTHLY_RANKING": {
+				"TITLE": "Monthly Ranking",
+				"DESCRIPTION": "On the first day of each month, the MonthlyXP points for all users are reset, starting a new monthly ranking."
+			},
+			"WHY_RESET": {
+				"TITLE": "Why Reset?",
+				"DESCRIPTION": "We provide equal conditions for competition – this helps maintain interest and motivation. Weekly and monthly resets make the race for points fair and exciting."
+			}
+		}
+	},
+	"AUTHORIZATION": {
+    "LOGIN": {
+      "TITLE": "Welcome Back",
+      "SUBTITLE": "Log in to your account",
+      "EMAIL_LABEL": "Email",
+      "EMAIL_PLACEHOLDER": "Enter email",
+      "PASSWORD_LABEL": "Password",
+      "PASSWORD_PLACEHOLDER": "Enter password",
+      "LOG_IN": "Log In",
+      "LOGGING_IN": "Logging In...",
+      "WELCOME": "Welcome!",
+      "INVALID_CREDENTIALS": "Invalid email or password.",
+      "NO_ACCOUNT": "Don't have an account?",
+      "SIGN_UP": "Sign Up",
+			"LOGIN_FORM": {
+        "EMAIL_REQUIRED": "Email is required",
+        "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
+        "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
+        "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
+        "PASSWORD_DIGIT": "Password must contain at least one digit",
+        "PASSWORD_SPECIAL": "Password must contain at least one special character (@$!%*?&)"
+      }
+    },
+		"OAUTH": {
+      "OR": "Or",
+      "LOGIN_WITH_GOOGLE": "Log In with Google",
+      "GOOGLE_SIGN_IN_ALERT": "Google Sign In"
+    },
+		"SIGNUP": {
+      "TITLE": "Let's Get Started",
+      "SUBTITLE": "Create your account below",
+      "FIRST_NAME_LABEL": "First Name",
+      "FIRST_NAME_PLACEHOLDER": "Enter first name",
+      "LAST_NAME_LABEL": "Last Name",
+      "LAST_NAME_PLACEHOLDER": "Enter last name",
+      "EMAIL_LABEL": "Email",
+      "EMAIL_PLACEHOLDER": "Enter email",
+      "PASSWORD_LABEL": "Password",
+      "PASSWORD_PLACEHOLDER": "Enter password",
+      "SIGN_UP": "Sign Up",
+      "SIGNING_UP": "Signing Up...",
+      "ALREADY_HAVE_ACCOUNT": "Already have an account?",
+      "LOG_IN": "Log In",
+      "ERROR": "Error during sign up",
+      "SUCCESS_TITLE": "Created",
+      "SUCCESS_TEXT": "You have successfully created your account.",
+      "BROWSE_HOME": "Browse Home",
+			"SIGNUP_FORM": {
+        "FIRST_NAME_REQUIRED": "First name is required",
+        "LAST_NAME_REQUIRED": "Last name is required",
+        "EMAIL_REQUIRED": "Email is required",
+        "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
+        "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
+        "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
+        "PASSWORD_DIGIT": "Password must contain at least one digit",
+        "PASSWORD_SPECIAL": "Password must contain at least one special character (@$!%*?&)"
+      }
+    }
+  },
+	"WELCOME": {
+    "DATA": {
+      "TITLE_1": "Discover Kazakh Language!",
+      "DESCRIPTION_1": "Start your journey to learn the Kazakh language with ease and fun.",
+      "TITLE_2": "Interactive Lessons and Quizzes",
+      "DESCRIPTION_2": "Engage with interactive lessons and quizzes to boost your Kazakh skills.",
+      "TITLE_3": "Master Kazakh, Step by Step!",
+      "DESCRIPTION_3": "Track your progress and become fluent in Kazakh, one step at a time."
+    }
+  },
+	"TASK": {
+    "REFILL": {
+      "OUT_OF_HEARTS_TITLE": "You ran out of hearts!",
+      "OUT_OF_HEARTS_SUBTITLE": "Use gems to keep learning.",
+      "CARD_TITLE": "Refill Hearts",
+      "PRICE": "500",
+      "REFILL_BUTTON": "Refill",
+      "NO_THANKS_BUTTON": "No Thanks",
+      "REFILL_SUCCESS": "Hearts refilled successfully!",
+      "REFILL_ERROR": "Failed to refill hearts. Please try again."
+    },
+		"ERROR_LOADING": "Error loading task",
+		"CLOSE_BOTTOMSHEET": {
+      "TITLE": "Wait, don’t go!",
+      "SUBTITLE": "You'll lose your progress if you quit now.",
+      "KEEP_LEARNING": "KEEP LEARNING",
+      "END_SESSION": "END SESSION"
+    },
+		"FOOTER": {
+      "CHECK": "CHECK",
+      "CONTINUE": "CONTINUE",
+      "SUCCESS_FEEDBACK": "✔ Great job!",
+      "FAILURE_FEEDBACK": "Correct solution:"
+    }
+  }
 }

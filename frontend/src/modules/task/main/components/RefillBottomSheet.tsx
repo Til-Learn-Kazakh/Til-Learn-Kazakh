@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet'
@@ -17,17 +18,18 @@ const RefillBottomSheet = ({
 }) => {
 	const navigation = useNavigation<NavigationProp<any>>()
 	const queryClient = useQueryClient()
+	const { t } = useTranslation()
 
 	const { mutate: refillWithCrystals, isPending } = useMutation({
 		mutationFn: () => homeService.refillHeartsWithCrystals(),
 		onSuccess: data => {
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 			bottomSheetRef.current?.dismiss()
-			toast.success('Сердца успешно пополнились!')
+			toast.success(t('TASK.REFILL.REFILL_SUCCESS'))
 		},
 		onError: error => {
-			toast.error(`${error}`)
 			console.error('Error refilling hearts with crystals:', error)
+			toast.error(t('TASK.REFILL.REFILL_ERROR'))
 		},
 	})
 
@@ -47,22 +49,22 @@ const RefillBottomSheet = ({
 		>
 			<BottomSheetScrollView contentContainerStyle={styles.scrollContainer}>
 				<View style={styles.container}>
-					<Text style={styles.title}>You ran out of hearts!</Text>
-					<Text style={styles.subtitle}>Use gems to keep learning.</Text>
+					<Text style={styles.title}>{t('TASK.REFILL.OUT_OF_HEARTS_TITLE')}</Text>
+					<Text style={styles.subtitle}>{t('TASK.REFILL.OUT_OF_HEARTS_SUBTITLE')}</Text>
 
 					<View style={styles.card}>
 						<Image
 							source={icons.heart}
 							style={styles.cardImage}
 						/>
-						<Text style={styles.cardTitle}>Refill Hearts</Text>
+						<Text style={styles.cardTitle}>{t('TASK.REFILL.CARD_TITLE')}</Text>
 
 						<View style={styles.priceContainer}>
 							<Image
 								source={icons.diamond}
 								style={styles.diamondIcon}
 							/>
-							<Text style={styles.priceText}>500</Text>
+							<Text style={styles.priceText}>{t('TASK.REFILL.PRICE')}</Text>
 						</View>
 					</View>
 
@@ -70,14 +72,14 @@ const RefillBottomSheet = ({
 						style={styles.refillButton}
 						onPress={() => refillWithCrystals()}
 					>
-						<Text style={styles.refillButtonText}>Refill</Text>
+						<Text style={styles.refillButtonText}>{t('TASK.REFILL.REFILL_BUTTON')}</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						style={styles.noThanksButton}
 						onPress={() => bottomSheetRef.current?.dismiss()}
 					>
-						<Text style={styles.noThanksText}>NO THANKS</Text>
+						<Text style={styles.noThanksText}>{t('TASK.REFILL.NO_THANKS_BUTTON')}</Text>
 					</TouchableOpacity>
 				</View>
 			</BottomSheetScrollView>

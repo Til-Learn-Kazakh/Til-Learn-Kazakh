@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
@@ -7,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 
 const InfoAnalyticsPage: React.FC = () => {
 	const navigation = useNavigation()
+	const { t } = useTranslation()
 
 	return (
 		<LinearGradient
@@ -25,7 +27,7 @@ const InfoAnalyticsPage: React.FC = () => {
 						color='#FFF'
 					/>
 				</TouchableOpacity>
-				<Text style={styles.title}>О Аналитике</Text>
+				<Text style={styles.title}>{t('PROFILE.INFO_ANALYTICS.TITLE')}</Text>
 				<View style={styles.iconButton}>
 					<Ionicons
 						name='bar-chart'
@@ -38,31 +40,22 @@ const InfoAnalyticsPage: React.FC = () => {
 			{/* Content */}
 			<View style={styles.content}>
 				<View style={styles.card}>
-					<Text style={styles.sectionTitle}>Как работает аналитика?</Text>
-					<Text style={styles.text}>
-						В этом разделе вы можете увидеть свою статистику за день, месяц и год. Календарь
-						показывает дни, когда были выполнены уроки. Вы можете нажимать на дни, чтобы посмотреть
-						детальную информацию.
-					</Text>
+					<Text style={styles.sectionTitle}>{t('PROFILE.INFO_ANALYTICS.HOW_IT_WORKS_TITLE')}</Text>
+					<Text style={styles.text}>{t('PROFILE.INFO_ANALYTICS.HOW_IT_WORKS_CONTENT')}</Text>
 				</View>
 
 				<View style={styles.card}>
-					<Text style={styles.sectionTitle}>Как читать данные?</Text>
-					<Text style={styles.text}>
-						- <Text style={styles.bold}>Серия</Text>: количество дней подряд без пропуска. {'\n'}-{' '}
-						<Text style={styles.bold}>Точность</Text>: процент правильных ответов. {'\n'}-{' '}
-						<Text style={styles.bold}>Время</Text>: минуты, проведённые в изучении. {'\n'}-{' '}
-						<Text style={styles.bold}>XP</Text>: заработанные очки опыта. {'\n'}-{' '}
-						<Text style={styles.bold}>Ошибки</Text>: количество допущенных ошибок.
+					<Text style={styles.sectionTitle}>
+						{t('PROFILE.INFO_ANALYTICS.HOW_TO_READ_DATA_TITLE')}
 					</Text>
+					<Text style={styles.text}>{t('PROFILE.INFO_ANALYTICS.HOW_TO_READ_DATA_CONTENT')}</Text>
 				</View>
 
 				<View style={styles.card}>
-					<Text style={styles.sectionTitle}>Почему важно следить за статистикой?</Text>
-					<Text style={styles.text}>
-						Регулярный прогресс помогает лучше запоминать материал. Следите за своей серией и не
-						пропускайте дни!
+					<Text style={styles.sectionTitle}>
+						{t('PROFILE.INFO_ANALYTICS.WHY_TRACK_STATS_TITLE')}
 					</Text>
+					<Text style={styles.text}>{t('PROFILE.INFO_ANALYTICS.WHY_TRACK_STATS_CONTENT')}</Text>
 				</View>
 			</View>
 		</LinearGradient>

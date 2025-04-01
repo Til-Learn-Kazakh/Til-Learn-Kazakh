@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Calendar } from 'react-native-calendars'
+import { Calendar, LocaleConfig } from 'react-native-calendars'
 
 import { Ionicons } from '@expo/vector-icons'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
@@ -14,10 +15,10 @@ const availableYears = [
 ]
 
 const AnalyticsScreen: React.FC = () => {
+	const { t, i18n } = useTranslation()
 	const navigation = useNavigation<NavigationProp<any>>()
 
 	const [activeTab, setActiveTab] = useState<'month' | 'year'>('month')
-
 	const [yearMonthKey, setYearMonthKey] = useState('')
 	const {
 		data: monthlyData,
@@ -28,9 +29,92 @@ const AnalyticsScreen: React.FC = () => {
 	const [markedDays, setMarkedDays] = useState<Record<string, any>>({})
 	const [selectedCalendarDay, setSelectedCalendarDay] = useState<string | null>(null)
 
+	// Configure calendar locale based on current language.
+	useEffect(() => {
+		if (i18n.language.startsWith('ru')) {
+			LocaleConfig.locales['ru'] = {
+				monthNames: [
+					'Январь',
+					'Февраль',
+					'Март',
+					'Апрель',
+					'Май',
+					'Июнь',
+					'Июль',
+					'Август',
+					'Сентябрь',
+					'Октябрь',
+					'Ноябрь',
+					'Декабрь',
+				],
+				monthNamesShort: [
+					'Янв',
+					'Фев',
+					'Мар',
+					'Апр',
+					'Май',
+					'Июн',
+					'Июл',
+					'Авг',
+					'Сен',
+					'Окт',
+					'Ноя',
+					'Дек',
+				],
+				dayNames: [
+					'Воскресенье',
+					'Понедельник',
+					'Вторник',
+					'Среда',
+					'Четверг',
+					'Пятница',
+					'Суббота',
+				],
+				dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+				today: 'Сегодня',
+			}
+			LocaleConfig.defaultLocale = 'ru'
+		} else {
+			LocaleConfig.locales['en'] = {
+				monthNames: [
+					'January',
+					'February',
+					'March',
+					'April',
+					'May',
+					'June',
+					'July',
+					'August',
+					'September',
+					'October',
+					'November',
+					'December',
+				],
+				monthNamesShort: [
+					'Jan',
+					'Feb',
+					'Mar',
+					'Apr',
+					'May',
+					'Jun',
+					'Jul',
+					'Aug',
+					'Sep',
+					'Oct',
+					'Nov',
+					'Dec',
+				],
+				dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+				dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+				today: 'Today',
+			}
+			LocaleConfig.defaultLocale = 'en'
+		}
+	}, [i18n.language])
+
 	useEffect(() => {
 		const today = new Date()
-		const currentMonth = `${today.getFullYear()}-${today.getMonth() + 1}` // "2025-3"
+		const currentMonth = `${today.getFullYear()}-${today.getMonth() + 1}` // e.g.: "2025-3"
 		setYearMonthKey(currentMonth)
 	}, [])
 
@@ -63,8 +147,6 @@ const AnalyticsScreen: React.FC = () => {
 		if (!markedDays[dateStr]) return
 		setMarkedDays(prev => {
 			const newMap = { ...prev }
-
-			// Сначала находим, есть ли уже красная дата
 			let redKey: string | null = null
 			for (const k in newMap) {
 				if (newMap[k].selectedColor === 'red') {
@@ -75,7 +157,6 @@ const AnalyticsScreen: React.FC = () => {
 			if (redKey) {
 				newMap[redKey] = { selected: true, selectedColor: 'black' }
 			}
-
 			if (redKey === dateStr) {
 				newMap[dateStr] = { selected: true, selectedColor: 'black' }
 				setSelectedCalendarDay(null)
@@ -83,7 +164,6 @@ const AnalyticsScreen: React.FC = () => {
 				newMap[dateStr] = { selected: true, selectedColor: 'red' }
 				setSelectedCalendarDay(dateStr)
 			}
-
 			return newMap
 		})
 	}
@@ -100,7 +180,7 @@ const AnalyticsScreen: React.FC = () => {
 		if (isMonthError || !monthlyData) {
 			return (
 				<View style={styles.card}>
-					<Text>Нет данных за {yearMonthKey}</Text>
+					<Text>{t('PROFILE.ANALYTICS.NO_DATA', { data: yearMonthKey })}</Text>
 				</View>
 			)
 		}
@@ -133,7 +213,7 @@ const AnalyticsScreen: React.FC = () => {
 		return (
 			<View style={styles.card}>
 				<View style={styles.rowBetween}>
-					<Text style={styles.sectionTitle}>Месяц (Свайп)</Text>
+					<Text style={styles.sectionTitle}>{t('PROFILE.MONTH_SWIPE')}</Text>
 					<Text style={{ color: '#999', fontSize: 13 }}>{yearMonthKey}</Text>
 				</View>
 
@@ -157,7 +237,6 @@ const AnalyticsScreen: React.FC = () => {
 						const isActive = !!info
 
 						if (state === 'disabled') {
-							// Не отображаем дни из другого месяца
 							return <View style={styles.dayContainer} />
 						}
 
@@ -179,32 +258,34 @@ const AnalyticsScreen: React.FC = () => {
 				/>
 
 				<Text style={styles.sectionTitle}>
-					{isDaySelected ? 'Статистика за день' : 'Общая статистика за месяц'}
+					{isDaySelected ? t('PROFILE.ANALYTICS.DAY_STATS') : t('PROFILE.ANALYTICS.MONTH_STATS')}
 				</Text>
 				<View style={styles.statsContainer}>
 					<View style={styles.statCard}>
 						<Text style={styles.statValue}>{displayStreak}</Text>
-						<Text style={styles.statLabel}>Серия</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.STREAK')}</Text>
 					</View>
 					<View style={styles.statCard}>
 						<Text style={styles.statValue}>{displayAccuracy}%</Text>
-						<Text style={styles.statLabel}>Точность</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.ACCURACY')}</Text>
 					</View>
 					<View style={styles.statCard}>
-						<Text style={styles.statValue}>{Math.floor(displayTime / 60)} мин</Text>
-						<Text style={styles.statLabel}>Время</Text>
+						<Text style={styles.statValue}>
+							{Math.floor(displayTime / 60)} {t('PROFILE.ANALYTICS.TIME')}
+						</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.TIME')}</Text>
 					</View>
 					<View style={styles.statCard}>
 						<Text style={styles.statValue}>{displayXp}</Text>
-						<Text style={styles.statLabel}>XP</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.XP')}</Text>
 					</View>
 					<View style={styles.statCard}>
 						<Text style={styles.statValue}>{displayLessons}</Text>
-						<Text style={styles.statLabel}>Уроков</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.LESSONS')}</Text>
 					</View>
 					<View style={styles.statCard}>
 						<Text style={styles.statValue}>{displayMistakes}</Text>
-						<Text style={styles.statLabel}>Ошибок</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.MISTAKES')}</Text>
 					</View>
 				</View>
 			</View>
@@ -248,7 +329,7 @@ const AnalyticsScreen: React.FC = () => {
 		if (isYearError || !yearlyData) {
 			return (
 				<View style={styles.card}>
-					<Text>Нет данных за {selectedYearKey}</Text>
+					<Text>{t('PROFILE.ANALYTICS.NO_DATA', { data: selectedYearKey })}</Text>
 				</View>
 			)
 		}
@@ -271,7 +352,9 @@ const AnalyticsScreen: React.FC = () => {
 				barMonthStatsContent = <LoadingUi />
 				showMonthStats = true
 			} else if (isBarMonthError || !barMonthData) {
-				barMonthStatsContent = <Text>Нет данных за {selectedBarMonthKey}</Text>
+				barMonthStatsContent = (
+					<Text>{t('PROFILE.ANALYTICS.NO_DATA', { data: selectedBarMonthKey })}</Text>
+				)
 				showMonthStats = true
 			} else {
 				const { monthStats = {} } = barMonthData
@@ -287,32 +370,34 @@ const AnalyticsScreen: React.FC = () => {
 				barMonthStatsContent = (
 					<>
 						<Text style={styles.sectionTitle}>
-							Статистика за месяц {selectedMonthIndex + 1} ({selectedBarMonthKey})
+							{t('PROFILE.ANALYTICS.MONTH_STATS')} {selectedMonthIndex + 1} ({selectedBarMonthKey})
 						</Text>
 						<View style={styles.statsContainer}>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{barStreak2}</Text>
-								<Text style={styles.statLabel}>Серия</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.STREAK')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{barAcc2}%</Text>
-								<Text style={styles.statLabel}>Точность</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.ACCURACY')}</Text>
 							</View>
 							<View style={styles.statCard}>
-								<Text style={styles.statValue}>{Math.floor(barTime2 / 60)} мин</Text>
-								<Text style={styles.statLabel}>Время</Text>
+								<Text style={styles.statValue}>
+									{Math.floor(barTime2 / 60)} {t('PROFILE.ANALYTICS.TIME')}
+								</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.TIME')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{barXp2}</Text>
-								<Text style={styles.statLabel}>XP</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.XP')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{barLessons2}</Text>
-								<Text style={styles.statLabel}>Уроков</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.LESSONS')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{barMistakes2}</Text>
-								<Text style={styles.statLabel}>Ошибок</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.MISTAKES')}</Text>
 							</View>
 						</View>
 					</>
@@ -324,7 +409,7 @@ const AnalyticsScreen: React.FC = () => {
 		return (
 			<View style={styles.card}>
 				<View style={styles.rowBetween}>
-					<Text style={styles.sectionTitle}>Год</Text>
+					<Text style={styles.sectionTitle}>{t('PROFILE.ANALYTICS.YEAR_TAB')}</Text>
 					<TouchableOpacity
 						style={styles.selectBtn}
 						onPress={() => setSelectedYearModal(true)}
@@ -368,31 +453,33 @@ const AnalyticsScreen: React.FC = () => {
 
 				{!showMonthStats && (
 					<>
-						<Text style={styles.sectionTitle}>Общая статистика за год</Text>
+						<Text style={styles.sectionTitle}>{t('PROFILE.ANALYTICS.YEAR_STATS')}</Text>
 						<View style={styles.statsContainer}>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{streak}</Text>
-								<Text style={styles.statLabel}>Серия</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.STREAK')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{accuracy}%</Text>
-								<Text style={styles.statLabel}>Точность</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.ACCURACY')}</Text>
 							</View>
 							<View style={styles.statCard}>
-								<Text style={styles.statValue}>{Math.floor(time / 60)} мин</Text>
-								<Text style={styles.statLabel}>Время</Text>
+								<Text style={styles.statValue}>
+									{Math.floor(time / 60)} {t('PROFILE.ANALYTICS.TIME')}
+								</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.TIME')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{xp}</Text>
-								<Text style={styles.statLabel}>XP</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.XP')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{lessons}</Text>
-								<Text style={styles.statLabel}>Уроков</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.LESSONS')}</Text>
 							</View>
 							<View style={styles.statCard}>
 								<Text style={styles.statValue}>{mistakes}</Text>
-								<Text style={styles.statLabel}>Ошибок</Text>
+								<Text style={styles.statLabel}>{t('PROFILE.ANALYTICS.MISTAKES')}</Text>
 							</View>
 						</View>
 					</>
@@ -403,18 +490,12 @@ const AnalyticsScreen: React.FC = () => {
 		)
 	}
 
-	let content
-	if (activeTab === 'month') {
-		content = renderMonthTab()
-	} else {
-		content = renderYearTab()
-	}
+	let content = activeTab === 'month' ? renderMonthTab() : renderYearTab()
 
 	return (
 		<View style={styles.container}>
 			{/* === HEADER === */}
 			<View style={styles.headerContainer}>
-				{/* GoBack Button (слева) */}
 				<TouchableOpacity
 					style={styles.headerLeft}
 					onPress={() => navigation.goBack()}
@@ -425,14 +506,10 @@ const AnalyticsScreen: React.FC = () => {
 						color='#007AFF'
 					/>
 				</TouchableOpacity>
-				{/* Title (по центру) */}
-				<Text style={styles.headerTitle}>Аналитика</Text>
-
-				{/* Кнопка ? (справа) */}
+				<Text style={styles.headerTitle}>{t('PROFILE.ANALYTICS.HEADER_TITLE')}</Text>
 				<TouchableOpacity
 					style={styles.headerRight}
 					onPress={() => {
-						// открыть InfoAnalyticsPage
 						navigation.navigate('InfoAnalyticsPage')
 					}}
 				>
@@ -446,16 +523,18 @@ const AnalyticsScreen: React.FC = () => {
 
 			{/* Табы */}
 			<View style={styles.tabsContainer}>
-				{(['month', 'year'] as const).map(t => {
-					const isActive = t === activeTab
+				{(['month', 'year'] as const).map(tab => {
+					const isActive = tab === activeTab
 					return (
 						<TouchableOpacity
-							key={t}
+							key={tab}
 							style={[styles.tabItem, isActive && styles.tabItemActive]}
-							onPress={() => setActiveTab(t)}
+							onPress={() => setActiveTab(tab)}
 						>
 							<Text style={[styles.tabText, isActive && styles.tabTextActive]}>
-								{t === 'month' ? 'Месяц' : 'Год'}
+								{tab === 'month'
+									? t('PROFILE.ANALYTICS.MONTH_TAB')
+									: t('PROFILE.ANALYTICS.YEAR_TAB')}
 							</Text>
 						</TouchableOpacity>
 					)
@@ -472,7 +551,7 @@ const AnalyticsScreen: React.FC = () => {
 			>
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalContainer}>
-						<Text style={styles.modalTitle}>Выберите год</Text>
+						<Text style={styles.modalTitle}>{t('PROFILE.ANALYTICS.SELECT_YEAR')}</Text>
 						{availableYears.map(y => (
 							<TouchableOpacity
 								key={y.key}
@@ -485,10 +564,7 @@ const AnalyticsScreen: React.FC = () => {
 								}}
 							>
 								<Text
-									style={{
-										fontSize: 16,
-										color: y.key === selectedYearKey ? '#FF6F61' : '#333',
-									}}
+									style={{ fontSize: 16, color: y.key === selectedYearKey ? '#FF6F61' : '#333' }}
 								>
 									{y.label}
 								</Text>
@@ -498,7 +574,7 @@ const AnalyticsScreen: React.FC = () => {
 							style={styles.closeBtn}
 							onPress={() => setSelectedYearModal(false)}
 						>
-							<Text style={{ color: '#FFF' }}>Закрыть</Text>
+							<Text style={{ color: '#FFF' }}>{t('PROFILE.ANALYTICS.CANCEL')}</Text>
 						</TouchableOpacity>
 					</View>
 				</View>

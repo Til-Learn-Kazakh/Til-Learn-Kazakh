@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	FlatList,
 	Image,
@@ -26,6 +27,7 @@ import {
 } from '../hooks/leaderboard.hooks'
 
 export default function LeaderboardScreen() {
+	const { t } = useTranslation()
 	const [activeTab, setActiveTab] = useState<'week' | 'month' | 'All Time'>('week')
 	const navigation = useNavigation<NavigationProp<any>>()
 	const { data: currentUser } = useCurrentUser()
@@ -91,7 +93,7 @@ export default function LeaderboardScreen() {
 	if (error) {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Text>Error loading {activeTab} Leaderboard</Text>
+				<Text>{t('LEADERBOARD.ERROR_LOADING', { tab: activeTab })}</Text>
 			</SafeAreaView>
 		)
 	}
@@ -100,7 +102,7 @@ export default function LeaderboardScreen() {
 		<SafeAreaView style={styles.safeArea}>
 			<View style={styles.container}>
 				<View style={styles.headerContainer}>
-					<Text style={styles.headerTitle}>Leaderboard</Text>
+					<Text style={styles.headerTitle}>{t('LEADERBOARD.HEADER_TITLE')}</Text>
 					<TouchableOpacity
 						style={styles.rightButton}
 						onPress={() => {
@@ -120,14 +122,16 @@ export default function LeaderboardScreen() {
 						onPress={() => setActiveTab('week')}
 						style={[styles.tabButton, activeTab === 'week' && styles.tabButtonActive]}
 					>
-						<Text style={[styles.tabText, activeTab === 'week' && styles.tabTextActive]}>Week</Text>
+						<Text style={[styles.tabText, activeTab === 'week' && styles.tabTextActive]}>
+							{t('LEADERBOARD.TABS.WEEK')}
+						</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={() => setActiveTab('month')}
 						style={[styles.tabButton, activeTab === 'month' && styles.tabButtonActive]}
 					>
 						<Text style={[styles.tabText, activeTab === 'month' && styles.tabTextActive]}>
-							Month
+							{t('LEADERBOARD.TABS.MONTH')}
 						</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
@@ -135,7 +139,7 @@ export default function LeaderboardScreen() {
 						style={[styles.tabButton, activeTab === 'All Time' && styles.tabButtonActive]}
 					>
 						<Text style={[styles.tabText, activeTab === 'All Time' && styles.tabTextActive]}>
-							All Time
+							{t('LEADERBOARD.TABS.ALL_TIME')}
 						</Text>
 					</TouchableOpacity>
 				</View>
@@ -168,7 +172,7 @@ export default function LeaderboardScreen() {
 						) : (
 							<View style={styles.topItem}>
 								<Text style={styles.topPosition}>--</Text>
-								<Text style={styles.topName}>No user</Text>
+								<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
 							</View>
 						)}
 
@@ -187,7 +191,7 @@ export default function LeaderboardScreen() {
 						) : (
 							<View style={styles.topItemCenter}>
 								<Text style={styles.topPosition}>--</Text>
-								<Text style={styles.topName}>No user</Text>
+								<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
 							</View>
 						)}
 
@@ -205,7 +209,7 @@ export default function LeaderboardScreen() {
 						) : (
 							<View style={styles.topItem}>
 								<Text style={styles.topPosition}>--</Text>
-								<Text style={styles.topName}>No user</Text>
+								<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
 							</View>
 						)}
 					</View>

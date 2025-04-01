@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { NavigationProp, useNavigation } from '@react-navigation/native'
@@ -6,16 +7,12 @@ import LottieView from 'lottie-react-native'
 
 import { icons, images } from '../../../core/constants'
 
-// Import icons
-
 const LessonCompleteScreen = ({ route }: any) => {
+	const { t } = useTranslation()
 	const { accuracy, committedTime, xpEarned } = route.params || {
 		accuracy: 0,
 		committedTime: '0:00',
 	}
-
-	console.log('xpEarned', xpEarned)
-
 	const navigation = useNavigation<NavigationProp<any>>()
 
 	return (
@@ -31,14 +28,16 @@ const LessonCompleteScreen = ({ route }: any) => {
 			</View>
 
 			{/* Title */}
-			<Text style={styles.title}>Lesson complete!</Text>
+			<Text style={styles.title}>{t('PROGRESS.LESSON_COMPLETE.TITLE')}</Text>
 
 			{/* Stats Section */}
 			<View style={styles.statsContainer}>
 				{/* XP */}
 				{xpEarned > 0 && (
 					<View style={styles.statBox}>
-						<Text style={[styles.statLabel, { color: '#FFD700' }]}>TOTAL XP</Text>
+						<Text style={[styles.statLabel, { color: '#FFD700' }]}>
+							{t('PROGRESS.LESSON_COMPLETE.TOTAL_XP')}
+						</Text>
 						<View style={[styles.innerBox, styles.goldBorder]}>
 							<Image
 								source={icons.light}
@@ -51,7 +50,9 @@ const LessonCompleteScreen = ({ route }: any) => {
 
 				{/* Accuracy */}
 				<View style={styles.statBox}>
-					<Text style={[styles.statLabel, { color: '#4CAF50' }]}>GREAT</Text>
+					<Text style={[styles.statLabel, { color: '#4CAF50' }]}>
+						{t('PROGRESS.LESSON_COMPLETE.ACCURACY_LABEL')}
+					</Text>
 					<View style={[styles.innerBox, styles.greenBorder]}>
 						<Image
 							source={icons.accuracy}
@@ -63,7 +64,9 @@ const LessonCompleteScreen = ({ route }: any) => {
 
 				{/* Time */}
 				<View style={styles.statBox}>
-					<Text style={[styles.statLabel, { color: '#2196F3' }]}>COMMITTED</Text>
+					<Text style={[styles.statLabel, { color: '#2196F3' }]}>
+						{t('PROGRESS.LESSON_COMPLETE.COMMITTED_LABEL')}
+					</Text>
 					<View style={[styles.innerBox, styles.blueBorder]}>
 						<Image
 							source={icons.clock}
@@ -79,20 +82,18 @@ const LessonCompleteScreen = ({ route }: any) => {
 					onPress={() => {
 						navigation.reset({
 							index: 0,
-							routes: [
-								{
-									name: 'StreakTracker',
-								},
-							],
+							routes: [{ name: 'StreakTracker' }],
 						})
 					}}
 				>
-					<Text style={styles.claimText}>CLAIM XP</Text>
+					<Text style={styles.claimText}>{t('PROGRESS.LESSON_COMPLETE.CLAIM')}</Text>
 				</TouchableOpacity>
 			</View>
 		</View>
 	)
 }
+
+export default LessonCompleteScreen
 
 const styles = StyleSheet.create({
 	container: {
@@ -101,12 +102,10 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 		paddingVertical: 20,
 	},
-
 	imageContainer: {
 		marginTop: 40,
 		alignItems: 'center',
 	},
-
 	title: {
 		fontSize: 25,
 		fontWeight: 'bold',
@@ -114,26 +113,22 @@ const styles = StyleSheet.create({
 		marginVertical: 20,
 		marginBottom: 35,
 	},
-
 	statsContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		width: '90%',
 		marginBottom: 20,
 	},
-
 	statBox: {
 		flex: 1,
 		marginHorizontal: 5,
 		alignItems: 'center',
 	},
-
 	statLabel: {
 		fontSize: 12,
 		fontWeight: 'bold',
 		marginBottom: 4,
 	},
-
 	innerBox: {
 		backgroundColor: 'white',
 		paddingVertical: 12,
@@ -142,48 +137,39 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		width: '90%',
 		flexDirection: 'row',
-		justifyContent: 'center', // Align items center
+		justifyContent: 'center',
 		shadowColor: '#000',
 		shadowOffset: { width: 0, height: 3 },
 		shadowOpacity: 0.1,
 		shadowRadius: 3,
 		elevation: 3,
 	},
-
 	statValue: {
 		fontSize: 18,
 		fontWeight: 'bold',
-		marginLeft: 5, // Add spacing between icon and number
+		marginLeft: 5,
 	},
-
-	// Borders for each stat box
 	goldBorder: {
 		borderColor: '#FFD700',
 		borderWidth: 4,
 	},
-
 	greenBorder: {
 		borderColor: '#4CAF50',
 		borderWidth: 4,
 	},
-
 	blueBorder: {
 		borderColor: '#2196F3',
 		borderWidth: 4,
 	},
-
 	icon: {
 		width: 20,
 		height: 20,
 	},
-
-	// Push button to bottom
 	bottomContainer: {
 		flex: 1,
 		justifyContent: 'flex-end',
 		width: '100%',
 	},
-
 	claimButton: {
 		backgroundColor: '#0286FF',
 		width: '93%',
@@ -194,12 +180,9 @@ const styles = StyleSheet.create({
 		marginBottom: 30,
 		alignSelf: 'center',
 	},
-
 	claimText: {
 		fontSize: 18,
 		color: '#fff',
 		fontWeight: 'bold',
 	},
 })
-
-export default LessonCompleteScreen

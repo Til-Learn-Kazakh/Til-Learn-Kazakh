@@ -37,22 +37,17 @@ export default function SupportPage() {
 	// Выбор фото из галереи
 	const handlePickPhoto = async () => {
 		const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-
 		if (status !== 'granted') {
-			Alert.alert(
-				'Нет доступа',
-				'Разрешение на доступ к фотографиям отключено. Вы можете включить его в настройках.',
-				[
-					{
-						text: 'Отмена',
-						style: 'cancel',
-					},
-					{
-						text: 'Открыть настройки',
-						onPress: () => Linking.openSettings(),
-					},
-				]
-			)
+			Alert.alert(t('SETTINGS.SUPPORT.NO_ACCESS_TITLE'), t('SETTINGS.SUPPORT.NO_ACCESS_DESC'), [
+				{
+					text: t('CANCEL'),
+					style: 'cancel',
+				},
+				{
+					text: t('OPEN_SETTINGS'),
+					onPress: () => Linking.openSettings(),
+				},
+			])
 			return
 		}
 
@@ -76,7 +71,7 @@ export default function SupportPage() {
 	// Нажатие на "Отправить"
 	const handleSend = async () => {
 		if (!email || !message) {
-			Alert.alert('Ошибка', 'Пожалуйста, заполните все поля')
+			Alert.alert(t('ERROR.TITLE'), t('ERROR.FILL_ALL_FIELDS'))
 			return
 		}
 		setIsSending(true)
@@ -87,15 +82,14 @@ export default function SupportPage() {
 			} else {
 				await sendMessage({ email, message })
 			}
-
-			Alert.alert('Успех', 'Сообщение отправлено!')
+			Alert.alert(t('SUCCESS.TITLE'), t('SETTINGS.SUPPORT.SUCCESS'))
 			setEmail('')
 			setMessage('')
 			setPhotoUri(null)
 			navigation.goBack()
 		} catch (err) {
 			console.error('[Support] Error:', err)
-			Alert.alert('Ошибка', 'Не удалось отправить сообщение')
+			Alert.alert(t('ERROR.TITLE'), t('SETTINGS.SUPPORT.FAILED'))
 		} finally {
 			setIsSending(false)
 		}
@@ -119,11 +113,11 @@ export default function SupportPage() {
 							size={26}
 							color='#007AFF'
 						/>
-						<Text style={styles.backText}>Назад</Text>
+						<Text style={styles.backText}>{t('SETTINGS.SUPPORT.BACK')}</Text>
 					</TouchableOpacity>
 
 					{/* Заголовок по центру */}
-					<Text style={styles.headerTitle}>{t('support.title')}</Text>
+					<Text style={styles.headerTitle}>{t('SETTINGS.SUPPORT.TITLE')}</Text>
 
 					{/* Справа пустая зона */}
 					<View style={{ width: 40 }} />
@@ -132,7 +126,7 @@ export default function SupportPage() {
 				<ScrollView contentContainerStyle={styles.contentContainer}>
 					<TextInput
 						style={styles.input}
-						placeholder={t('support.email')}
+						placeholder={t('SETTINGS.SUPPORT.EMAIL')}
 						placeholderTextColor='#999'
 						keyboardType='email-address'
 						autoCapitalize='none'
@@ -142,7 +136,7 @@ export default function SupportPage() {
 
 					<TextInput
 						style={styles.textarea}
-						placeholder={t('support.message')}
+						placeholder={t('SETTINGS.SUPPORT.MESSAGE')}
 						placeholderTextColor='#999'
 						value={message}
 						onChangeText={setMessage}
@@ -154,9 +148,7 @@ export default function SupportPage() {
 						style={styles.attachButton}
 						onPress={handlePickPhoto}
 					>
-						<Text style={styles.attachButtonText}>
-							{t('support.attach_photo', 'Прикрепить фото')}
-						</Text>
+						<Text style={styles.attachButtonText}>{t('SETTINGS.SUPPORT.ATTACH_PHOTO')}</Text>
 					</TouchableOpacity>
 
 					{photoUri && (
@@ -166,7 +158,7 @@ export default function SupportPage() {
 								style={styles.photoImage}
 							/>
 							<TouchableOpacity onPress={() => setPhotoUri(null)}>
-								<Text style={styles.removePhotoText}>Убрать фото</Text>
+								<Text style={styles.removePhotoText}>{t('SETTINGS.SUPPORT.REMOVE_PHOTO')}</Text>
 							</TouchableOpacity>
 						</View>
 					)}
@@ -176,7 +168,9 @@ export default function SupportPage() {
 						disabled={!email || !message || isSending}
 						onPress={handleSend}
 					>
-						<Text style={styles.sendButtonText}>{isSending ? 'Отправляю...' : 'Отправить'}</Text>
+						<Text style={styles.sendButtonText}>
+							{isSending ? t('SETTINGS.SUPPORT.SENDING') : t('SETTINGS.SUPPORT.SEND')}
+						</Text>
 					</TouchableOpacity>
 				</ScrollView>
 			</SafeAreaView>
@@ -214,8 +208,6 @@ async function sendPhoto({
 }) {
 	const caption = `🆘 *Сообщение в поддержку*\n\n📧 Email: ${email}\n📝 Сообщение: ${message}`
 	const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`
-
-	// собираем FormData
 	const formData = new FormData()
 	formData.append('chat_id', TELEGRAM_CHAT_ID)
 	formData.append('caption', caption)
@@ -225,7 +217,6 @@ async function sendPhoto({
 		name: 'image.jpg',
 		type: 'image/jpeg',
 	} as any)
-
 	const res = await fetch(url, {
 		method: 'POST',
 		headers: {

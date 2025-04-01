@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -7,13 +8,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { imageserver } from '../../../core/config/environment.config'
 import { toast } from '../../../core/ui/toast'
-// Хук с информацией о текущем пользователе
 import { CURRENT_USER_QUERY_KEY, useCurrentUser } from '../../auth/hooks/user-current-user.hook'
 import { achievementsService } from '../services/achievements.service'
 
 export default function AchievementModalScreen() {
 	const route = useRoute<RouteProp<any, any>>()
 	const navigation = useNavigation()
+	const { t } = useTranslation()
 
 	// Из params берем achievementId, title, description, image
 	const { achievementId, title, description, image } = route.params || {}
@@ -31,11 +32,11 @@ export default function AchievementModalScreen() {
 	const { mutate: claimReward, isPending: isClaiming } = useMutation({
 		mutationFn: (achID: string) => achievementsService.claimAchievementReward(achID),
 		onSuccess: () => {
-			toast.success('Кристалы получены!')
+			toast.success(t('ACHIEVEMENTS.MODAL.TITLE'))
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 		},
 		onError: () => {
-			toast.error('Ошибка при получении кристаллов.')
+			toast.error(t('ACHIEVEMENTS.MODAL.ERROR'))
 		},
 	})
 
@@ -51,21 +52,20 @@ export default function AchievementModalScreen() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			{/* Заголовок "ДОСТИЖЕНИЕ ПОЛУЧЕНО!" */}
-			<Text style={styles.topLabel}>ДОСТИЖЕНИЕ ПОЛУЧЕНО!</Text>
+			{/* Modal Title */}
+			<Text style={styles.topLabel}>{t('ACHIEVEMENTS.MODAL.TITLE')}</Text>
 
-			{/* Контейнер контента */}
+			{/* Content Container */}
 			<View style={styles.contentContainer}>
 				<Image
 					source={{ uri: `${imageserver}${image}` }}
 					style={styles.achievementImage}
 				/>
-
 				<Text style={styles.achievementTitle}>{title}</Text>
 				<Text style={styles.achievementDescription}>{description}</Text>
 			</View>
 
-			{/* Футер */}
+			{/* Footer */}
 			<View style={styles.footer}>
 				{rewardPending ? (
 					<TouchableOpacity
@@ -73,7 +73,6 @@ export default function AchievementModalScreen() {
 						onPress={onClaim}
 						disabled={isClaiming}
 					>
-						{/* Можно совместить иконку и текст */}
 						<View style={styles.iconRow}>
 							<MaterialCommunityIcons
 								name='diamond-stone'
@@ -81,9 +80,10 @@ export default function AchievementModalScreen() {
 								color='#fff'
 								style={{ marginRight: 6 }}
 							/>
-
 							<Text style={styles.buttonText}>
-								{isClaiming ? 'Получаем...' : `Получить +${rewardPending.reward}`}
+								{isClaiming
+									? t('ACHIEVEMENTS.MODAL.CLAIMING')
+									: t('ACHIEVEMENTS.MODAL.CLAIM', { reward: rewardPending.reward })}
 							</Text>
 						</View>
 					</TouchableOpacity>
@@ -92,7 +92,7 @@ export default function AchievementModalScreen() {
 						style={styles.button}
 						onPress={onClose}
 					>
-						<Text style={styles.buttonText}>Закрыть</Text>
+						<Text style={styles.buttonText}>{t('ACHIEVEMENTS.MODAL.CLOSE')}</Text>
 					</TouchableOpacity>
 				)}
 			</View>

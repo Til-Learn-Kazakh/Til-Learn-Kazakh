@@ -12,6 +12,7 @@ import {
 import HomeStackScreen from './HomeStackScreen'
 import LeaderboardStackScreen from './LeaderboardStackScreen'
 import ProfileStackScreen from './ProfileStackScreen '
+import { t } from 'i18next'
 
 const COLORS = {
 	DUOLINGO_GREEN: '#0286FF',
@@ -108,7 +109,7 @@ const BottomTabNavigation = ({ route }: { route: any }) => {
 									backgroundColor: '#fff',
 								},
 
-						tabBarLabel: 'Lessons',
+						tabBarLabel: t('LESSONS'),
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons
 								name='book-outline'
@@ -138,7 +139,7 @@ const BottomTabNavigation = ({ route }: { route: any }) => {
 				name='LeaderboardStack'
 				component={LeaderboardStackScreen}
 				options={{
-					tabBarLabel: 'Leaderboard',
+					tabBarLabel: t('LEADERBOARD.HEADER_TITLE'),
 					tabBarIcon: ({ color, size }) => (
 						<Ionicons
 							name='trophy-outline'
@@ -190,7 +191,7 @@ const BottomTabNavigation = ({ route }: { route: any }) => {
 									backgroundColor: '#fff',
 								},
 
-						tabBarLabel: 'Profile',
+						tabBarLabel: t('PROFILE.HEADER_TITLE'),
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons
 								name='person-outline'
