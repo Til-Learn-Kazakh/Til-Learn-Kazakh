@@ -66,8 +66,8 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 
 	var user auth.User
 	if cursor.Next(ctx) {
-		if err := cursor.Decode(&user); err != nil {
-			return nil, err
+		if decodeErr := cursor.Decode(&user); decodeErr != nil {
+			return nil, decodeErr
 		}
 	} else {
 		return nil, errors.New("user not found")

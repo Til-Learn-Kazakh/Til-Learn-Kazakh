@@ -249,7 +249,9 @@ func (s *AchievementsService) ClaimAchievementReward(ctx context.Context, userID
 	if len(updatedRewards) > 0 {
 		updateData["$set"] = bson.M{"pending_rewards": updatedRewards}
 	} else {
-		updateData["$set"] = bson.M{"pending_rewards": []interface{}{}}
+		updateData["$set"] = bson.M{
+			"pending_rewards": []interface{}{},
+		}
 	}
 
 	_, err = s.UserCollection.UpdateOne(ctx, bson.M{"_id": userID}, updateData)

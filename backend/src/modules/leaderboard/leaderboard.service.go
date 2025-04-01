@@ -43,7 +43,7 @@ func (s *LeaderboardService) getLeaderboard(ctx context.Context, xpField string,
 	cached, err := database.RedisClient.Get(ctx, cacheKey).Result()
 	if err == nil {
 		var result []bson.M
-		if err := json.Unmarshal([]byte(cached), &result); err == nil {
+		if unmarshalErr := json.Unmarshal([]byte(cached), &result); unmarshalErr == nil {
 			return result, nil
 		}
 	}

@@ -24,7 +24,10 @@ lint: ## Run golangci-lint
 gosec: 
 	@gosec ./...
 
-
+# Поиск теней, ошибок и др. через go vet
+vet:
+	@echo "🔍 Running go vet..."
+	@go vet ./...
 # Fix linter issues
 lint-fix: ## Run golangci-lint with auto-fix
 	@$(LINTER) run --fix
