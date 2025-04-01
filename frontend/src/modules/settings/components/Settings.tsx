@@ -12,13 +12,16 @@ import {
 
 import FeatherIcon from '@expo/vector-icons/Feather'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { LANGUAGES } from '../../../core/constants/languages'
+import { toast } from '../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY } from '../../auth/hooks/user-current-user.hook'
 import { authService } from '../../auth/services/auth.service'
 import { usePreferences } from '../hooks/preferences.context'
 import { Preferences } from '../hooks/preferences.storage'
+import { profileService } from '../services/settings.service'
+import { LoadingUi } from '../../../core/ui/LoadingUi'
 
 export default function SettingsScreen() {
 	const navigation = useNavigation<NavigationProp<any>>()
@@ -32,6 +35,23 @@ export default function SettingsScreen() {
 
 	const handleToggleParam = (key: keyof Preferences) => {
 		togglePreference(key)
+	}
+
+	const { mutate: deleteProfile, isPending } = useMutation({
+		mutationFn: () => profileService.deleteProfile(),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
+			toast.success(t('SETTINGS.DELETE_ACCOUNT_SUCCESS'))
+			navigation.navigate('Login') // Redirect to Login page after profile deletion
+		},
+		onError: err => {
+			console.error('❌ Ошибка удаления аккаунта:', err)
+			toast.error(t('SETTINGS.DELETE_ACCOUNT_ERROR'))
+		},
+	})
+
+	if (isPending) {
+		return <LoadingUi />
 	}
 
 	return (
@@ -310,6 +330,7 @@ export default function SettingsScreen() {
 
 						<TouchableOpacity
 							onPress={() => {
+								deleteProfile()
 								// handle delete account
 							}}
 						>

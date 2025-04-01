@@ -52,6 +52,8 @@
 		"AND": "and",
 		"PRIVACY": "Privacy Policy",
 		"DELETE_ACCOUNT": "Delete Account",
+		"DELETE_ACCOUNT_SUCCESS": "Account deleted successfully",
+		"DELETE_ACCOUNT_ERROR": "Error deleting account",
 		"CHANGE_PROFILE": {
 			"TITLE": "Profile",
 			"FIRST_NAME": "First Name",

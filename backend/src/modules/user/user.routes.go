@@ -15,4 +15,5 @@ func UserRoutes(router *gin.RouterGroup, controller *UserController) {
 	routerGroup.PUT("/update", controller.UpdateUserProfileHandler)
 	routerGroup.PUT("/change-password", controller.ChangePasswordHandler)
 	routerGroup.PUT("/update-avatar", controller.UpdateUserAvatarHandler)
+	routerGroup.DELETE("/delete", controller.DeleteUserProfileHandler)
 }

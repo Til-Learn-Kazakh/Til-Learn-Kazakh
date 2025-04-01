@@ -56,6 +56,26 @@ func (ctrl *UserController) UpdateUserProfileHandler(c *gin.Context) {
 	c.JSON(200, updatedUser)
 }
 
+func (ctrl *UserController) DeleteUserProfileHandler(c *gin.Context) {
+	userID, exists := c.Get("uid")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	err := ctrl.Service.DeleteUser(userID.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User deleted successfully",
+	})
+}
+
 func (ctrl *UserController) UpdateUserAvatarHandler(c *gin.Context) {
 	userID, exists := c.Get("uid")
 	if !exists {

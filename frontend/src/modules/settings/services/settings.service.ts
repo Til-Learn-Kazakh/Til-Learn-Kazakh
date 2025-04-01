@@ -37,6 +37,15 @@ class ProfileService {
 				throw e
 			})
 	}
+	async deleteProfile(config?: AxiosRequestConfig) {
+    return axiosWithAuth
+      .delete(`${this.url}/delete`, config)
+      .then((resp) => resp.data)
+      .catch((e) => {
+        console.error('[ProfileService] Error deleting profile:', e)
+        throw e
+      })
+  }
 }
 
 export const profileService = new ProfileService()

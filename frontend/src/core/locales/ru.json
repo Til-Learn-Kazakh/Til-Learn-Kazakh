@@ -52,6 +52,8 @@
 		"AND": "и",
 		"PRIVACY": "Политика конфиденциальности",
 		"DELETE_ACCOUNT": "Удалить учетную запись",
+		"DELETE_ACCOUNT_SUCCESS": "Учетная запись успешно удалена",
+		"DELETE_ACCOUNT_ERROR": "Ошибка при удалении учетной записи",
 		"CHANGE_PROFILE": {
 			"TITLE": "Профиль",
 			"FIRST_NAME": "Имя",
