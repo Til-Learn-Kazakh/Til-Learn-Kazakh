@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"diploma/src/database"
 	"diploma/src/middlewares"
 	"diploma/src/modules/achievements"
 	"diploma/src/modules/analytics"
@@ -16,6 +17,9 @@ import (
 	"diploma/src/modules/user"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
+	csrf "github.com/utrack/gin-csrf"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -35,6 +39,12 @@ func main() {
 		port = "8080"
 		log.Println("PORT не задан, используется порт по умолчанию: 8080")
 	}
+
+	csrfSecret := os.Getenv("CSRF_SECRET")
+	if csrfSecret == "" {
+		log.Fatal("CSRF_SECRET not found in env")
+	}
+	database.InitRedis()
 
 	streakService := streak.NewStreakService()
 	streakController := streak.NewStreakController(streakService)
@@ -68,18 +78,30 @@ func main() {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.12:19000"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Content-Type", "Authorization", "X-CSRF-Token"},
 		AllowCredentials: true,
 	}))
 
 	router.Use(gin.Logger(), gin.Recovery())
+	//csrf token
+	store := cookie.NewStore([]byte(os.Getenv("SESSION_SECRET")))
+	router.Use(sessions.Sessions("session", store))
+	router.Use(middlewares.CSRFMiddleware())
 
-	rateLimiter := middlewares.NewRateLimiter()
-	router.Use(middlewares.RateLimitMiddleware(rateLimiter))
+	router.Use(middlewares.SecureHeaders())
+
+	//ratelimit
+	// rateLimiter := middlewares.NewRateLimiter()
+	// router.Use(middlewares.RateLimitMiddleware(rateLimiter))
 
 	router.Static("/src/public", "./src/public")
 
 	apiRoutes := router.Group("/api/v1")
+
+	router.GET("/csrf-token", func(c *gin.Context) {
+		token := csrf.GetToken(c)
+		c.JSON(200, gin.H{"csrfToken": token})
+	})
 
 	auth.AuthRoutes(apiRoutes, authController)
 	apiRoutes.Use(middlewares.Authentication())

@@ -3,6 +3,7 @@ package level
 import (
 	"context"
 	"diploma/src/database"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -42,6 +43,17 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 }
 
 func (s *LevelService) GetAllLevels() ([]Level, error) {
+	ctx := context.Background()
+	redisKey := "levels:with_progress"
+
+	cached, err := database.RedisClient.Get(ctx, redisKey).Result()
+	if err == nil {
+		var levels []Level
+		if jsonErr := json.Unmarshal([]byte(cached), &levels); jsonErr == nil {
+			return levels, nil
+		}
+	}
+
 	pipeline := mongo.Pipeline{
 		{
 			{Key: "$lookup", Value: bson.D{
@@ -101,6 +113,9 @@ func (s *LevelService) GetAllLevels() ([]Level, error) {
 	if err := cursor.All(context.Background(), &levels); err != nil {
 		return nil, fmt.Errorf("cursor decoding error: %w", err)
 	}
+
+	jsonData, _ := json.Marshal(levels)
+	_ = database.RedisClient.Set(ctx, redisKey, jsonData, time.Hour).Err()
 
 	return levels, nil
 }
