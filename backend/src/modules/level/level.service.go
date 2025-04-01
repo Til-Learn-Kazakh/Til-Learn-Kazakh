@@ -43,7 +43,6 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 }
 
 func (s *LevelService) GetAllLevels() ([]Level, error) {
-
 	ctx := context.Background()
 	redisKey := "levels:with_progress"
 

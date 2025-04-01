@@ -133,8 +133,6 @@ func (s *UserService) UpdateUserProfile(ctx context.Context, userID string, dto 
 		decryptedEmail, err := utils.Decrypt(updatedUser.Email)
 		if err == nil {
 			updatedUser.Email = decryptedEmail
-		} else {
-			// Решать, что делать с ошибкой расшифровки
 		}
 	}
 

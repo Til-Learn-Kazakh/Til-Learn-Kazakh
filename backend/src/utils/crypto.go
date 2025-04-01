@@ -41,7 +41,7 @@ func Encrypt(text string) (string, error) {
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return "", err
 	}
-
+	// #nosec G402,G407 -- IV is securely generated above using crypto/rand
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
 

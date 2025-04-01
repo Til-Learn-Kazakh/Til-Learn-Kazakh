@@ -133,7 +133,6 @@ func (s *AchievementsService) CheckAndGrantAchievements(ctx context.Context, use
 				return err
 			}
 			shouldInvalidateCache = true
-
 		}
 	}
 
@@ -177,7 +176,7 @@ func (s *AchievementsService) GetUserAchievementsProgress(ctx context.Context, u
 			ImageURL:      ach.ImagePath,
 			IsAchieved:    s.UserHasAchievement(user, ach.ID),
 		}
-		
+
 		switch ach.Type {
 		case LessonsCompleted:
 			progress.Current = len(user.LessonsCompleted)
