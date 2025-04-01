@@ -8,6 +8,8 @@ import * as SecureStore from 'expo-secure-store'
 
 import { server } from '../core/config/environment.config'
 
+import { getCSRFToken } from './csrf'
+
 const options: AxiosRequestConfig = {
 	baseURL: server,
 	headers: {
@@ -20,11 +22,23 @@ const options: AxiosRequestConfig = {
 const axiosBase = axios.create(options)
 const axiosWithAuth = axios.create(options)
 
+axiosBase.interceptors.request.use(async config => {
+	const token = await getCSRFToken()
+	if (token && config.method !== 'get') {
+		;(config.headers as AxiosHeaders).set('X-CSRF-Token', token)
+	}
+	return config
+})
+
 axiosWithAuth.interceptors.request.use(async (config: InternalAxiosRequestConfig<any>) => {
 	const accessToken = await SecureStore.getItemAsync('token')
 
 	if (config.headers && accessToken) {
 		;(config.headers as AxiosHeaders).set('Authorization', `${accessToken}`)
+	}
+	const token = await getCSRFToken()
+	if (token && config.method !== 'get') {
+		;(config.headers as AxiosHeaders).set('X-CSRF-Token', token)
 	}
 
 	return config

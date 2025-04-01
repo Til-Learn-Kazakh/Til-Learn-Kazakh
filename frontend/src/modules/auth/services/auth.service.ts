@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store'
 
 import { server } from '../../../core/config/environment.config'
 import { axiosBase, axiosWithAuth } from '../../../middleware/axios-interceptors'
+import { fetchAndSetCSRFToken } from '../../../middleware/fetchCSRF'
 import { LoginDTO, SignupDTO } from '../models/auth-dto.types'
 import { User } from '../models/users.types'
 
@@ -10,6 +11,7 @@ class AuthService {
 	private readonly url = `${server}/auth`
 
 	async login(dto: LoginDTO, config?: AxiosRequestConfig) {
+		await fetchAndSetCSRFToken()
 		return axiosBase
 			.post<{ access_token: string; refresh_token: string }>(`${this.url}/login`, dto, config)
 			.then(async resp => {
@@ -27,6 +29,7 @@ class AuthService {
 	}
 
 	async signup(dto: SignupDTO, config?: AxiosRequestConfig) {
+		await fetchAndSetCSRFToken()
 		return axiosBase
 			.post<{ access_token: string; refresh_token: string }>(`${this.url}/register`, dto, config)
 			.then(async resp => {

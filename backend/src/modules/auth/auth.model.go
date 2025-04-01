@@ -12,6 +12,7 @@ type User struct {
 	FirstName           string               `bson:"first_name" json:"first_name" validate:"required"`       // Имя пользователя (обязательно)
 	LastName            string               `bson:"last_name" json:"last_name" validate:"required"`         // Фамилия пользователя (обязательно)
 	Email               string               `bson:"email" json:"email" validate:"required,email"`           // Email пользователя (обязательно)
+	EmailHash           string               `bson:"email_hash"`                                             // SHA-256(email), для поиска
 	Password            string               `bson:"password" json:"password,omitempty" validate:"required"` // Хэшированный пароль (обязательно)
 	Hearts              int                  `bson:"hearts" json:"hearts" validate:"required"`               // Сердечки (жизни)
 	Avatar              string               `bson:"avatar" json:"avatar"`
