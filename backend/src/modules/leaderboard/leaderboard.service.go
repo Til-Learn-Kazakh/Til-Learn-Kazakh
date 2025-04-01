@@ -3,6 +3,7 @@ package leaderboard
 import (
 	"context"
 	"diploma/src/database"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -36,6 +37,18 @@ func (s *LeaderboardService) GetAllTimeLeaderboard(ctx context.Context, limit in
 
 // 🔥 Общая логика получения лидерборда
 func (s *LeaderboardService) getLeaderboard(ctx context.Context, xpField string, limit int64) ([]bson.M, error) {
+	cacheKey := "leaderboard:" + xpField
+
+	// 1. Попробуем получить из Redis
+	cached, err := database.RedisClient.Get(ctx, cacheKey).Result()
+	if err == nil {
+		var result []bson.M
+		if err := json.Unmarshal([]byte(cached), &result); err == nil {
+			return result, nil
+		}
+	}
+
+	// 2. Если нет — получаем из MongoDB
 	opts := options.Find().
 		SetSort(bson.D{{Key: xpField, Value: -1}}).
 		SetLimit(limit).
@@ -56,6 +69,11 @@ func (s *LeaderboardService) getLeaderboard(ctx context.Context, xpField string,
 	if err := cursor.All(ctx, &leaderboard); err != nil {
 		return nil, err
 	}
+
+	// 3. Сохраняем в Redis на 5 минут
+	data, _ := json.Marshal(leaderboard)
+	_ = database.RedisClient.Set(ctx, cacheKey, data, 5*time.Minute).Err()
+
 	return leaderboard, nil
 }
 
@@ -66,6 +84,8 @@ func (s *LeaderboardService) ResetWeeklyXP(ctx context.Context) error {
 		bson.M{}, // обновляем всех
 		bson.M{"$set": bson.M{"weekly_xp": 0}},
 	)
+	_ = database.RedisClient.Del(ctx, "leaderboard:weekly_xp").Err()
+
 	return err
 }
 
@@ -76,12 +96,10 @@ func (s *LeaderboardService) ResetMonthlyXP(ctx context.Context) error {
 		bson.M{}, // обновляем всех
 		bson.M{"$set": bson.M{"monthly_xp": 0}},
 	)
+	_ = database.RedisClient.Del(ctx, "leaderboard:monthly_xp").Err()
 	return err
 }
 
-// 🔥 Функция для планового вызова сброса XP каждую неделю/месяц
-// 🔥 Функция для планового вызова сброса XP каждую неделю/месяц
-// 🔥 Функция для планового вызова сброса XP каждую неделю/месяц
 func (s *LeaderboardService) ScheduleResetXP() {
 	c := cron.New(cron.WithLocation(time.UTC)) // Указываем часовой пояс UTC
 

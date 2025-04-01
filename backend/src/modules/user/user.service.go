@@ -7,6 +7,7 @@ import (
 	"diploma/src/modules/analytics"
 	"diploma/src/modules/auth"
 	"diploma/src/modules/streak"
+	"diploma/src/utils"
 	"errors"
 	"fmt"
 	"math"
@@ -72,6 +73,10 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 		return nil, errors.New("user not found")
 	}
 
+	if user.Email, err = utils.Decrypt(user.Email); err != nil {
+		return nil, err
+	}
+
 	if user.Streak != nil {
 		err := s.checkAndResetStreak(&user)
 		if err != nil {
@@ -88,16 +93,32 @@ func (s *UserService) UpdateUserProfile(ctx context.Context, userID string, dto 
 		return nil, err
 	}
 
-	filter := bson.M{"_id": objectID}
-	update := bson.M{
-		"$set": bson.M{
-			"first_name": dto.FirstName,
-			"last_name":  dto.LastName,
-			"email":      dto.Email,
-		},
+	updateFields := bson.M{
+		"first_name": dto.FirstName,
+		"last_name":  dto.LastName,
 	}
 
-	result := s.Collection.FindOneAndUpdate(ctx, filter, update, options.FindOneAndUpdate().SetReturnDocument(options.After))
+	// Если в DTO пришёл новый Email — шифруем и пересчитываем hash
+	if dto.Email != "" {
+		encryptedEmail, err := utils.Encrypt(dto.Email)
+		if err != nil {
+			return nil, err
+		}
+		updateFields["email"] = encryptedEmail
+
+		newEmailHash := utils.GetEmailHash(dto.Email)
+		updateFields["email_hash"] = newEmailHash
+	}
+
+	filter := bson.M{"_id": objectID}
+	update := bson.M{"$set": updateFields}
+
+	result := s.Collection.FindOneAndUpdate(
+		ctx,
+		filter,
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After),
+	)
 	if result.Err() != nil {
 		return nil, result.Err()
 	}
@@ -105,6 +126,16 @@ func (s *UserService) UpdateUserProfile(ctx context.Context, userID string, dto 
 	var updatedUser auth.User
 	if err := result.Decode(&updatedUser); err != nil {
 		return nil, err
+	}
+
+	// Расшифруем email для возвращения во фронт
+	if updatedUser.Email != "" {
+		decryptedEmail, err := utils.Decrypt(updatedUser.Email)
+		if err == nil {
+			updatedUser.Email = decryptedEmail
+		} else {
+			// Решать, что делать с ошибкой расшифровки
+		}
 	}
 
 	return &updatedUser, nil
@@ -419,6 +450,9 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 	} else {
 		fmt.Println("[UpdateXP] ✅ Achievements checked.")
 	}
+
+	cacheKey := fmt.Sprintf("user:achievements_progress:%s", user.ID.Hex())
+	_ = database.RedisClient.Del(context.Background(), cacheKey)
 
 	return user, unitXP, accuracy, nil
 }

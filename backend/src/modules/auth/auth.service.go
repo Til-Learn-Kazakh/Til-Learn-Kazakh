@@ -3,12 +3,12 @@ package auth
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"time"
 
 	"diploma/src/database"
 	"diploma/src/modules/streak"
+	"diploma/src/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -49,11 +49,13 @@ func VerifyPassword(inputPassword, userPassword string) (valid bool, msg string)
 }
 
 func (s *AuthService) Login(dto LoginDTO) (*User, error) {
-	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
+	emailHash := utils.GetEmailHash(dto.Email)
+
 	var foundUser User
-	err := s.UserCollection.FindOne(ctx, bson.M{"email": dto.Email}).Decode(&foundUser)
+	err := s.UserCollection.FindOne(ctx, bson.M{"email_hash": emailHash}).Decode(&foundUser)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, errors.New("user not found")
@@ -61,13 +63,19 @@ func (s *AuthService) Login(dto LoginDTO) (*User, error) {
 		return nil, err
 	}
 
-	isValid, msg := VerifyPassword(dto.Password, foundUser.Password)
-
+	isValid, _ := VerifyPassword(dto.Password, foundUser.Password)
 	if !isValid {
-		fmt.Println(msg)
 		return nil, errors.New("invalid credentials")
 	}
 
+	decryptedEmail, err := utils.Decrypt(foundUser.Email)
+	if err == nil {
+		foundUser.Email = decryptedEmail
+	} else {
+		// Если почему-то не удалось расшифровать,
+		// либо можете вернуть foundUser.Email, либо вернуть ошибку
+		log.Println("failed to decrypt email:", err)
+	}
 	return &foundUser, nil
 }
 
@@ -75,12 +83,19 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 
-	count, err := s.UserCollection.CountDocuments(ctx, bson.M{"email": dto.Email})
+	emailHash := utils.GetEmailHash(dto.Email)
+
+	// Проверяем, нет ли уже пользователя с таким хэшем
+	count, err := s.UserCollection.CountDocuments(ctx, bson.M{"email_hash": emailHash})
 	if err != nil {
 		return nil, err
 	}
 	if count > 0 {
 		return nil, errors.New("user already exists")
+	}
+	encryptedEmail, err := utils.Encrypt(dto.Email)
+	if err != nil {
+		return nil, err
 	}
 
 	session, err := s.UserCollection.Database().Client().StartSession()
@@ -96,11 +111,14 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 			ID:               primitive.NewObjectID(),
 			FirstName:        dto.FirstName,
 			LastName:         dto.LastName,
-			Email:            dto.Email,
+			Email:            encryptedEmail,
+			EmailHash:        emailHash,
 			Password:         hashedPassword,
 			Hearts:           4,
 			Crystals:         1000,
 			LessonsCompleted: []primitive.ObjectID{},
+			UserAchievements: []primitive.ObjectID{},
+			PendingRewards:   []PendingReward{},
 			CreatedAt:        time.Now(),
 			UpdatedAt:        time.Now(),
 			LastRefillAt:     time.Now(),
