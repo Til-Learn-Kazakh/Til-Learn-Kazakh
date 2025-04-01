@@ -19,6 +19,7 @@ import { useTask } from '../hooks/task.hook'
 import { taskService } from '../services/task.service'
 
 import RefillBottomSheet from './RefillBottomSheet'
+import { t } from 'i18next'
 
 const TaskScreen = ({ route }: any) => {
 	const { unitId } = route.params
@@ -123,7 +124,7 @@ const TaskScreen = ({ route }: any) => {
 	}
 
 	if (isError || !task) {
-		return <Text>Error loading task</Text>
+		return <Text>t('ERROR_LOADING')</Text>
 	}
 
 	const renderTaskComponent = () => {
@@ -208,7 +209,7 @@ const TaskScreen = ({ route }: any) => {
 					/>
 				)
 			default:
-				return <Text>Unknown Task Type</Text>
+				return <Text>{t('TASK.UNKNOWN_TYPE')}</Text>
 		}
 	}
 

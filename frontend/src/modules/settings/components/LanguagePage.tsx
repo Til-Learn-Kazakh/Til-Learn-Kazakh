@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-// если используешь react-i18next
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import Ionicons from '@expo/vector-icons/Ionicons'
@@ -9,17 +8,10 @@ import { useNavigation } from '@react-navigation/native'
 
 import { LANGUAGES } from '../../../core/constants/languages'
 
-// Допустим, у нас есть i18n, и язык хранится в i18n.language
-// Или можно хранить выбранный язык в AsyncStorage.
-
 export default function LanguagePage() {
 	const navigation = useNavigation()
-	const { i18n } = useTranslation()
-
-	// Текущее значение языка из i18n или, если нужно, из AsyncStorage
+	const { t, i18n } = useTranslation()
 	const currentLang = i18n.language || 'en-US'
-
-	// Локальный стейт для «выбранного» в списке
 	const [selectedLang, setSelectedLang] = useState(currentLang)
 
 	const handleConfirm = async () => {
@@ -68,8 +60,8 @@ export default function LanguagePage() {
 						color='#000'
 					/>
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Language</Text>
-				{/* Кнопка confirm справа */}
+				<Text style={styles.headerTitle}>{t('SETTINGS.LANGUAGE_PAGE.TITLE')}</Text>
+				{/* Confirm button on the right */}
 				<TouchableOpacity
 					style={styles.confirmButton}
 					onPress={handleConfirm}
@@ -82,7 +74,7 @@ export default function LanguagePage() {
 				</TouchableOpacity>
 			</View>
 
-			{/* Список языков */}
+			{/* Languages list */}
 			<FlatList
 				data={LANGUAGES}
 				keyExtractor={item => item.code}
@@ -132,8 +124,6 @@ const styles = StyleSheet.create({
 		borderRadius: 8,
 		paddingHorizontal: 16,
 		paddingVertical: 12,
-
-		// Тень (опционально)
 		elevation: 1,
 		shadowColor: '#000',
 		shadowOpacity: 0.05,

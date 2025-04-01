@@ -14,6 +14,7 @@ import { useLevels } from '../hooks/home.hooks'
 
 import { HeartsTopSheet, HeartsTopSheetRef } from './HeartsTopSheet'
 import { InfoBottomSheet } from './InfoBottomSheet'
+import { t } from 'i18next'
 
 const Home = ({ route }: { route: any }) => {
 	const navigation = useNavigation<NavigationProp<any>>()
@@ -114,6 +115,7 @@ const Home = ({ route }: { route: any }) => {
 					<View key={level.id}>
 						<View style={styles.sectionCard}>
 							<View style={styles.sectionInfo}>
+								{/* If level.name is dynamic from API, it may not need localization */}
 								<Text style={styles.sectionText}>{level.name}</Text>
 							</View>
 							<TouchableOpacity
@@ -141,7 +143,10 @@ const Home = ({ route }: { route: any }) => {
 									color='#4CAF50'
 									style={styles.lessonProgress}
 								/>
-								<Text style={styles.lessonProgressText}>{unit?.progress}% завершено</Text>
+								{/* Localized lesson progress text */}
+								<Text style={styles.lessonProgressText}>
+									{t('HOME.LESSON_PROGRESS_TEXT', { progress: unit?.progress })}
+								</Text>
 								<View style={styles.lessonDescription}>
 									<Text style={styles.descriptionTextRu}>{unit.descriptions.ru}</Text>
 									<Text style={styles.descriptionTextKz}>{unit.descriptions.kk}</Text>

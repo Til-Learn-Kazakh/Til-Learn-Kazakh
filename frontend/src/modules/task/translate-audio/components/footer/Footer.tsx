@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { StyleSheet, Text, Vibration, View } from 'react-native'
 import { RectButton } from 'react-native-gesture-handler'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -12,9 +13,9 @@ interface FooterProps {
 	isDisabled: boolean
 	onPress: () => void
 	isSuccess?: boolean | null
-	correctAnswer?: any // Добавлен правильный ответ
-	onContinue?: () => void // Добавлен обработчик нажатия "CONTINUE"
-	hearts: number // Pass the current hearts
+	correctAnswer?: any
+	onContinue?: () => void
+	hearts: number
 	bottomSheetRef: React.RefObject<BottomSheetModal>
 }
 
@@ -28,29 +29,26 @@ const Footer = ({
 	bottomSheetRef,
 }: FooterProps) => {
 	const insets = useSafeAreaInsets()
-	const { preferences } = usePreferences() // 👈 вот здесь получаем настройки
+	const { preferences } = usePreferences()
+	const { t } = useTranslation()
 
-	// Определяем стили в зависимости от правильности ответа
-	let feedbackMessage = ''
-	let feedbackColor = '#333' // Цвет текста фидбэка
-	let backgroundColor = 'transparent' // По умолчанию скрыто
-	let buttonColor = '#0286FF' // Стандартный синий
+	// Define styling values based on feedback status
+	let feedbackColor = '#333'
+	let backgroundColor = 'transparent'
+	let buttonColor = '#0286FF'
 	let soundFile: AVPlaybackSource | null = null
 
 	if (isSuccess === true) {
-		feedbackMessage = '✔ Great job!'
-		feedbackColor = '#61e002' // Зеленый для правильного ответа
+		feedbackColor = '#61e002'
 		backgroundColor = '#d4fcbc'
 		buttonColor = '#61e002'
 		soundFile = require('../../../../../../public/sound/correct.wav')
 	} else if (isSuccess === false) {
-		feedbackMessage = 'Correct solution:'
-		feedbackColor = '#ff4b4b' // Красный для ошибки
+		feedbackColor = '#ff4b4b'
 		backgroundColor = '#ffdfe0'
 		buttonColor = '#ff4b4b'
 		soundFile = require('../../../../../../public/sound/wrong.mp3')
 	}
-
 
 	useEffect(() => {
 		const playSound = async () => {
@@ -61,13 +59,13 @@ const Footer = ({
 		}
 
 		if (isSuccess === true && preferences.vibration) {
-			Vibration.vibrate(200) // Легкая вибрация при правильном ответе
+			Vibration.vibrate(200)
 		} else if (isSuccess === false && preferences.vibration) {
-			Vibration.vibrate(500) // Длинная вибрация при ошибке
+			Vibration.vibrate(500)
 		}
 
 		playSound()
-	}, [isSuccess, preferences])
+	}, [isSuccess, preferences, soundFile])
 
 	const handleCheckPress = () => {
 		if (hearts === 0) {
@@ -81,29 +79,27 @@ const Footer = ({
 		if (hearts === 0) {
 			bottomSheetRef.current?.present()
 		} else {
-			// Continue to next task
 			onContinue?.()
 		}
 	}
 
 	return (
 		<View style={{ paddingBottom: insets.bottom, alignItems: 'center' }}>
-			{/* Если ответ еще не проверен, показываем кнопку CHECK */}
 			{isSuccess === null ? (
 				<RectButton
 					style={[styles.checkButton, { backgroundColor: isDisabled ? '#B0BEC5' : '#0286FF' }]}
 					enabled={!isDisabled}
 					onPress={isDisabled ? undefined : handleCheckPress}
 				>
-					<Text style={styles.buttonLabel}>CHECK</Text>
+					<Text style={styles.buttonLabel}>{t('TASK.FOOTER.CHECK')}</Text>
 				</RectButton>
 			) : (
-				// После проверки показываем блок с фидбэком
 				<View style={[styles.footerContainer, { backgroundColor }]}>
-					{/* Сообщение Great job! или Correct solution: */}
-					<Text style={[styles.feedbackText, { color: feedbackColor }]}>{feedbackMessage}</Text>
-
-					{/* Если ответ был неверным, показываем правильное решение */}
+					{/* Feedback message */}
+					<Text style={[styles.feedbackText, { color: feedbackColor }]}>
+						{isSuccess ? t('TASK.FOOTER.SUCCESS_FEEDBACK') : t('TASK.FOOTER.FAILURE_FEEDBACK')}
+					</Text>
+					{/* Display correct answer if the answer was wrong */}
 					{isSuccess === false && correctAnswer && (
 						<Text style={styles.correctAnswer}>{correctAnswer}</Text>
 					)}
@@ -111,7 +107,7 @@ const Footer = ({
 						style={[styles.button, { backgroundColor: buttonColor }]}
 						onPress={handleContinuePress}
 					>
-						<Text style={styles.buttonLabel}>CONTINUE</Text>
+						<Text style={styles.buttonLabel}>{t('TASK.FOOTER.CONTINUE')}</Text>
 					</RectButton>
 				</View>
 			)}
@@ -127,20 +123,20 @@ const styles = StyleSheet.create({
 		bottom: 0,
 		left: 0,
 		right: 0,
-		alignItems: 'flex-start', // Выровняли контент влево
+		alignItems: 'flex-start',
 	},
 	feedbackText: {
 		fontSize: 22,
 		fontWeight: 'bold',
 		marginBottom: 5,
-		textAlign: 'left', // Текст слева
-		alignSelf: 'flex-start', // Текст выравнен влево
+		textAlign: 'left',
+		alignSelf: 'flex-start',
 		marginLeft: 10,
 	},
 	correctAnswer: {
-		fontSize: 17, // Сделал чуть меньше
+		fontSize: 17,
 		fontWeight: 'bold',
-		color: '#ff4b4b', // Красный цвет
+		color: '#ff4b4b',
 		marginBottom: 15,
 		textAlign: 'left',
 		alignSelf: 'flex-start',

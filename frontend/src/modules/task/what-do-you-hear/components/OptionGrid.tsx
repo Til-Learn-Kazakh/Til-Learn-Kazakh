@@ -1,3 +1,4 @@
+import { t } from 'i18next'
 import React, { useState } from 'react'
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
@@ -29,7 +30,7 @@ const OptionGrid = ({ options = [], onOptionPress }: OptionGridProps) => {
 					</TouchableOpacity>
 				))
 			) : (
-				<Text>No options available</Text> // Fallback message
+				<Text>{t('noOptionsAvailable', 'No options available')}</Text> // Localized fallback message
 			)}
 		</View>
 	)

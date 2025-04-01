@@ -1,10 +1,11 @@
+import { t } from 'i18next'
 import { createNotifications } from 'react-native-notificated'
 
 const { useNotifications, NotificationsProvider } = createNotifications()
 
 // Оборачиваем методы в более удобный интерфейс
 const toast = {
-	success: (message: string, title = 'Успех') => {
+	success: (message: string, title = t('SUCCESS.TITLE')) => {
 		const { notify } = useNotifications()
 		notify('success', {
 			params: {
@@ -13,7 +14,7 @@ const toast = {
 			},
 		})
 	},
-	error: (message: string, title = 'Ошибка') => {
+	error: (message: string, title = t('ERROR.TITLE')) => {
 		const { notify } = useNotifications()
 		notify('error', {
 			params: {
@@ -22,7 +23,7 @@ const toast = {
 			},
 		})
 	},
-	warning: (message: string, title = 'Предупреждение') => {
+	warning: (message: string, title = t('WARNING')) => {
 		const { notify } = useNotifications()
 		notify('warning', {
 			params: {
@@ -31,7 +32,7 @@ const toast = {
 			},
 		})
 	},
-	info: (message: string, title = 'Информация') => {
+	info: (message: string, title = t('INFORMATION')) => {
 		const { notify } = useNotifications()
 		notify('info', {
 			params: {

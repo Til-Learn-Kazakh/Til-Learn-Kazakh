@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Calendar, LocaleConfig } from 'react-native-calendars'
 
@@ -9,6 +10,7 @@ import { icons } from '../../../core/constants'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
 import { useStreak } from '../hooks/home.hooks'
 
+// Define locales for English and Russian
 LocaleConfig.locales['en'] = {
 	monthNames: [
 		'January',
@@ -27,13 +29,37 @@ LocaleConfig.locales['en'] = {
 	dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
 	dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 }
-LocaleConfig.defaultLocale = 'en'
+LocaleConfig.locales['ru'] = {
+	monthNames: [
+		'Январь',
+		'Февраль',
+		'Март',
+		'Апрель',
+		'Май',
+		'Июнь',
+		'Июль',
+		'Август',
+		'Сентябрь',
+		'Октябрь',
+		'Ноябрь',
+		'Декабрь',
+	],
+	dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+	dayNamesShort: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+}
 
 export const InfoBottomSheet = ({ onClose }: any) => {
 	const navigation = useNavigation<NavigationProp<any>>()
+	const { t, i18n } = useTranslation()
+
+	// Dynamically set the calendar locale on language change
+	useEffect(() => {
+		LocaleConfig.defaultLocale = i18n.language.startsWith('ru') ? 'ru' : 'en'
+	}, [i18n.language])
 
 	const [selectedDate, setSelectedDate] = useState<string | null>(null)
 	const { data: streak, isPending } = useStreak()
+
 	const onCloseClick = useCallback(() => {
 		onClose()
 	}, [onClose])
@@ -50,15 +76,16 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 		}, 300)
 	}, [onClose, navigation])
 
-	const markedDates = streak?.streak_days.reduce((acc: any, day: any) => {
-		acc[day] = {
-			customStyles: {
-				container: { backgroundColor: '#FFD700' },
-				text: { color: '#333333', fontWeight: 'bold' },
-			},
-		}
-		return acc
-	}, {})
+	const markedDates =
+		streak?.streak_days.reduce((acc: any, day: any) => {
+			acc[day] = {
+				customStyles: {
+					container: { backgroundColor: '#FFD700' },
+					text: { color: '#333333', fontWeight: 'bold' },
+				},
+			}
+			return acc
+		}, {}) || {}
 
 	if (selectedDate) {
 		markedDates[selectedDate] = {
@@ -67,6 +94,7 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 			selectedTextColor: '#ffffff',
 		}
 	}
+
 	if (isPending) {
 		return <LoadingUi />
 	}
@@ -88,7 +116,7 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 				</TouchableOpacity>
 			</View>
 
-			{/* Информация о streak */}
+			{/* Streak Information */}
 			<View style={styles.streakHeader}>
 				<View style={styles.streakCountContainer}>
 					<Text style={styles.streakCount}>{streak?.current_streak}</Text>
@@ -96,11 +124,14 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 						source={streak?.current_streak > 0 ? icons.fire : icons.grayfire}
 						style={styles.largeFireIcon}
 					/>
-					<Text style={styles.streakLabel}>days streak</Text>
+					<Text style={styles.streakLabel}>{t('STREAK_BOTTOM.STREAK.LABEL')}</Text>
 				</View>
-				<Text style={styles.recordText}>Record Streak: {streak?.max_streak} days</Text>
+				<Text style={styles.recordText}>
+					{t('STREAK_BOTTOM.STREAK.RECORD', { max: streak?.max_streak })}
+				</Text>
 			</View>
 
+			{/* Calendar */}
 			<View style={styles.calendarContainer}>
 				<Calendar
 					markedDates={markedDates}
@@ -119,7 +150,7 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 				onPress={onCloseClick}
 				style={styles.cancelButton}
 			>
-				<Text style={styles.cancelButtonText}>Close</Text>
+				<Text style={styles.cancelButtonText}>{t('STREAK_BOTTOM.CLOSE')}</Text>
 			</TouchableOpacity>
 		</BottomSheetScrollView>
 	)

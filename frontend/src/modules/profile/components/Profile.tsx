@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
@@ -13,10 +14,10 @@ import { useYearlyStats } from '../hooks/analytics.hooks'
 import { avatars } from './AvatarPickerPage'
 
 const ProfileScreen = () => {
-	const streakCount = 0 // Здесь можно вставить реальное количество streak
+	const { t, i18n } = useTranslation()
 	const navigation = useNavigation<NavigationProp<any>>()
 
-	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser() // <-- тут подтягиваем юзера из запроса
+	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser()
 	const [selectedYearKey, setSelectedYearKey] = useState(() => new Date().getFullYear().toString())
 	const selectedAvatar = avatars.find(a => a.id === currentUser?.avatar)
 
@@ -45,19 +46,21 @@ const ProfileScreen = () => {
 		})
 	}, [bottomSheet, topSheetContent])
 
+	// Use the current language; default to 'en-US' if not Russian.
+	const locale = i18n.language === 'ru' ? 'ru-RU' : 'en-US'
 	const joinDate = currentUser?.created_at
-		? new Date(currentUser.created_at).toLocaleDateString('ru-RU', {
+		? new Date(currentUser.created_at).toLocaleDateString(locale, {
 				year: 'numeric',
 				month: 'long',
 				day: 'numeric',
 			})
-		: 'Неизвестно'
+		: t('PROFILE.JOINED_UNKNOWN')
 
 	return (
 		<View style={styles.container}>
 			{/* Fixed Header */}
 			<View style={styles.header}>
-				<Text style={styles.headerTitle}>Профиль</Text>
+				<Text style={styles.headerTitle}>{t('PROFILE.HEADER_TITLE')}</Text>
 				<TouchableOpacity
 					style={styles.settingsButton}
 					onPress={() => navigation.navigate('Settings')}
@@ -84,7 +87,10 @@ const ProfileScreen = () => {
 						/>
 					</TouchableOpacity>
 					<Text style={styles.username}>{currentUser?.first_name}</Text>
-					<Text style={styles.userTag}>Присоединился: {joinDate}</Text>
+					<Text style={styles.userTag}>
+						{t('PROFILE.JOINED')}
+						{joinDate}
+					</Text>
 				</View>
 
 				{/* Overview Section */}
@@ -92,11 +98,11 @@ const ProfileScreen = () => {
 					{/* Heart Item */}
 					<View style={styles.overviewItem}>
 						<Image
-							source={icons.heart} // Replace with your actual heart icon
+							source={icons.heart}
 							style={styles.overviewIcon}
 						/>
 						<Text style={styles.overviewValue}>{currentUser?.hearts}</Text>
-						<Text style={styles.overviewLabel}>Hearts</Text>
+						<Text style={styles.overviewLabel}>{t('PROFILE.HEARTS')}</Text>
 					</View>
 
 					{/* XP Item */}
@@ -106,7 +112,7 @@ const ProfileScreen = () => {
 							style={styles.overviewIcon}
 						/>
 						<Text style={styles.overviewValue}>{currentUser?.xp}</Text>
-						<Text style={styles.overviewLabel}>XP</Text>
+						<Text style={styles.overviewLabel}>{t('PROFILE.XP')}</Text>
 					</View>
 
 					{/* Diamond Item */}
@@ -116,7 +122,7 @@ const ProfileScreen = () => {
 							style={styles.overviewIcon}
 						/>
 						<Text style={styles.overviewValue}>{currentUser?.crystals}</Text>
-						<Text style={styles.overviewLabel}>Diamonds</Text>
+						<Text style={styles.overviewLabel}>{t('PROFILE.DIAMONDS')}</Text>
 					</View>
 				</View>
 
@@ -127,7 +133,7 @@ const ProfileScreen = () => {
 						style={styles.squareCard}
 						onPress={() => onOpenTopSheet()}
 					>
-						<Text style={styles.cardTitle}>СЕРИЯ</Text>
+						<Text style={styles.cardTitle}>{t('PROFILE.STREAK')}</Text>
 						<View style={styles.streakContainer}>
 							<Image
 								source={
@@ -146,7 +152,7 @@ const ProfileScreen = () => {
 						onPress={() => navigation.navigate('AchievementsScreen')}
 						style={styles.squareCard}
 					>
-						<Text style={styles.cardTitle}>ДОСТИЖЕНИЯ</Text>
+						<Text style={styles.cardTitle}>{t('PROFILE.ACHIEVEMENTS')}</Text>
 						<View style={styles.cardGrid}>
 							<View style={styles.row}>
 								<Image
@@ -183,9 +189,9 @@ const ProfileScreen = () => {
 							color='#009688'
 						/>
 						<Text style={styles.statValue}>
-							{yearlyData ? `${Math.floor(yearlyData.time / 60)} мин` : '-'}
+							{yearlyData ? `${Math.floor(yearlyData.time / 60)} ${t('PROFILE.MIN')}` : '-'}
 						</Text>
-						<Text style={styles.statLabel}>Время в обучении</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.TIME_LEARNING')}</Text>
 					</View>
 					<View style={styles.statItem}>
 						<Ionicons
@@ -194,7 +200,7 @@ const ProfileScreen = () => {
 							color='#7C4DFF'
 						/>
 						<Text style={styles.statValue}>{yearlyData ? yearlyData.lessons : '-'}</Text>
-						<Text style={styles.statLabel}>Пройдено уроков</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.LESSONS_COMPLETED')}</Text>
 					</View>
 					<View style={styles.statItem}>
 						<Ionicons
@@ -203,7 +209,7 @@ const ProfileScreen = () => {
 							color='#E91E63'
 						/>
 						<Text style={styles.statValue}>{yearlyData ? `${yearlyData.accuracy} %` : '-'}</Text>
-						<Text style={styles.statLabel}>Точность</Text>
+						<Text style={styles.statLabel}>{t('PROFILE.ACCURACY')}</Text>
 					</View>
 				</TouchableOpacity>
 			</ScrollView>

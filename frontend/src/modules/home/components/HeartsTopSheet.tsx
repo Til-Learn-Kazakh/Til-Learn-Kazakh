@@ -16,6 +16,7 @@ import { LoadingUi } from '../../../core/ui/LoadingUi'
 import { toast } from '../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY } from '../../auth/hooks/user-current-user.hook'
 import { homeService } from '../services/home.service'
+import { t } from 'i18next'
 
 export interface HeartsTopSheetRef {
 	open: () => void
@@ -156,7 +157,7 @@ export const HeartsTopSheet = forwardRef<HeartsTopSheetRef, HeartsTopSheetProps>
 		return (
 			<Animated.View style={[styles.topSheet, { transform: [{ translateY: slideAnim }] }]}>
 				<View style={styles.topSheetContent}>
-					{/* Отображение сердец */}
+					{/* Display hearts */}
 					<View style={styles.heartsContainer}>
 						{Array.from({ length: 5 }).map((_, index) => (
 							<Image
@@ -168,7 +169,7 @@ export const HeartsTopSheet = forwardRef<HeartsTopSheetRef, HeartsTopSheetProps>
 					</View>
 
 					<Text style={styles.topSheetText}>
-						{hearts === 5 ? 'You have full hearts!' : 'Next heart in '}
+						{hearts === 5 ? t('HOME.HEARTS.FULL') : t('HOME.HEARTS.NEXT')}
 						{hearts < 5 && <Text style={styles.redText}>{formatTime(nextHeartTime)}</Text>}
 					</Text>
 
@@ -183,7 +184,7 @@ export const HeartsTopSheet = forwardRef<HeartsTopSheetRef, HeartsTopSheetProps>
 								style={styles.refillIcon}
 							/>
 							<Text style={[styles.refillText, hearts === 5 && styles.disabledText]}>
-								{hearts === 5 ? 'FULL HEARTS' : 'REFILL HEARTS'}
+								{hearts === 5 ? t('HOME.HEARTS.FULL_BUTTON') : t('HOME.HEARTS.REFILL_BUTTON')}
 							</Text>
 						</View>
 						<View style={styles.priceContent}>
@@ -191,7 +192,9 @@ export const HeartsTopSheet = forwardRef<HeartsTopSheetRef, HeartsTopSheetProps>
 								source={hearts === 5 ? icons.graydiamond : icons.diamond}
 								style={styles.priceIcon}
 							/>
-							<Text style={[styles.priceText, hearts === 5 && styles.disabledText]}>500</Text>
+							<Text style={[styles.priceText, hearts === 5 && styles.disabledText]}>
+								{t('HOME.HEARTS.PRICE')}
+							</Text>
 						</View>
 					</TouchableOpacity>
 				</View>

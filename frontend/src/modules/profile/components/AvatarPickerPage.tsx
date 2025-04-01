@@ -12,6 +12,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 
 import { icons } from '../../../core/constants'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
@@ -102,6 +103,7 @@ export const avatars = [
 ]
 
 export default function AvatarPickerPage() {
+	const { t } = useTranslation()
 	const navigation = useNavigation()
 	const route = useRoute()
 	const { selectedAvatarId }: any = route.params || {}
@@ -117,13 +119,12 @@ export default function AvatarPickerPage() {
 	const { mutate, isPending } = useMutation({
 		mutationFn: (avatar: string) => profileService.updateAvatar(avatar),
 		onSuccess: () => {
-			// Можно обновить кэш пользователя
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
-			toast.success('Аватар успешно обновлён!')
+			toast.success(t('PROFILE.AVATAR_CHANGE.AVATAR_UPDATED_SUCCESS'))
 		},
 		onError: err => {
 			console.error('❌ Ошибка обновления аватара:', err)
-			toast.error('Не удалось обновить аватар. Попробуйте позже.')
+			toast.error(t('PROFILE.AVATAR_CHANGE.AVATAR_UPDATE_FAILED'))
 		},
 	})
 
@@ -182,8 +183,8 @@ export default function AvatarPickerPage() {
 						color='#000'
 					/>
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Profile</Text>
-				{/* Пробел вправо (для симметрии) */}
+				<Text style={styles.headerTitle}>{t('PROFILE.AVATAR_CHANGE.HEADER_TITLE')}</Text>
+				{/* Пробел для симметрии */}
 				<View style={{ width: 24 }} />
 			</View>
 
@@ -201,7 +202,7 @@ export default function AvatarPickerPage() {
 				)}
 			</View>
 
-			{/* Карточка с фоном / с закруглёнными углами */}
+			{/* Карточка */}
 			<View style={styles.card}>
 				{/* Сетка: 4 столбца, 3 строки */}
 				<FlatList
@@ -210,7 +211,7 @@ export default function AvatarPickerPage() {
 					renderItem={renderItem}
 					numColumns={4}
 					contentContainerStyle={styles.gridContent}
-					columnWrapperStyle={{ justifyContent: 'space-between' }} // 👈 равномерно по ширине
+					columnWrapperStyle={{ justifyContent: 'space-between' }}
 				/>
 
 				{/* Кнопки Cancel / Save */}
@@ -219,14 +220,14 @@ export default function AvatarPickerPage() {
 						onPress={() => navigation.goBack()}
 						style={styles.cancelBtn}
 					>
-						<Text style={styles.cancelText}>Cancel</Text>
+						<Text style={styles.cancelText}>{t('PROFILE.AVATAR_CHANGE.CANCEL')}</Text>
 					</TouchableOpacity>
 					<TouchableOpacity
 						onPress={handleSave}
 						style={[styles.saveBtn, !selected && { opacity: 0.5 }]}
 						disabled={!selected}
 					>
-						<Text style={styles.saveText}>Save</Text>
+						<Text style={styles.saveText}>{t('PROFILE.AVATAR_CHANGE.SAVE')}</Text>
 					</TouchableOpacity>
 				</View>
 			</View>

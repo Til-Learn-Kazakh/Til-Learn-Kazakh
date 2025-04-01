@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 import FeatherIcon from '@expo/vector-icons/Feather'
@@ -11,6 +12,8 @@ import { profileService } from '../services/settings.service'
 
 const PasswordChange = () => {
 	const navigation = useNavigation()
+	const { t } = useTranslation()
+
 	const [form, setForm] = useState({
 		oldPassword: '',
 		newPassword: '',
@@ -33,7 +36,7 @@ const PasswordChange = () => {
 	const { mutate, isPending } = useMutation({
 		mutationFn: (dto: ChangePasswordDto) => profileService.changePassword(dto),
 		onSuccess: () => {
-			toast.success('Пароль успешно обновлён')
+			toast.success(t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.SUCCESS'))
 			navigation.goBack()
 		},
 		onError: (err: any) => {
@@ -41,7 +44,7 @@ const PasswordChange = () => {
 				err?.response?.data?.error ||
 				err?.response?.data?.message ||
 				err?.message ||
-				'Ошибка при смене пароля'
+				t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.ERROR')
 			toast.error(message)
 		},
 	})
@@ -68,14 +71,16 @@ const PasswordChange = () => {
 						color='#999'
 					/>
 				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Password</Text>
+				<Text style={styles.headerTitle}>{t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.TITLE')}</Text>
 			</View>
 			<View style={styles.divider} />
 
 			<ScrollView contentContainerStyle={styles.scrollWrapper}>
 				{/* Old Password */}
 				<View style={styles.inputWrapper}>
-					<Text style={styles.label}>Old password</Text>
+					<Text style={styles.label}>
+						{t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.OLD_PASSWORD')}
+					</Text>
 					<View style={styles.inputField}>
 						<TextInput
 							style={styles.input}
@@ -96,7 +101,9 @@ const PasswordChange = () => {
 
 				{/* New Password */}
 				<View style={styles.inputWrapper}>
-					<Text style={styles.label}>New password</Text>
+					<Text style={styles.label}>
+						{t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.NEW_PASSWORD')}
+					</Text>
 					<View style={styles.inputField}>
 						<TextInput
 							style={styles.input}
@@ -117,7 +124,9 @@ const PasswordChange = () => {
 
 				{/* Confirm Password */}
 				<View style={styles.inputWrapper}>
-					<Text style={styles.label}>Confirm password</Text>
+					<Text style={styles.label}>
+						{t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.CONFIRM_PASSWORD')}
+					</Text>
 					<View style={styles.inputField}>
 						<TextInput
 							style={styles.input}
@@ -147,7 +156,11 @@ const PasswordChange = () => {
 				disabled={!(form.oldPassword && form.newPassword && form.confirmPassword)}
 				onPress={handleSave}
 			>
-				<Text style={styles.saveButtonText}>{isPending ? 'Сохраняю...' : 'Сохранить'}</Text>
+				<Text style={styles.saveButtonText}>
+					{isPending
+						? t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.SAVING')
+						: t('SETTINGS.CHANGE_PROFILE.PASSWORD_CHANGE.SAVE')}
+				</Text>
 			</TouchableOpacity>
 		</View>
 	)

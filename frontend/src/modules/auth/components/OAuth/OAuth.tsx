@@ -1,24 +1,27 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Alert, Image, StyleSheet, Text, View } from 'react-native'
 
 import { icons } from '../../../../core/constants'
 import CustomButton from '../../../../core/ui/CustomButton'
 
 const OAuth = () => {
+	const { t } = useTranslation()
+
 	const handleGoogleSignIn = () => {
-		Alert.alert('Google Sign In')
+		Alert.alert(t('AUTHORIZATION.OAUTH.GOOGLE_SIGN_IN_ALERT'))
 	}
 
 	return (
 		<View>
 			<View style={styles.dividerContainer}>
 				<View style={styles.divider} />
-				<Text style={styles.dividerText}>Or</Text>
+				<Text style={styles.dividerText}>{t('AUTHORIZATION.OAUTH.OR')}</Text>
 				<View style={styles.divider} />
 			</View>
 
 			<CustomButton
-				title='Log In with Google'
+				title={t('AUTHORIZATION.OAUTH.LOGIN_WITH_GOOGLE')}
 				style={styles.googleButton}
 				IconLeft={() => (
 					<Image
@@ -43,7 +46,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 	},
 	divider: {
-		backgroundColor: '#e0e0e0', // Замените на ваш цвет general-100
+		backgroundColor: '#e0e0e0',
 		height: 1,
 		flex: 1,
 	},
@@ -54,7 +57,7 @@ const styles = StyleSheet.create({
 	googleButton: {
 		marginTop: 20,
 		width: '100%',
-		shadowColor: 'transparent', // Убираем тень
+		shadowColor: 'transparent',
 	},
 	googleIcon: {
 		marginHorizontal: 8,

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	FlatList,
 	Image,
@@ -16,13 +17,14 @@ import { imageserver } from '../../../core/config/environment.config'
 import { useAchievementsProgress } from '../hooks/achievements.hooks'
 
 export default function AchievementsScreen() {
+	const { t } = useTranslation()
 	const { data: achievements, isLoading, isError } = useAchievementsProgress()
 	const navigation = useNavigation<NavigationProp<any>>()
 
 	if (isLoading) {
 		return (
 			<View style={styles.loaderContainer}>
-				<Text>Загрузка...</Text>
+				<Text>{t('ACHIEVEMENTS.SCREEN.LOADING')}</Text>
 			</View>
 		)
 	}
@@ -30,16 +32,16 @@ export default function AchievementsScreen() {
 	if (isError) {
 		return (
 			<View style={styles.errorContainer}>
-				<Text>Ошибка загрузки достижений</Text>
+				<Text>{t('ACHIEVEMENTS.SCREEN.ERROR')}</Text>
 			</View>
 		)
 	}
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			{/* Шапка */}
+			{/* Header */}
 			<View style={styles.header}>
-				{/* Левая часть: кнопка «Back» */}
+				{/* Left: Back Button */}
 				<TouchableOpacity
 					style={styles.backButton}
 					onPress={() => navigation.goBack()}
@@ -50,13 +52,13 @@ export default function AchievementsScreen() {
 						color='#007AFF'
 						style={{ marginRight: 4 }}
 					/>
-					<Text style={styles.backText}>Back</Text>
+					<Text style={styles.backText}>{t('ACHIEVEMENTS.SCREEN.BACK')}</Text>
 				</TouchableOpacity>
 
-				{/* Заголовок по центру */}
-				<Text style={styles.headerTitle}>Достижения</Text>
+				{/* Center: Title */}
+				<Text style={styles.headerTitle}>{t('ACHIEVEMENTS.SCREEN.TITLE')}</Text>
 
-				{/* Справа пустая вьюшка */}
+				{/* Right: Empty view */}
 				<View style={{ width: 50 }} />
 			</View>
 
@@ -68,7 +70,7 @@ export default function AchievementsScreen() {
 					const isAchieved = item.is_achieved
 					const progressText = `${item.current}/${item.threshold}`
 
-					// Нажатие, если ачивка выполнена
+					// Only navigate if achieved
 					const onPressAchievement = () => {
 						if (isAchieved) {
 							navigation.navigate('AchievementModalScreen', {
@@ -84,7 +86,7 @@ export default function AchievementsScreen() {
 						<TouchableOpacity
 							style={styles.achievementItem}
 							onPress={onPressAchievement}
-							activeOpacity={isAchieved ? 0.6 : 1} // если не выполнено, делаем тап «неактивным»
+							activeOpacity={isAchieved ? 0.6 : 1}
 						>
 							{isAchieved ? (
 								<Image
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
 		backgroundColor: '#fff',
 	},
 
-	// Шапка
+	// Header styles
 	header: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
 	},
 
-	// Элемент списка
+	// Achievement item styles
 	achievementItem: {
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -171,7 +173,6 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: '#FFD700',
 	},
-
 	achievementInfo: {
 		flex: 1,
 	},
@@ -185,6 +186,7 @@ const styles = StyleSheet.create({
 		color: '#6c757d',
 	},
 
+	// Loader & error containers
 	loaderContainer: {
 		flex: 1,
 		justifyContent: 'center',

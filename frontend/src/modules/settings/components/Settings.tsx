@@ -12,18 +12,21 @@ import {
 
 import FeatherIcon from '@expo/vector-icons/Feather'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { LANGUAGES } from '../../../core/constants/languages'
+import { toast } from '../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY } from '../../auth/hooks/user-current-user.hook'
 import { authService } from '../../auth/services/auth.service'
 import { usePreferences } from '../hooks/preferences.context'
 import { Preferences } from '../hooks/preferences.storage'
+import { profileService } from '../services/settings.service'
+import { LoadingUi } from '../../../core/ui/LoadingUi'
 
 export default function SettingsScreen() {
 	const navigation = useNavigation<NavigationProp<any>>()
 	const queryClient = useQueryClient()
-	const { i18n } = useTranslation()
+	const { t, i18n } = useTranslation()
 	const currentLanguageCode = i18n.language
 
 	const currentLanguageLabel =
@@ -32,6 +35,23 @@ export default function SettingsScreen() {
 
 	const handleToggleParam = (key: keyof Preferences) => {
 		togglePreference(key)
+	}
+
+	const { mutate: deleteProfile, isPending } = useMutation({
+		mutationFn: () => profileService.deleteProfile(),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
+			toast.success(t('SETTINGS.DELETE_ACCOUNT_SUCCESS'))
+			navigation.navigate('Login') // Redirect to Login page after profile deletion
+		},
+		onError: err => {
+			console.error('❌ Ошибка удаления аккаунта:', err)
+			toast.error(t('SETTINGS.DELETE_ACCOUNT_ERROR'))
+		},
+	})
+
+	if (isPending) {
+		return <LoadingUi />
 	}
 
 	return (
@@ -49,18 +69,18 @@ export default function SettingsScreen() {
 							color='#000'
 						/>
 					</TouchableOpacity>
-					<Text style={styles.headerTitle}>Настройки</Text>
+					<Text style={styles.headerTitle}>{t('SETTINGS.TITLE')}</Text>
 				</View>
 
 				{/* Подзаголовок */}
-				<Text style={styles.headerSubtitle}>Настройки приложения</Text>
+				<Text style={styles.headerSubtitle}>{t('SETTINGS.SUBTITLE')}</Text>
 
 				<ScrollView contentContainerStyle={{ minHeight: '125%', paddingBottom: 40 }}>
-					{/* ============ Блок 1. ПАРАМЕТРЫ ============ */}
+					{/* ============ BLOCK 1: PARAMETERS ============ */}
 					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>Параметры</Text>
+						<Text style={styles.sectionTitle}>{t('SETTINGS.PARAMETERS.TITLE')}</Text>
 						<View style={styles.sectionBody}>
-							{/* Язык */}
+							{/* Language */}
 							<View style={[styles.rowWrapper, styles.rowFirst]}>
 								<TouchableOpacity
 									style={styles.row}
@@ -75,10 +95,9 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Язык</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.PARAMETERS.LANGUAGE')}</Text>
 									<View style={styles.rowSpacer} />
 									<Text style={styles.rowValue}>{currentLanguageLabel}</Text>
-
 									<FeatherIcon
 										name='chevron-right'
 										size={20}
@@ -87,7 +106,7 @@ export default function SettingsScreen() {
 								</TouchableOpacity>
 							</View>
 
-							{/* Уведомления */}
+							{/* Notifications */}
 							<View style={styles.rowWrapper}>
 								<View style={styles.row}>
 									<View style={[styles.rowIcon, { backgroundColor: '#FBBF24' }]}>
@@ -97,7 +116,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Уведомления</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.PARAMETERS.NOTIFICATIONS')}</Text>
 									<View style={styles.rowSpacer} />
 									<Switch
 										value={preferences.notifications}
@@ -106,7 +125,7 @@ export default function SettingsScreen() {
 								</View>
 							</View>
 
-							{/* Звуковые эффекты */}
+							{/* Sound Effects */}
 							<View style={styles.rowWrapper}>
 								<View style={styles.row}>
 									<View style={[styles.rowIcon, { backgroundColor: '#34D399' }]}>
@@ -116,7 +135,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Звуковые эффекты</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.PARAMETERS.SOUND_EFFECTS')}</Text>
 									<View style={styles.rowSpacer} />
 									<Switch
 										value={preferences.soundEffects}
@@ -125,7 +144,7 @@ export default function SettingsScreen() {
 								</View>
 							</View>
 
-							{/* Вибрация */}
+							{/* Vibration */}
 							<View style={styles.rowWrapper}>
 								<View style={styles.row}>
 									<View style={[styles.rowIcon, { backgroundColor: '#3B82F6' }]}>
@@ -135,7 +154,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Вибрация</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.PARAMETERS.VIBRATION')}</Text>
 									<View style={styles.rowSpacer} />
 									<Switch
 										value={preferences.vibration}
@@ -148,7 +167,7 @@ export default function SettingsScreen() {
 
 					{/* ============ Блок 2. Профиль ============ */}
 					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>Профиль</Text>
+						<Text style={styles.sectionTitle}>{t('SETTINGS.PROFILE')}</Text>
 						<View style={styles.sectionBody}>
 							<View style={[styles.rowWrapper, styles.rowFirst]}>
 								<TouchableOpacity
@@ -164,7 +183,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Profile</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.PROFILE')}</Text>
 									<View style={styles.rowSpacer} />
 									<FeatherIcon
 										name='chevron-right'
@@ -176,9 +195,9 @@ export default function SettingsScreen() {
 						</View>
 					</View>
 
-					{/* ============ Блок 3. TIL в соцсетях ============ */}
+					{/* ============ Блок 3. Social Platforms ============ */}
 					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>TIL в соцсетях</Text>
+						<Text style={styles.sectionTitle}>{t('SETTINGS.SOCIAL_PLATFORMS.TITLE')}</Text>
 						<View style={styles.sectionBody}>
 							{/* Discord */}
 							<View style={[styles.rowWrapper, styles.rowFirst]}>
@@ -195,7 +214,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Discord</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.SOCIAL_PLATFORMS.DISCORD')}</Text>
 									<View style={styles.rowSpacer} />
 									<FeatherIcon
 										name='chevron-right'
@@ -220,7 +239,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Instagram</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.SOCIAL_PLATFORMS.INSTAGRAM')}</Text>
 									<View style={styles.rowSpacer} />
 									<FeatherIcon
 										name='chevron-right'
@@ -245,7 +264,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Telegram</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.SOCIAL_PLATFORMS.TELEGRAM')}</Text>
 									<View style={styles.rowSpacer} />
 									<FeatherIcon
 										name='chevron-right'
@@ -257,9 +276,9 @@ export default function SettingsScreen() {
 						</View>
 					</View>
 
-					{/* ============ Блок 4. Поддержка ============ */}
+					{/* ============ Блок 4. Support ============ */}
 					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>Поддержка</Text>
+						<Text style={styles.sectionTitle}>{t('SETTINGS.SUPPORT.SECTION')}</Text>
 						<View style={styles.sectionBody}>
 							<View style={[styles.rowWrapper, styles.rowFirst]}>
 								<TouchableOpacity
@@ -275,7 +294,7 @@ export default function SettingsScreen() {
 											color='#fff'
 										/>
 									</View>
-									<Text style={styles.rowLabel}>Написать в поддержку</Text>
+									<Text style={styles.rowLabel}>{t('SETTINGS.SUPPORT.CONTACT')}</Text>
 									<View style={styles.rowSpacer} />
 									<FeatherIcon
 										name='chevron-right'
@@ -296,25 +315,26 @@ export default function SettingsScreen() {
 								queryClient.setQueryData([CURRENT_USER_QUERY_KEY], null)
 							}}
 						>
-							<Text style={styles.logoutButtonText}>Выйти</Text>
+							<Text style={styles.logoutButtonText}>{t('SETTINGS.LOGOUT')}</Text>
 						</TouchableOpacity>
 
 						<View style={styles.legalLinksContainer}>
 							<TouchableOpacity onPress={() => console.log('Переход на Terms')}>
-								<Text style={styles.legalLink}>Условия предоставления услуг</Text>
+								<Text style={styles.legalLink}>{t('SETTINGS.TERMS')}</Text>
 							</TouchableOpacity>
-							<Text style={styles.legalDivider}>и</Text>
+							<Text style={styles.legalDivider}>{t('SETTINGS.AND')}</Text>
 							<TouchableOpacity onPress={() => console.log('Переход на Privacy')}>
-								<Text style={styles.legalLink}>Политика конфиденциальности</Text>
+								<Text style={styles.legalLink}>{t('SETTINGS.PRIVACY')}</Text>
 							</TouchableOpacity>
 						</View>
 
 						<TouchableOpacity
 							onPress={() => {
+								deleteProfile()
 								// handle delete account
 							}}
 						>
-							<Text style={styles.deleteAccountText}>Удалить аккаунт</Text>
+							<Text style={styles.deleteAccountText}>{t('SETTINGS.DELETE_ACCOUNT')}</Text>
 						</TouchableOpacity>
 					</View>
 				</ScrollView>

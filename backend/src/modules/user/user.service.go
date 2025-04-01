@@ -87,6 +87,59 @@ func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 	return &user, nil
 }
 
+func (s *UserService) DeleteUser(userID string) error {
+	objectID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return err
+	}
+
+	// Start a session to handle the transaction (if needed)
+	session, err := database.Client.StartSession()
+	if err != nil {
+		return err
+	}
+	defer session.EndSession(context.Background())
+
+	// Begin transaction
+	err = session.StartTransaction()
+	if err != nil {
+		return err
+	}
+
+	// Define context with a timeout for the delete operation
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Delete the user document
+	_, err = s.Collection.DeleteOne(ctx, bson.M{"_id": objectID})
+	if err != nil {
+		// Abort transaction and check for error
+		if abortErr := session.AbortTransaction(ctx); abortErr != nil {
+			return fmt.Errorf("failed to abort transaction: %w", abortErr)
+		}
+		return err
+	}
+
+	// Delete related streaks or other dependent data if necessary
+	streakCollection := database.GetCollection(database.Client, "Streak")
+	_, err = streakCollection.DeleteMany(ctx, bson.M{"userId": objectID})
+	if err != nil {
+		// Abort transaction and check for error
+		if abortErr := session.AbortTransaction(ctx); abortErr != nil {
+			return fmt.Errorf("failed to abort transaction: %w", abortErr)
+		}
+		return err
+	}
+
+	// Commit the transaction
+	err = session.CommitTransaction(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *UserService) UpdateUserProfile(ctx context.Context, userID string, dto UpdateUserDto) (*auth.User, error) {
 	objectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {

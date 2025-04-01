@@ -9,6 +9,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '../../../core/navigation/AuthStack/AuthStackScreen'
 import CustomButton from '../../../core/ui/CustomButton'
 import { data } from '../data/data'
+import { t } from 'i18next'
 
 type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamList>
 
@@ -28,7 +29,7 @@ const Welcome: React.FC = () => {
 				}}
 				style={styles.skipButton}
 			>
-				<Text style={styles.skipText}>Skip</Text>
+				<Text style={styles.skipText}>{t('SKIP')}</Text>
 			</TouchableOpacity>
 
 			<Swiper
@@ -55,7 +56,7 @@ const Welcome: React.FC = () => {
 			</Swiper>
 
 			<CustomButton
-				title={isLastSlide ? 'Get Started' : 'Next'}
+				title={isLastSlide ? t('GET_STARTED') : t('NEXT')}
 				onPress={() =>
 					isLastSlide ? navigation.navigate('SignUp') : swiperRef.current?.scrollBy(1)
 				}

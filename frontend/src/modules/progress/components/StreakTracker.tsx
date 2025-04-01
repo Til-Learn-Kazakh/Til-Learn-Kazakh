@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
@@ -10,6 +11,7 @@ import { useStreak } from '../../home/hooks/home.hooks'
 
 const StreakTracker = () => {
 	const navigation = useNavigation<NavigationProp<any>>()
+	const { t } = useTranslation()
 
 	// ✅ Fetch streak data from backend
 	const { data: streakData, isPending } = useStreak()
@@ -22,19 +24,6 @@ const StreakTracker = () => {
 
 	const currentStreak = streakData?.current_streak || 0
 
-	const todayIndex = new Date().getDay()
-	const hasStreakToday = weekStreak[todayIndex]
-
-	// //Если streak уже получен сегодня → отправляем сразу в Home
-	// useEffect(() => {
-	// 	if (hasStreakToday) {
-	// 		navigation.reset({
-	// 			index: 0,
-	// 			routes: [{ name: 'Home' }],
-	// 		})
-	// 	}
-	// }, [hasStreakToday, navigation])
-
 	// ✅ Handle loading state
 	if (isPending) {
 		return <LoadingUi />
@@ -43,8 +32,8 @@ const StreakTracker = () => {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.title}>Day {currentStreak + 1} of your streak</Text>
-				<Text style={styles.subtitle}>starts tomorrow!</Text>
+				<Text style={styles.title}>{t('PROGRESS.STREAK.TITLE', { day: currentStreak + 1 })}</Text>
+				<Text style={styles.subtitle}>{t('PROGRESS.STREAK.SUBTITLE')}</Text>
 			</View>
 
 			{/* Streak Animation */}
@@ -75,9 +64,7 @@ const StreakTracker = () => {
 			</View>
 
 			{/* Tip Message */}
-			<Text style={styles.tip}>
-				Tip: Your streak will reset if you don't practice tomorrow. Watch out!
-			</Text>
+			<Text style={styles.tip}>{t('PROGRESS.STREAK.TIP')}</Text>
 
 			{/* Continue Button */}
 			<TouchableOpacity
@@ -89,7 +76,7 @@ const StreakTracker = () => {
 				}}
 				style={styles.button}
 			>
-				<Text style={styles.buttonText}>CONTINUE</Text>
+				<Text style={styles.buttonText}>{t('PROGRESS.STREAK.CONTINUE')}</Text>
 			</TouchableOpacity>
 		</View>
 	)
