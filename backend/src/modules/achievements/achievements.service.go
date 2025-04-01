@@ -250,7 +250,7 @@ func (s *AchievementsService) ClaimAchievementReward(ctx context.Context, userID
 		updateData["$set"] = bson.M{"pending_rewards": updatedRewards}
 	} else {
 		updateData["$set"] = bson.M{
-			"pending_rewards": []interface{}{},
+			"pending_rewards": []any{},
 		}
 	}
 
