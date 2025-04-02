@@ -156,6 +156,20 @@
 			"ERROR": "Ошибка при получении награды."
 		},
 		"SCREEN": {
+			"LIST": {
+				"FIRST_LESSON": {
+					"TITLE": "Первый урок",
+					"DESCRIPTION": "Заверши свой первый урок!"
+				},
+				"THREE_DAY_STREAK": {
+					"TITLE": "Настоящий воин",
+					"DESCRIPTION": "Достигни 3-дневной серии стрика"
+				},
+				"TWO_PERFECT": {
+					"TITLE": "Идеальный ученик",
+					"DESCRIPTION": "Пройди 2 урока без ошибок"
+				}
+			},
 			"LOADING": "Загрузка...",
 			"ERROR": "Ошибка загрузки достижений",
 			"BACK": "Назад",
@@ -165,7 +179,8 @@
 	"STREAK_BOTTOM": {
 		"STREAK": {
 			"LABEL": "дней серии",
-			"RECORD": "Рекорд серии: {{max}} дней"
+			"RECORD": "Рекорд серии: {{max}} дней",
+			"CLOSE": "Закрыть"
 		},
 		"INFO_STREAK": {
 			"TITLE": "Победная серия показывает, сколько дней ты занимаешься без перерывов",
@@ -186,6 +201,8 @@
 			"REFILL_BUTTON": "ПОПОЛНИ СЕРДЦА",
 			"PRICE": "500"
 		},
+		"LESSON_COMPLETED": "Пройдено",
+		"LESSON_NOT_COMPLETED": "Не пройдено",
 		"LESSON_PROGRESS_TEXT": "{{progress}}% завершено"
 	},
 	"LEADERBOARD": {
@@ -214,97 +231,97 @@
 		}
 	},
 	"AUTHORIZATION": {
-    "LOGIN": {
-      "TITLE": "С возвращением",
-      "SUBTITLE": "Войдите в свою учетную запись",
-      "EMAIL_LABEL": "Email",
-      "EMAIL_PLACEHOLDER": "Введите email",
-      "PASSWORD_LABEL": "Пароль",
-      "PASSWORD_PLACEHOLDER": "Введите пароль",
-      "LOG_IN": "Войти",
-      "LOGGING_IN": "Вход...",
-      "WELCOME": "Добро пожаловать!",
-      "INVALID_CREDENTIALS": "Неверный email или пароль.",
-      "NO_ACCOUNT": "Нет аккаунта?",
-      "SIGN_UP": "Зарегистрироваться",
+		"LOGIN": {
+			"TITLE": "С возвращением",
+			"SUBTITLE": "Войдите в свою учетную запись",
+			"EMAIL_LABEL": "Email",
+			"EMAIL_PLACEHOLDER": "Введите email",
+			"PASSWORD_LABEL": "Пароль",
+			"PASSWORD_PLACEHOLDER": "Введите пароль",
+			"LOG_IN": "Войти",
+			"LOGGING_IN": "Вход...",
+			"WELCOME": "Добро пожаловать!",
+			"INVALID_CREDENTIALS": "Неверный email или пароль.",
+			"NO_ACCOUNT": "Нет аккаунта?",
+			"SIGN_UP": "Зарегистрироваться",
 			"LOGIN_FORM": {
-        "EMAIL_REQUIRED": "Email обязательное поле",
-        "PASSWORD_MIN_LENGTH": "Пароль должен содержать минимум 8 символов",
-        "PASSWORD_UPPERCASE": "Пароль должен содержать хотя бы одну заглавную букву",
-        "PASSWORD_LOWERCASE": "Пароль должен содержать хотя бы одну строчную букву",
-        "PASSWORD_DIGIT": "Пароль должен содержать хотя бы одну цифру",
-        "PASSWORD_SPECIAL": "Пароль должен содержать хотя бы один специальный символ (@$!%*?&)"
-      }
-    },
+				"EMAIL_REQUIRED": "Email обязательное поле",
+				"PASSWORD_MIN_LENGTH": "Пароль должен содержать минимум 8 символов",
+				"PASSWORD_UPPERCASE": "Пароль должен содержать хотя бы одну заглавную букву",
+				"PASSWORD_LOWERCASE": "Пароль должен содержать хотя бы одну строчную букву",
+				"PASSWORD_DIGIT": "Пароль должен содержать хотя бы одну цифру",
+				"PASSWORD_SPECIAL": "Пароль должен содержать хотя бы один специальный символ (@$!%*?&)"
+			}
+		},
 		"OAUTH": {
-      "OR": "Или",
-      "LOGIN_WITH_GOOGLE": "Войти через Google",
-      "GOOGLE_SIGN_IN_ALERT": "Вход через Google"
-    },
+			"OR": "Или",
+			"LOGIN_WITH_GOOGLE": "Войти через Google",
+			"GOOGLE_SIGN_IN_ALERT": "Вход через Google"
+		},
 		"SIGNUP": {
-      "TITLE": "Начнём!",
-      "SUBTITLE": "Создайте свой аккаунт ниже",
-      "FIRST_NAME_LABEL": "Имя",
-      "FIRST_NAME_PLACEHOLDER": "Введите имя",
-      "LAST_NAME_LABEL": "Фамилия",
-      "LAST_NAME_PLACEHOLDER": "Введите фамилию",
-      "EMAIL_LABEL": "Email",
-      "EMAIL_PLACEHOLDER": "Введите email",
-      "PASSWORD_LABEL": "Пароль",
-      "PASSWORD_PLACEHOLDER": "Введите пароль",
-      "SIGN_UP": "Зарегистрироваться",
-      "SIGNING_UP": "Регистрация...",
-      "ALREADY_HAVE_ACCOUNT": "Уже есть аккаунт?",
-      "LOG_IN": "Войти",
-      "ERROR": "Ошибка при регистрации",
-      "SUCCESS_TITLE": "Создано",
-      "SUCCESS_TEXT": "Аккаунт успешно создан.",
-      "BROWSE_HOME": "Перейти к начальной странице",
+			"TITLE": "Начнём!",
+			"SUBTITLE": "Создайте свой аккаунт ниже",
+			"FIRST_NAME_LABEL": "Имя",
+			"FIRST_NAME_PLACEHOLDER": "Введите имя",
+			"LAST_NAME_LABEL": "Фамилия",
+			"LAST_NAME_PLACEHOLDER": "Введите фамилию",
+			"EMAIL_LABEL": "Email",
+			"EMAIL_PLACEHOLDER": "Введите email",
+			"PASSWORD_LABEL": "Пароль",
+			"PASSWORD_PLACEHOLDER": "Введите пароль",
+			"SIGN_UP": "Зарегистрироваться",
+			"SIGNING_UP": "Регистрация...",
+			"ALREADY_HAVE_ACCOUNT": "Уже есть аккаунт?",
+			"LOG_IN": "Войти",
+			"ERROR": "Ошибка при регистрации",
+			"SUCCESS_TITLE": "Создано",
+			"SUCCESS_TEXT": "Аккаунт успешно создан.",
+			"BROWSE_HOME": "Перейти к начальной странице",
 			"SIGNUP_FORM": {
-        "FIRST_NAME_REQUIRED": "Имя обязательное поле",
-        "LAST_NAME_REQUIRED": "Фамилия обязательное поле",
-        "EMAIL_REQUIRED": "Email обязательное поле",
-        "PASSWORD_MIN_LENGTH": "Пароль должен содержать минимум 8 символов",
-        "PASSWORD_UPPERCASE": "Пароль должен содержать хотя бы одну заглавную букву",
-        "PASSWORD_LOWERCASE": "Пароль должен содержать хотя бы одну строчную букву",
-        "PASSWORD_DIGIT": "Пароль должен содержать хотя бы одну цифру",
-        "PASSWORD_SPECIAL": "Пароль должен содержать хотя бы один специальный символ (@$!%*?&)"
-      }
-    }
-  },
+				"FIRST_NAME_REQUIRED": "Имя обязательное поле",
+				"LAST_NAME_REQUIRED": "Фамилия обязательное поле",
+				"EMAIL_REQUIRED": "Email обязательное поле",
+				"PASSWORD_MIN_LENGTH": "Пароль должен содержать минимум 8 символов",
+				"PASSWORD_UPPERCASE": "Пароль должен содержать хотя бы одну заглавную букву",
+				"PASSWORD_LOWERCASE": "Пароль должен содержать хотя бы одну строчную букву",
+				"PASSWORD_DIGIT": "Пароль должен содержать хотя бы одну цифру",
+				"PASSWORD_SPECIAL": "Пароль должен содержать хотя бы один специальный символ (@$!%*?&)"
+			}
+		}
+	},
 	"WELCOME": {
-    "DATA": {
-      "TITLE_1": "Открой для себя казахский язык!",
-      "DESCRIPTION_1": "Начни своё путешествие по изучению казахского языка легко и весело.",
-      "TITLE_2": "Интерактивные уроки и викторины",
-      "DESCRIPTION_2": "Погрузись в интерактивные уроки и викторины для улучшения своих навыков в казахском.",
-      "TITLE_3": "Овладей казахским шаг за шагом!",
-      "DESCRIPTION_3": "Следи за своим прогрессом и становись свободным в казахском, шаг за шагом."
-    }
-  },
+		"DATA": {
+			"TITLE_1": "Открой для себя казахский язык!",
+			"DESCRIPTION_1": "Начни своё путешествие по изучению казахского языка легко и весело.",
+			"TITLE_2": "Интерактивные уроки и викторины",
+			"DESCRIPTION_2": "Погрузись в интерактивные уроки и викторины для улучшения своих навыков в казахском.",
+			"TITLE_3": "Овладей казахским шаг за шагом!",
+			"DESCRIPTION_3": "Следи за своим прогрессом и становись свободным в казахском, шаг за шагом."
+		}
+	},
 	"TASK": {
-    "REFILL": {
-      "OUT_OF_HEARTS_TITLE": "У вас закончились сердца!",
-      "OUT_OF_HEARTS_SUBTITLE": "Используйте алмазы, чтобы продолжить обучение.",
-      "CARD_TITLE": "Пополнить сердца",
-      "PRICE": "500",
-      "REFILL_BUTTON": "Пополнить",
-      "NO_THANKS_BUTTON": "Нет, спасибо",
-      "REFILL_SUCCESS": "Сердца успешно пополнены!",
-      "REFILL_ERROR": "Не удалось пополнить сердца. Повторите попытку."
-    },
+		"REFILL": {
+			"OUT_OF_HEARTS_TITLE": "У вас закончились сердца!",
+			"OUT_OF_HEARTS_SUBTITLE": "Используйте алмазы, чтобы продолжить обучение.",
+			"CARD_TITLE": "Пополнить сердца",
+			"PRICE": "500",
+			"REFILL_BUTTON": "Пополнить",
+			"NO_THANKS_BUTTON": "Нет, спасибо",
+			"REFILL_SUCCESS": "Сердца успешно пополнены!",
+			"REFILL_ERROR": "Не удалось пополнить сердца. Повторите попытку."
+		},
 		"ERROR_LOADING": "Ошибка загрузки задания",
 		"CLOSE_BOTTOMSHEET": {
-      "TITLE": "Подожди, не уходи!",
-      "SUBTITLE": "Если ты выйдешь сейчас, то потеряешь прогресс.",
-      "KEEP_LEARNING": "ПРОДОЛЖАЙ УЧИТЬСЯ",
-      "END_SESSION": "ЗАВЕРШИТЬ СЕССИЮ"
-    },
+			"TITLE": "Подожди, не уходи!",
+			"SUBTITLE": "Если ты выйдешь сейчас, то потеряешь прогресс.",
+			"KEEP_LEARNING": "ПРОДОЛЖАЙ УЧИТЬСЯ",
+			"END_SESSION": "ЗАВЕРШИТЬ СЕССИЮ"
+		},
 		"FOOTER": {
-      "CHECK": "ПРОВЕРИТЬ",
-      "CONTINUE": "ПРОДОЛЖИТЬ",
-      "SUCCESS_FEEDBACK": "✔ Отлично!",
-      "FAILURE_FEEDBACK": "Правильное решение:"
-    }
-  }
+			"CHECK": "ПРОВЕРИТЬ",
+			"CONTINUE": "ПРОДОЛЖИТЬ",
+			"SUCCESS_FEEDBACK": "✔ Отлично!",
+			"FAILURE_FEEDBACK": "Правильное решение:"
+		}
+	}
 }

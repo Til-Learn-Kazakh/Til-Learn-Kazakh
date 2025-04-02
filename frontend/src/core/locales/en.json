@@ -156,6 +156,20 @@
 			"ERROR": "Error claiming reward."
 		},
 		"SCREEN": {
+			"LIST": {
+				"FIRST_LESSON": {
+					"TITLE": "First Lesson",
+					"DESCRIPTION": "You have to complete your first lesson!"
+				},
+				"THREE_DAY_STREAK": {
+					"TITLE": "True Warrior",
+					"DESCRIPTION": "Reach a 3-day streak"
+				},
+				"TWO_PERFECT": {
+					"TITLE": "Perfect Student",
+					"DESCRIPTION": "Complete 2 perfect lessons"
+				}
+			},
 			"LOADING": "Loading...",
 			"ERROR": "Error loading achievements",
 			"BACK": "Back",
@@ -165,7 +179,8 @@
 	"STREAK_BOTTOM": {
 		"STREAK": {
 			"LABEL": "days streak",
-			"RECORD": "Record Streak: {{max}} days"
+			"RECORD": "Record Streak: {{max}} days",
+			"CLOSE": "Close"
 		},
 		"INFO_STREAK": {
 			"TITLE": "The winning streak shows how many days you've been practicing without a break",
@@ -186,6 +201,8 @@
 			"REFILL_BUTTON": "REFILL HEARTS",
 			"PRICE": "500"
 		},
+		"LESSON_COMPLETED": "Completed",
+		"LESSON_NOT_COMPLETED": "Not Completed",
 		"LESSON_PROGRESS_TEXT": "{{progress}}% completed"
 	},
 	"LEADERBOARD": {
@@ -214,97 +231,97 @@
 		}
 	},
 	"AUTHORIZATION": {
-    "LOGIN": {
-      "TITLE": "Welcome Back",
-      "SUBTITLE": "Log in to your account",
-      "EMAIL_LABEL": "Email",
-      "EMAIL_PLACEHOLDER": "Enter email",
-      "PASSWORD_LABEL": "Password",
-      "PASSWORD_PLACEHOLDER": "Enter password",
-      "LOG_IN": "Log In",
-      "LOGGING_IN": "Logging In...",
-      "WELCOME": "Welcome!",
-      "INVALID_CREDENTIALS": "Invalid email or password.",
-      "NO_ACCOUNT": "Don't have an account?",
-      "SIGN_UP": "Sign Up",
+		"LOGIN": {
+			"TITLE": "Welcome Back",
+			"SUBTITLE": "Log in to your account",
+			"EMAIL_LABEL": "Email",
+			"EMAIL_PLACEHOLDER": "Enter email",
+			"PASSWORD_LABEL": "Password",
+			"PASSWORD_PLACEHOLDER": "Enter password",
+			"LOG_IN": "Log In",
+			"LOGGING_IN": "Logging In...",
+			"WELCOME": "Welcome!",
+			"INVALID_CREDENTIALS": "Invalid email or password.",
+			"NO_ACCOUNT": "Don't have an account?",
+			"SIGN_UP": "Sign Up",
 			"LOGIN_FORM": {
-        "EMAIL_REQUIRED": "Email is required",
-        "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
-        "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
-        "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
-        "PASSWORD_DIGIT": "Password must contain at least one digit",
-        "PASSWORD_SPECIAL": "Password must contain at least one special character (@$!%*?&)"
-      }
-    },
+				"EMAIL_REQUIRED": "Email is required",
+				"PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
+				"PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
+				"PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
+				"PASSWORD_DIGIT": "Password must contain at least one digit",
+				"PASSWORD_SPECIAL": "Password must contain at least one special character (@$!%*?&)"
+			}
+		},
 		"OAUTH": {
-      "OR": "Or",
-      "LOGIN_WITH_GOOGLE": "Log In with Google",
-      "GOOGLE_SIGN_IN_ALERT": "Google Sign In"
-    },
+			"OR": "Or",
+			"LOGIN_WITH_GOOGLE": "Log In with Google",
+			"GOOGLE_SIGN_IN_ALERT": "Google Sign In"
+		},
 		"SIGNUP": {
-      "TITLE": "Let's Get Started",
-      "SUBTITLE": "Create your account below",
-      "FIRST_NAME_LABEL": "First Name",
-      "FIRST_NAME_PLACEHOLDER": "Enter first name",
-      "LAST_NAME_LABEL": "Last Name",
-      "LAST_NAME_PLACEHOLDER": "Enter last name",
-      "EMAIL_LABEL": "Email",
-      "EMAIL_PLACEHOLDER": "Enter email",
-      "PASSWORD_LABEL": "Password",
-      "PASSWORD_PLACEHOLDER": "Enter password",
-      "SIGN_UP": "Sign Up",
-      "SIGNING_UP": "Signing Up...",
-      "ALREADY_HAVE_ACCOUNT": "Already have an account?",
-      "LOG_IN": "Log In",
-      "ERROR": "Error during sign up",
-      "SUCCESS_TITLE": "Created",
-      "SUCCESS_TEXT": "You have successfully created your account.",
-      "BROWSE_HOME": "Browse Home",
+			"TITLE": "Let's Get Started",
+			"SUBTITLE": "Create your account below",
+			"FIRST_NAME_LABEL": "First Name",
+			"FIRST_NAME_PLACEHOLDER": "Enter first name",
+			"LAST_NAME_LABEL": "Last Name",
+			"LAST_NAME_PLACEHOLDER": "Enter last name",
+			"EMAIL_LABEL": "Email",
+			"EMAIL_PLACEHOLDER": "Enter email",
+			"PASSWORD_LABEL": "Password",
+			"PASSWORD_PLACEHOLDER": "Enter password",
+			"SIGN_UP": "Sign Up",
+			"SIGNING_UP": "Signing Up...",
+			"ALREADY_HAVE_ACCOUNT": "Already have an account?",
+			"LOG_IN": "Log In",
+			"ERROR": "Error during sign up",
+			"SUCCESS_TITLE": "Created",
+			"SUCCESS_TEXT": "You have successfully created your account.",
+			"BROWSE_HOME": "Browse Home",
 			"SIGNUP_FORM": {
-        "FIRST_NAME_REQUIRED": "First name is required",
-        "LAST_NAME_REQUIRED": "Last name is required",
-        "EMAIL_REQUIRED": "Email is required",
-        "PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
-        "PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
-        "PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
-        "PASSWORD_DIGIT": "Password must contain at least one digit",
-        "PASSWORD_SPECIAL": "Password must contain at least one special character (@$!%*?&)"
-      }
-    }
-  },
+				"FIRST_NAME_REQUIRED": "First name is required",
+				"LAST_NAME_REQUIRED": "Last name is required",
+				"EMAIL_REQUIRED": "Email is required",
+				"PASSWORD_MIN_LENGTH": "Password must be at least 8 characters long",
+				"PASSWORD_UPPERCASE": "Password must contain at least one uppercase letter",
+				"PASSWORD_LOWERCASE": "Password must contain at least one lowercase letter",
+				"PASSWORD_DIGIT": "Password must contain at least one digit",
+				"PASSWORD_SPECIAL": "Password must contain at least one special character (@$!%*?&)"
+			}
+		}
+	},
 	"WELCOME": {
-    "DATA": {
-      "TITLE_1": "Discover Kazakh Language!",
-      "DESCRIPTION_1": "Start your journey to learn the Kazakh language with ease and fun.",
-      "TITLE_2": "Interactive Lessons and Quizzes",
-      "DESCRIPTION_2": "Engage with interactive lessons and quizzes to boost your Kazakh skills.",
-      "TITLE_3": "Master Kazakh, Step by Step!",
-      "DESCRIPTION_3": "Track your progress and become fluent in Kazakh, one step at a time."
-    }
-  },
+		"DATA": {
+			"TITLE_1": "Discover Kazakh Language!",
+			"DESCRIPTION_1": "Start your journey to learn the Kazakh language with ease and fun.",
+			"TITLE_2": "Interactive Lessons and Quizzes",
+			"DESCRIPTION_2": "Engage with interactive lessons and quizzes to boost your Kazakh skills.",
+			"TITLE_3": "Master Kazakh, Step by Step!",
+			"DESCRIPTION_3": "Track your progress and become fluent in Kazakh, one step at a time."
+		}
+	},
 	"TASK": {
-    "REFILL": {
-      "OUT_OF_HEARTS_TITLE": "You ran out of hearts!",
-      "OUT_OF_HEARTS_SUBTITLE": "Use gems to keep learning.",
-      "CARD_TITLE": "Refill Hearts",
-      "PRICE": "500",
-      "REFILL_BUTTON": "Refill",
-      "NO_THANKS_BUTTON": "No Thanks",
-      "REFILL_SUCCESS": "Hearts refilled successfully!",
-      "REFILL_ERROR": "Failed to refill hearts. Please try again."
-    },
+		"REFILL": {
+			"OUT_OF_HEARTS_TITLE": "You ran out of hearts!",
+			"OUT_OF_HEARTS_SUBTITLE": "Use gems to keep learning.",
+			"CARD_TITLE": "Refill Hearts",
+			"PRICE": "500",
+			"REFILL_BUTTON": "Refill",
+			"NO_THANKS_BUTTON": "No Thanks",
+			"REFILL_SUCCESS": "Hearts refilled successfully!",
+			"REFILL_ERROR": "Failed to refill hearts. Please try again."
+		},
 		"ERROR_LOADING": "Error loading task",
 		"CLOSE_BOTTOMSHEET": {
-      "TITLE": "Wait, don’t go!",
-      "SUBTITLE": "You'll lose your progress if you quit now.",
-      "KEEP_LEARNING": "KEEP LEARNING",
-      "END_SESSION": "END SESSION"
-    },
+			"TITLE": "Wait, don’t go!",
+			"SUBTITLE": "You'll lose your progress if you quit now.",
+			"KEEP_LEARNING": "KEEP LEARNING",
+			"END_SESSION": "END SESSION"
+		},
 		"FOOTER": {
-      "CHECK": "CHECK",
-      "CONTINUE": "CONTINUE",
-      "SUCCESS_FEEDBACK": "✔ Great job!",
-      "FAILURE_FEEDBACK": "Correct solution:"
-    }
-  }
+			"CHECK": "CHECK",
+			"CONTINUE": "CONTINUE",
+			"SUCCESS_FEEDBACK": "✔ Great job!",
+			"FAILURE_FEEDBACK": "Correct solution:"
+		}
+	}
 }
