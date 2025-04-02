@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Text, View } from 'react-native'
 
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet'
@@ -19,7 +20,6 @@ import { useTask } from '../hooks/task.hook'
 import { taskService } from '../services/task.service'
 
 import RefillBottomSheet from './RefillBottomSheet'
-import { t } from 'i18next'
 
 const TaskScreen = ({ route }: any) => {
 	const { unitId } = route.params
@@ -29,6 +29,7 @@ const TaskScreen = ({ route }: any) => {
 	const hearts = currentUser?.hearts || 0
 
 	const [isFinished, setIsFinished] = useState(false)
+	const { t, i18n } = useTranslation()
 
 	// Track time
 	const [startTime, setStartTime] = useState(Date.now())
@@ -124,7 +125,7 @@ const TaskScreen = ({ route }: any) => {
 	}
 
 	if (isError || !task) {
-		return <Text>t('ERROR_LOADING')</Text>
+		return <Text>{t('ERROR_LOADING')}</Text>
 	}
 
 	const renderTaskComponent = () => {
@@ -217,7 +218,7 @@ const TaskScreen = ({ route }: any) => {
 		<BottomSheetModalProvider>
 			<View style={{ flex: 1, backgroundColor: 'white' }}>
 				<Header
-					title={task?.question?.en || []}
+					title={task?.question?.[i18n.language] || task?.question?.en || ''}
 					progress={progress}
 				/>
 

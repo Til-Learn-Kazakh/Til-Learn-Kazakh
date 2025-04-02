@@ -42,7 +42,6 @@ export default function SettingsScreen() {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 			toast.success(t('SETTINGS.DELETE_ACCOUNT_SUCCESS'))
-			navigation.navigate('Login') // Redirect to Login page after profile deletion
 		},
 		onError: err => {
 			console.error('❌ Ошибка удаления аккаунта:', err)

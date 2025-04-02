@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -22,6 +23,7 @@ const ReadRespond = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, on
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const queryClient = useQueryClient() // Получаем queryClient
+	const { i18n } = useTranslation()
 
 	// Backend request for checking the answer
 	const { mutate } = useMutation({
@@ -74,11 +76,13 @@ const ReadRespond = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, on
 			{/* Content */}
 			<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 				<QuestionCard
-					description={task?.description['en']}
-					question={task?.question['en']}
+					description={task?.description[i18n.language] || task?.description['en']}
+					question={task?.question[i18n.language] || task?.question['en']}
 					options={task?.hints}
 					selectedOption={selectedOption}
-					highlightedWord={task?.highlighted_word['en']}
+					highlightedWord={
+						task?.highlighted_word?.[i18n.language] || task?.highlighted_word?.['en']
+					}
 					onOptionSelect={handleOptionSelect}
 				/>
 			</ScrollView>

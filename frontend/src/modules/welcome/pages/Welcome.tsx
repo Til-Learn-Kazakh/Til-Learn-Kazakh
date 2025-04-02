@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import Swiper from 'react-native-swiper'
@@ -9,13 +10,13 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '../../../core/navigation/AuthStack/AuthStackScreen'
 import CustomButton from '../../../core/ui/CustomButton'
 import { data } from '../data/data'
-import { t } from 'i18next'
 
 type AuthStackNavigationProp = NativeStackNavigationProp<AuthStackParamList>
 
 const Welcome: React.FC = () => {
 	const swiperRef = useRef<Swiper>(null)
 	const navigation = useNavigation<AuthStackNavigationProp>()
+	const { t } = useTranslation()
 
 	const [activeIndex, setActiveIndex] = useState(0)
 
@@ -45,12 +46,12 @@ const Welcome: React.FC = () => {
 						style={styles.slide}
 					>
 						<Image
-							source={item.image} // Оберните URL в объект { uri: ... }
+							source={item.image} 
 							style={styles.image}
 							resizeMode='contain'
 						/>
-						<Text style={styles.title}>{item.title}</Text>
-						<Text style={styles.description}>{item.description}</Text>
+						<Text style={styles.title}>{t(item.title)}</Text>
+						<Text style={styles.description}>{t(item.description)}</Text>
 					</View>
 				))}
 			</Swiper>

@@ -5,8 +5,10 @@ import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { Ionicons } from '@expo/vector-icons'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 
+import { imageserver } from '../../../core/config/environment.config'
 import { icons } from '../../../core/constants'
 import { useBottomSheet } from '../../../core/hooks/useBottomSheet'
+import { useAchievementsProgress } from '../../achievements/hooks/achievements.hooks'
 import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
 import { InfoBottomSheet } from '../../home/components/InfoBottomSheet'
 import { useYearlyStats } from '../hooks/analytics.hooks'
@@ -17,15 +19,19 @@ const ProfileScreen = () => {
 	const { t, i18n } = useTranslation()
 	const navigation = useNavigation<NavigationProp<any>>()
 
-	const { data: currentUser, isLoading: isLoadingUser } = useCurrentUser()
+	const { data: currentUser } = useCurrentUser()
 	const [selectedYearKey, setSelectedYearKey] = useState(() => new Date().getFullYear().toString())
 	const selectedAvatar = avatars.find(a => a.id === currentUser?.avatar)
 
+	// Данные по достижениям
 	const {
-		data: yearlyData,
-		isLoading: isYearLoading,
-		isError: isYearError,
-	} = useYearlyStats(selectedYearKey)
+		data: achievements,
+		isLoading: isLoadingAchievements,
+		isError: isAchievementsError,
+	} = useAchievementsProgress()
+
+	// Данные по статистике
+	const { data: yearlyData } = useYearlyStats(selectedYearKey)
 
 	const bottomSheet = useBottomSheet()
 
@@ -46,7 +52,7 @@ const ProfileScreen = () => {
 		})
 	}, [bottomSheet, topSheetContent])
 
-	// Use the current language; default to 'en-US' if not Russian.
+	// Локаль для форматирования даты
 	const locale = i18n.language === 'ru' ? 'ru-RU' : 'en-US'
 	const joinDate = currentUser?.created_at
 		? new Date(currentUser.created_at).toLocaleDateString(locale, {
@@ -56,9 +62,25 @@ const ProfileScreen = () => {
 			})
 		: t('PROFILE.JOINED_UNKNOWN')
 
+	// Загружается или упала ошибка — можно отрисовать лоадер/заглушку
+	// Но при желании можно просто не показывать карточку, если нет достижений
+	if (isLoadingAchievements && !achievements) {
+		// Можно возвращать <LoadingUi /> или что-то подобное
+	}
+
+	// Подготовим первые 3 достижения, чтобы отобразить их иконки
+	const firstThree = achievements?.slice(0, 3) || []
+	// Сколько *осталось* вне первых трёх
+	const remainCount = achievements?.length || 0
+
+	// Для удобства
+	const topLeft = firstThree[0]
+	const topRight = firstThree[1]
+	const bottomLeft = firstThree[2]
+
 	return (
 		<View style={styles.container}>
-			{/* Fixed Header */}
+			{/* ---------- HEADER ---------- */}
 			<View style={styles.header}>
 				<Text style={styles.headerTitle}>{t('PROFILE.HEADER_TITLE')}</Text>
 				<TouchableOpacity
@@ -74,7 +96,7 @@ const ProfileScreen = () => {
 			</View>
 
 			<ScrollView contentContainerStyle={styles.scrollContainer}>
-				{/* Profile Section */}
+				{/* ---------- PROFILE SECTION ---------- */}
 				<View style={styles.profileSection}>
 					<TouchableOpacity
 						onPress={() => {
@@ -93,9 +115,8 @@ const ProfileScreen = () => {
 					</Text>
 				</View>
 
-				{/* Overview Section */}
+				{/* ---------- OVERVIEW SECTION (Hearts / XP / Diamonds) ---------- */}
 				<View style={styles.overviewSection}>
-					{/* Heart Item */}
 					<View style={styles.overviewItem}>
 						<Image
 							source={icons.heart}
@@ -105,7 +126,6 @@ const ProfileScreen = () => {
 						<Text style={styles.overviewLabel}>{t('PROFILE.HEARTS')}</Text>
 					</View>
 
-					{/* XP Item */}
 					<View style={styles.overviewItem}>
 						<Image
 							source={icons.light}
@@ -115,7 +135,6 @@ const ProfileScreen = () => {
 						<Text style={styles.overviewLabel}>{t('PROFILE.XP')}</Text>
 					</View>
 
-					{/* Diamond Item */}
 					<View style={styles.overviewItem}>
 						<Image
 							source={icons.diamond}
@@ -126,7 +145,7 @@ const ProfileScreen = () => {
 					</View>
 				</View>
 
-				{/* Streak & Achievements Section */}
+				{/* ---------- STREAK & ACHIEVEMENTS CARD ---------- */}
 				<View style={styles.cardsContainer}>
 					{/* Streak Card */}
 					<TouchableOpacity
@@ -149,35 +168,60 @@ const ProfileScreen = () => {
 
 					{/* Achievements Card */}
 					<TouchableOpacity
-						onPress={() => navigation.navigate('AchievementsScreen')}
 						style={styles.squareCard}
+						onPress={() => {
+							// При нажатии передаем достижения в AchievementsScreen
+							navigation.navigate('AchievementsScreen', { achievements })
+						}}
 					>
 						<Text style={styles.cardTitle}>{t('PROFILE.ACHIEVEMENTS')}</Text>
+
+						{/* 2×2 СЕТКА */}
 						<View style={styles.cardGrid}>
 							<View style={styles.row}>
-								<Image
-									source={icons.loseheart}
-									style={styles.achievementIcon}
-								/>
-								<Image
-									source={icons.fillblank}
-									style={styles.achievementIcon}
-								/>
+								{topLeft ? (
+									<Image
+										source={{ uri: imageserver + topLeft.image_url }}
+										style={styles.achievementIcon}
+									/>
+								) : (
+									<View style={styles.placeholder} />
+								)}
+
+								{topRight ? (
+									<Image
+										source={{ uri: imageserver + topRight.image_url }}
+										style={styles.achievementIcon}
+									/>
+								) : (
+									<View style={styles.placeholder} />
+								)}
 							</View>
+
 							<View style={styles.row}>
-								<Image
-									source={icons.fillblank}
-									style={styles.achievementIcon}
-								/>
-								<View style={styles.moreCircle}>
-									<Text style={styles.moreText}>+10</Text>
-								</View>
+								{bottomLeft ? (
+									<Image
+										source={{ uri: imageserver + bottomLeft.image_url }}
+										style={styles.achievementIcon}
+									/>
+								) : (
+									<View style={styles.placeholder} />
+								)}
+
+								{/* Если остались ещё достижения – показываем +N */}
+								{remainCount > 0 ? (
+									<View style={styles.moreCircle}>
+										<Text style={styles.moreText}>+{remainCount}</Text>
+									</View>
+								) : (
+									<View style={styles.placeholder} />
+								)}
 							</View>
 						</View>
 					</TouchableOpacity>
 				</View>
 
-				{/* Statistics Section */}
+				{/* ---------- STATISTICS SECTION ---------- */}
 				<TouchableOpacity
 					onPress={() => navigation.navigate('AnalyticsScreen')}
 					style={styles.statsContainer}
@@ -193,6 +237,7 @@ const ProfileScreen = () => {
 						</Text>
 						<Text style={styles.statLabel}>{t('PROFILE.TIME_LEARNING')}</Text>
 					</View>
+
 					<View style={styles.statItem}>
 						<Ionicons
 							name='school-outline'
@@ -202,6 +247,7 @@ const ProfileScreen = () => {
 						<Text style={styles.statValue}>{yearlyData ? yearlyData.lessons : '-'}</Text>
 						<Text style={styles.statLabel}>{t('PROFILE.LESSONS_COMPLETED')}</Text>
 					</View>
+
 					<View style={styles.statItem}>
 						<Ionicons
 							name='stats-chart-outline'
@@ -268,6 +314,41 @@ const styles = StyleSheet.create({
 		color: '#777',
 		fontStyle: 'italic',
 	},
+
+	// Hearts / XP / Diamonds
+	overviewSection: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		backgroundColor: '#fff',
+		padding: 16,
+		borderRadius: 12,
+		shadowColor: '#000',
+		shadowOpacity: 0.1,
+		shadowRadius: 5,
+		elevation: 3,
+		marginBottom: 25,
+	},
+	overviewItem: {
+		alignItems: 'center',
+		flex: 1,
+	},
+	overviewIcon: {
+		width: 40,
+		height: 40,
+		marginBottom: 8,
+	},
+	overviewValue: {
+		fontSize: 18,
+		fontWeight: 'bold',
+		color: '#000',
+	},
+	overviewLabel: {
+		fontSize: 12,
+		color: '#777',
+	},
+
+	// Two cards: Streak & Achievements
 	cardsContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -285,42 +366,6 @@ const styles = StyleSheet.create({
 		elevation: 3,
 		alignItems: 'center',
 	},
-	overviewSection: {
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-		backgroundColor: '#fff',
-		padding: 16,
-		borderRadius: 12,
-		shadowColor: '#000',
-		shadowOpacity: 0.1,
-		shadowRadius: 5,
-		elevation: 3,
-		marginBottom: 25, // space below the section
-	},
-
-	overviewItem: {
-		alignItems: 'center',
-		flex: 1, // so each overview item evenly spaces out
-	},
-
-	overviewIcon: {
-		width: 40,
-		height: 40,
-		marginBottom: 8,
-	},
-
-	overviewValue: {
-		fontSize: 18,
-		fontWeight: 'bold',
-		color: '#000',
-	},
-
-	overviewLabel: {
-		fontSize: 12,
-		color: '#777',
-	},
-
 	cardTitle: {
 		fontSize: 14,
 		fontWeight: 'bold',
@@ -343,6 +388,8 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#000',
 	},
+
+	// 2×2 grid для первых достижений
 	cardGrid: {
 		width: '100%',
 		justifyContent: 'center',
@@ -356,6 +403,14 @@ const styles = StyleSheet.create({
 		width: 50,
 		height: 50,
 		margin: 4,
+		borderRadius: 25,
+	},
+	placeholder: {
+		width: 50,
+		height: 50,
+		margin: 4,
+		borderRadius: 25,
+		backgroundColor: '#DDD',
 	},
 	moreCircle: {
 		width: 50,
@@ -371,6 +426,8 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		color: '#666',
 	},
+
+	// Stats
 	statsContainer: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
@@ -386,17 +443,17 @@ const styles = StyleSheet.create({
 	},
 	statItem: {
 		alignItems: 'center',
-		flex: 1, // Равномерное распределение по ширине
+		flex: 1,
 	},
 	statValue: {
 		fontSize: 18,
 		fontWeight: 'bold',
 		marginTop: 5,
-		textAlign: 'center', // Выравнивание по центру
+		textAlign: 'center',
 	},
 	statLabel: {
 		fontSize: 12,
 		color: '#777',
-		textAlign: 'center', // Выравнивание по центру
+		textAlign: 'center',
 	},
 })

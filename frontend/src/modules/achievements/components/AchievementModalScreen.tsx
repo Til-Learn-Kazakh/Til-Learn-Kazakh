@@ -9,6 +9,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { imageserver } from '../../../core/config/environment.config'
 import { toast } from '../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY, useCurrentUser } from '../../auth/hooks/user-current-user.hook'
+import { achievementMap } from '../constants/achievementMap'
 import { achievementsService } from '../services/achievements.service'
 
 export default function AchievementModalScreen() {
@@ -61,8 +62,17 @@ export default function AchievementModalScreen() {
 					source={{ uri: `${imageserver}${image}` }}
 					style={styles.achievementImage}
 				/>
-				<Text style={styles.achievementTitle}>{title}</Text>
-				<Text style={styles.achievementDescription}>{description}</Text>
+				<Text style={styles.achievementTitle}>
+					{achievementMap[title]
+						? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[title]}.TITLE`)
+						: title}
+				</Text>
+				<Text style={styles.achievementDescription}>
+					{' '}
+					{achievementMap[description]
+						? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[description]}.DESCRIPTION`)
+						: description}
+				</Text>
 			</View>
 
 			{/* Footer */}

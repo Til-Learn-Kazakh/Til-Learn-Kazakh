@@ -67,12 +67,7 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 	const handleInfoPress = useCallback(() => {
 		onClose()
 		setTimeout(() => {
-			navigation.navigate('AppStack', {
-				screen: 'HomeStack',
-				params: {
-					screen: 'InfoPage',
-				},
-			})
+			navigation.navigate('InfoPage')
 		}, 300)
 	}, [onClose, navigation])
 
@@ -150,7 +145,7 @@ export const InfoBottomSheet = ({ onClose }: any) => {
 				onPress={onCloseClick}
 				style={styles.cancelButton}
 			>
-				<Text style={styles.cancelButtonText}>{t('STREAK_BOTTOM.CLOSE')}</Text>
+				<Text style={styles.cancelButtonText}>{t('STREAK_BOTTOM.STREAK.CLOSE')}</Text>
 			</TouchableOpacity>
 		</BottomSheetScrollView>
 	)

@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 
 import { imageserver } from '../../../core/config/environment.config'
+import { achievementMap } from '../constants/achievementMap'
 import { useAchievementsProgress } from '../hooks/achievements.hooks'
 
 export default function AchievementsScreen() {
@@ -100,8 +101,16 @@ export default function AchievementsScreen() {
 							)}
 
 							<View style={styles.achievementInfo}>
-								<Text style={styles.achievementTitle}>{item.title}</Text>
-								<Text style={styles.achievementDescription}>{item.description}</Text>
+								<Text style={styles.achievementTitle}>
+									{achievementMap[item.title]
+										? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[item.title]}.TITLE`)
+										: item.title}
+								</Text>
+								<Text style={styles.achievementDescription}>
+									{achievementMap[item.description]
+										? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[item.description]}.DESCRIPTION`)
+										: item.description}
+								</Text>
 							</View>
 						</TouchableOpacity>
 					)
