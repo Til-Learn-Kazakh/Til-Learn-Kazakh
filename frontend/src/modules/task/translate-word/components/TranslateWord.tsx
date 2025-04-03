@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -34,7 +35,7 @@ const TranslateWord = ({
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const queryClient = useQueryClient() // Получаем queryClient
-
+	const { i18n } = useTranslation()
 	// Whenever user picks an option
 	const handleOptionSelect = (option: string) => {
 		setSelectedOption(option)
@@ -81,7 +82,7 @@ const TranslateWord = ({
 			<ScrollView contentContainerStyle={styles.content}>
 				<ImageWithOptions
 					image={`${imageserver}${task.image_path}`}
-					options={task.hints}
+					options={task?.localized_hints?.[i18n.language] || task?.localized_hints?.['en'] || []}
 					selectedOption={selectedOption}
 					onOptionSelect={handleOptionSelect}
 					isDisabled={isCorrect !== null} // block selection after check

@@ -42,6 +42,10 @@ check: fmt lint test ## Run all checks: fmt, lint, and test
 run: ## Run the application locally
 	@go run src/main.go
 
+# Run Script locally
+run-script: ## Run the Script locally
+	@go run src/script/script.go
+
 # Build binary
 build: ## Build the binary
 	@go build -o backend ./src

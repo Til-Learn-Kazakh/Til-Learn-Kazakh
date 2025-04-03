@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -6,7 +7,6 @@ import { Audio } from 'expo-av'
 
 import { imageserver } from '../../../../../core/config/environment.config'
 import { CURRENT_USER_QUERY_KEY } from '../../../../auth/hooks/user-current-user.hook'
-import { usePreferences } from '../../../../settings/hooks/preferences.context'
 import { taskService } from '../../../main/services/task.service'
 import Footer from '../footer/Footer'
 import WordList from '../wordList/WordList'
@@ -58,7 +58,8 @@ const TranslateAudio = ({
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const [sound, setSound] = useState<Audio.Sound | null>(null)
 	const queryClient = useQueryClient() // Получаем queryClient
-	const { preferences } = usePreferences()
+	// const { preferences } = usePreferences()
+	const { i18n } = useTranslation()
 
 	// Мутация
 	const { mutate } = useMutation({
@@ -88,7 +89,7 @@ const TranslateAudio = ({
 
 	// Аудио
 	const handlePlayAudio = async () => {
-		if (!preferences.soundEffects) return
+		// if (!preferences.soundEffects) return
 		try {
 			await Audio.setAudioModeAsync({
 				playsInSilentModeIOS: true, // Позволяет играть звук в режиме "без звука"
@@ -116,7 +117,7 @@ const TranslateAudio = ({
 			: undefined
 	}, [sound])
 
-	const userLang = 'ru'
+	const userLang = i18n.language
 	const localizedHints = task.localized_hints?.[userLang] || []
 	const cleanedHints = localizedHints.map((h: string) => h.trim())
 

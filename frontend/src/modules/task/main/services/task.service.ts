@@ -1,9 +1,9 @@
 import { server } from '../../../../core/config/environment.config'
+import i18n from '../../../../core/i18n'
 import { axiosWithAuth } from '../../../../middleware/axios-interceptors'
 
 class TaskService {
 	private readonly baseUrl = `${server}/tasks/unit`
-
 	async getNextTask(unitId: string, currentOrder: number) {
 		return axiosWithAuth
 			.get(`${this.baseUrl}/${unitId}/next-task?currentOrder=${currentOrder}`)
@@ -15,13 +15,11 @@ class TaskService {
 	}
 
 	async checkAnswer(taskId: string, userAnswer: string, userLang?: string) {
+		const lang = userLang || i18n.language
+
 		const payload: Record<string, string> = {
 			user_answer: userAnswer,
-		}
-
-		// ✅ Добавляем user_lang только если он указан
-		if (userLang) {
-			payload.user_lang = userLang
+			user_lang: lang,
 		}
 
 		return axiosWithAuth

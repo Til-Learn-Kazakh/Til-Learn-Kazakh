@@ -19,9 +19,9 @@ const (
 )
 
 type ImageOption struct {
-	ID    string `bson:"id" json:"id"`       // Unique identifier for the option
-	Text  string `bson:"text" json:"text"`   // Displayed text (e.g., "Cheese")
-	Image string `bson:"image" json:"image"` // Image URL or path
+	ID    string            `bson:"id" json:"id"`       // Unique identifier for the option
+	Text  map[string]string `bson:"text" json:"text"`   // Localized text
+	Image string            `bson:"image" json:"image"` // Image URL or path
 }
 
 type Task struct {
