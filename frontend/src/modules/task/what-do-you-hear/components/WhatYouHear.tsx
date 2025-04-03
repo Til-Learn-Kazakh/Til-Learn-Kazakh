@@ -6,7 +6,6 @@ import { Audio } from 'expo-av'
 
 import { imageserver } from '../../../../core/config/environment.config'
 import { CURRENT_USER_QUERY_KEY } from '../../../auth/hooks/user-current-user.hook'
-import { usePreferences } from '../../../settings/hooks/preferences.context'
 import { taskService } from '../../main/services/task.service'
 import SoundImage from '../../tap-audio/components/SoundImage'
 import Footer from '../../translate-audio/components/footer/Footer'
@@ -27,7 +26,7 @@ const WhatYouHear = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, on
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const [sound, setSound] = useState<Audio.Sound | null>(null)
 	const queryClient = useQueryClient() // Получаем queryClient
-	const { preferences } = usePreferences()
+	// const { preferences } = usePreferences()
 
 	// Backend request to check the answer
 	const { mutate } = useMutation({
@@ -50,7 +49,7 @@ const WhatYouHear = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, on
 
 	// Play audio function
 	const handlePlayAudio = async () => {
-		if (!preferences.soundEffects) return
+		// if (!preferences.soundEffects) return
 
 		try {
 			await Audio.setAudioModeAsync({

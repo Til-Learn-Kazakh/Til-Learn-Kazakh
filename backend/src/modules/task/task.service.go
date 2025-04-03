@@ -6,6 +6,7 @@ import (
 	"diploma/src/services"
 	"errors"
 	"fmt"
+	"log"
 	"mime/multipart"
 	"time"
 
@@ -150,35 +151,51 @@ func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer, userLan
 	var task Task
 	err = s.Collection.FindOne(context.Background(), bson.M{"_id": taskID}).Decode(&task)
 	if err != nil {
-		err = fmt.Errorf("task not found: %w", err)
-		return false, "", err
+		log.Printf("❌ Task not found: %v", err)
+		return false, "", fmt.Errorf("task not found: %w", err)
 	}
 
-	isCorrect = (userAnswer == task.CorrectAnswer)
-	correctAnswerText = ""
+	log.Printf("🔍 Task type: %s | Lang: %s", task.Type, userLang)
+	log.Printf("🧠 User answer: '%s'", userAnswer)
 
+	// Step 1 — get localized correct answer
+	realCorrectAnswer := task.CorrectAnswer
+	if userLang != "" && len(task.LocalizedCorrectAnswer) > 0 {
+		if localized := task.LocalizedCorrectAnswer[userLang]; localized != "" {
+			realCorrectAnswer = localized
+			log.Printf("🌍 Using localized correct answer: '%s'", realCorrectAnswer)
+		}
+	}
+
+	// Step 2 — compare
+	isCorrect = (userAnswer == realCorrectAnswer)
+	log.Printf("✅ Is correct: %v", isCorrect)
+
+	// Step 3 — if incorrect, try find text in ImageOptions
 	if !isCorrect && len(task.ImageOptions) > 0 {
+		log.Println("🖼️ Searching in ImageOptions...")
 		for _, option := range task.ImageOptions {
 			if option.ID == task.CorrectAnswer {
-				correctAnswerText = option.Text
+				if userLang != "" {
+					if localizedText, ok := option.Text[userLang]; ok {
+						correctAnswerText = localizedText
+						log.Printf("📌 Correct answer from image option (localized): %s", correctAnswerText)
+						break
+					}
+				}
+				if defaultText, ok := option.Text["ru"]; ok {
+					correctAnswerText = defaultText
+					log.Printf("📌 Correct answer from image option (ru fallback): %s", correctAnswerText)
+				}
 				break
 			}
 		}
 	}
 
-	if len(task.LocalizedCorrectAnswer) > 0 && userLang != "" {
-		realCorrectAnswer := task.LocalizedCorrectAnswer[userLang]
-		if realCorrectAnswer == "" {
-			realCorrectAnswer = task.CorrectAnswer
-		}
-		isCorrect = (userAnswer == realCorrectAnswer)
-		if !isCorrect && correctAnswerText == "" {
-			correctAnswerText = realCorrectAnswer
-		}
-	}
-
+	// Step 4 — fallback if still empty
 	if correctAnswerText == "" {
-		correctAnswerText = task.CorrectAnswer
+		correctAnswerText = realCorrectAnswer
+		log.Printf("🔙 Fallback correct answer used: '%s'", correctAnswerText)
 	}
 
 	return isCorrect, correctAnswerText, nil

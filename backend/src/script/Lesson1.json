@@ -1,0 +1,256 @@
+{
+	"unit": {
+		"_id": { "$oid": "640000000000000000000001" },
+		"title": "Урок 1: Сәлемдесу",
+		"level_id": { "$oid": "678c841d59457d74f9332384" },
+		"descriptions": {
+			"kk": "Бұл сабақта сәлемдесуді үйренеміз",
+			"ru": "В этом уроке научимся приветствию на казахском",
+			"en": "In this lesson, we will learn greetings in Kazakh"
+		},
+		"tasks": [],
+		"completed": [],
+		"progress": 0,
+		"created_at": "2025-04-03T00:00:00.000Z",
+		"updated_at": "2025-04-03T00:00:00.000Z"
+	},
+	"tasks": [
+		{
+			"_id": { "$oid": "640000000000000000000101" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести слово 'Сәлем'?",
+				"en": "How to translate the word 'Сәлем'?"
+			},
+			"localized_correct_answer": {
+				"ru": "Привет",
+				"en": "Hi"
+			},
+			"localized_hints": {
+				"ru": ["Привет", "Пока", "Спасибо"],
+				"en": ["Hi", "Bye", "Thanks"]
+			},
+			"image_path": "/src/public/tasks/hello.png",
+			"order": 1
+		},
+		{
+			"_id": { "$oid": "640000000000000000000102" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести слово 'Сау бол'?",
+				"en": "How to translate the word 'Сау бол'?"
+			},
+			"localized_correct_answer": {
+				"ru": "До свидания",
+				"en": "Goodbye"
+			},
+			"localized_hints": {
+				"ru": ["До свидания", "Привет", "Извините"],
+				"en": ["Goodbye", "Hello", "Sorry"]
+			},
+			"image_path": "/src/public/tasks/goodbye.png",
+			"order": 2
+		},
+		{
+			"_id": { "$oid": "640000000000000000000103" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "fill_blank",
+			"question": {
+				"ru": "Заполните пробел: 'Сәлем, менің атым __.'",
+				"en": "Fill in the blank: 'Сәлем, менің атым __.'"
+			},
+			"correct_answer": "Алия",
+			"hints": ["Алия", "Сау бол!", "қайырлы таң"],
+			"sentence": ["Сәлем, менің атым", "__", "."],
+			"image_path": "/src/public/tasks/fillblank.png",
+			"order": 3
+		},
+		{
+			"_id": { "$oid": "640000000000000000000104" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "read_respond",
+			"question": {
+				"ru": "Что означает 'қайырлы таң'?",
+				"en": "What does 'қайырлы таң' mean?"
+			},
+			"localized_correct_answer": {
+				"ru": "Доброе утро",
+				"en": "Good morning"
+			},
+			"localized_hints": {
+				"ru": ["Доброе утро", "Добрый день", "Добрый вечер"],
+				"en": ["Good morning", "Good afternoon", "Good evening"]
+			},
+			"description": {
+				"ru": "Фраза 'қайырлы таң' используется утром для приветствия.",
+				"en": "The phrase 'қайырлы таң' is used in the morning to greet."
+			},
+			"highlighted_word": {
+				"ru": "қайырлы таң",
+				"en": "қайырлы таң"
+			},
+			"order": 4
+		},
+		{
+			"_id": { "$oid": "640000000000000000000105" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "read_respond",
+			"question": {
+				"ru": "Что означает 'қайырлы кеш'?",
+				"en": "What does 'қайырлы кеш' mean?"
+			},
+			"localized_correct_answer": {
+				"ru": "Добрый вечер",
+				"en": "Good evening"
+			},
+			"localized_hints": {
+				"ru": ["Добрый вечер", "Добро пожаловать", "До свидания"],
+				"en": ["Good evening", "Welcome", "Goodbye"]
+			},
+			"description": {
+				"ru": "Фраза 'қайырлы кеш' используется вечером.",
+				"en": "The phrase 'қайырлы кеш' is used in the evening."
+			},
+			"highlighted_word": {
+				"ru": "қайырлы кеш",
+				"en": "қайырлы кеш"
+			},
+			"order": 5
+		},
+		{
+			"_id": { "$oid": "640000000000000000000106" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "choose_correct_image",
+			"question": {
+				"ru": "Выберите изображение для слова 'Сәлем'",
+				"en": "Choose the image for the word 'Сәлем'"
+			},
+			"correct_answer": "1",
+			"image_options": [
+				{
+					"id": "1",
+					"text": { "ru": "Приветствие", "en": "Greeting" },
+					"image": "/src/public/tasks/options/handshake.png"
+				},
+				{
+					"id": "2",
+					"text": { "ru": "Еда", "en": "Food" },
+					"image": "/src/public/tasks/options/food.png"
+				},
+				{
+					"id": "3",
+					"text": { "ru": "Книга", "en": "Book" },
+					"image": "/src/public/tasks/options/readbook.png"
+				}
+			],
+			"order": 6
+		},
+		{
+			"_id": { "$oid": "640000000000000000000107" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "choose_correct_image",
+			"question": {
+				"ru": "Где изображен прощальный жест?",
+				"en": "Which image shows a goodbye gesture?"
+			},
+			"correct_answer": "2",
+			"image_options": [
+				{
+					"id": "1",
+					"text": { "ru": "Приветствие", "en": "Greeting" },
+					"image": "/src/public/tasks/options/hellochoose.png"
+				},
+				{
+					"id": "2",
+					"text": { "ru": "Прощание", "en": "Farewell" },
+					"image": "/src/public/tasks/options/seeyou.png"
+				},
+				{
+					"id": "3",
+					"text": { "ru": "Благодарность", "en": "Gratitude" },
+					"image": "/src/public/tasks/options/thankyou.png"
+				}
+			],
+			"order": 7
+		},
+		{
+			"_id": { "$oid": "640000000000000000000108" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы слышите?",
+				"en": "What do you hear?"
+			},
+			"correct_answer": "Сәлеметсіз бе?",
+			"hints": ["Сәлеметсіз бе?", "Сау бол!", "Қайырлы таң!"],
+			"audio_path": "/src/public/voice/salemetsizbe.mp3",
+			"order": 8
+		},
+		{
+			"_id": { "$oid": "640000000000000000000109" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы слышите?",
+				"en": "What do you hear?"
+			},
+			"correct_answer": "Сау бол!",
+			"hints": ["Сау бол!", "Сәлем!", "Рахмет!"],
+			"audio_path": "/src/public/voice/goodbye.mp3",
+			"order": 9
+		},
+		{
+			"_id": { "$oid": "64000000000000000000010a" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "tap_audio",
+			"question": {
+				"ru": "Послушайте и расставьте слова по порядку",
+				"en": "Listen and rearrange the words"
+			},
+			"correct_answer": "Сәлеметсіз бе, құрметті қонақтар!",
+			"hints": ["Сәлеметсіз", "бе,", "құрметті", "қонақтар!"],
+			"audio_path": "/src/public/voice/salemetsizbe_konak.mp3",
+			"order": 10
+		},
+		{
+			"_id": { "$oid": "64000000000000000000010b" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_audio",
+			"question": {
+				"ru": "Прослушайте и переведите фразу",
+				"en": "Listen and translate the phrase"
+			},
+			"audio_path": "/src/public/voice/Кайырлы_тан.mp3",
+			"localized_hints": {
+				"ru": ["Доброе", "утро", "вечер", "день"],
+				"en": ["Good", "morning", "evening", "day"]
+			},
+			"localized_correct_answer": {
+				"ru": "Доброе утро",
+				"en": "Good morning"
+			},
+			"order": 11
+		},
+		{
+			"_id": { "$oid": "64000000000000000000010c" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести фразу 'Сәлеметсіз бе'?",
+				"en": "How to translate the phrase 'Сәлеметсіз бе'?"
+			},
+			"localized_correct_answer": {
+				"ru": "Здравствуйте",
+				"en": "Hello"
+			},
+			"localized_hints": {
+				"ru": ["Здравствуйте", "Привет", "Пока"],
+				"en": ["Hello", "Hi", "Bye"]
+			},
+			"image_path": "/src/public/tasks/hello12.png",
+			"order": 12
+		}
+	]
+}

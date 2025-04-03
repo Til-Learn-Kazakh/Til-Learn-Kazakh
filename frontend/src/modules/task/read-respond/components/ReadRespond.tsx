@@ -78,7 +78,7 @@ const ReadRespond = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, on
 				<QuestionCard
 					description={task?.description[i18n.language] || task?.description['en']}
 					question={task?.question[i18n.language] || task?.question['en']}
-					options={task?.hints}
+					options={task?.localized_hints?.[i18n.language] || task?.localized_hints?.['en'] || []}
 					selectedOption={selectedOption}
 					highlightedWord={
 						task?.highlighted_word?.[i18n.language] || task?.highlighted_word?.['en']

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScrollView, StyleSheet, View } from 'react-native'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -37,7 +38,7 @@ const WhichIsTrue = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, on
 	const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
 	const [correctAnswer, setCorrectAnswer] = useState<string | null>(null)
 	const queryClient = useQueryClient() // Получаем queryClient
-
+	const { i18n } = useTranslation()
 	// Backend request to check the answer
 	const { mutate } = useMutation({
 		mutationFn: ({ taskId, userAnswer }: { taskId: string; userAnswer: string }) =>
@@ -86,7 +87,7 @@ const WhichIsTrue = ({ task, onNext, hearts, bottomSheetRef, onCorrectAnswer, on
 					{task?.image_options?.map((option: any) => (
 						<ImageCard
 							key={option.id}
-							text={option.text}
+							text={option.text?.[i18n.language] || option.text?.['en']}
 							image={{ uri: `${imageserver}${option.image}` }}
 							isSelected={selectedOption === option.id}
 							onPress={() => handleOptionSelect(option.id)}
