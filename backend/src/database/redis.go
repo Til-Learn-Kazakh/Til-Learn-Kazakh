@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -17,7 +18,7 @@ func InitRedis() {
 	_ = godotenv.Load() // Загрузка переменных из .env
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),
-		Password: "",
+		Password: os.Getenv("REDIS_PASSWORD"), // <-- добавили
 		DB:       0,
 	})
 
@@ -28,4 +29,11 @@ func InitRedis() {
 		panic("❌ Ошибка подключения к Redis: " + err.Error())
 	}
 	fmt.Println("✅ Успешное подключение к Redis")
+
+	err := RedisClient.Set(ctx, "til:hello", "world", 0).Err()
+	if err != nil {
+		log.Fatalf("❌ Ошибка записи в Redis: %v", err)
+	}
+
+	log.Println("✅ Ключ 'til:hello' успешно записан в Redis")
 }

@@ -155,37 +155,29 @@ func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer, userLan
 		return false, "", fmt.Errorf("task not found: %w", err)
 	}
 
-	log.Printf("🔍 Task type: %s | Lang: %s", task.Type, userLang)
-	log.Printf("🧠 User answer: '%s'", userAnswer)
-
 	// Step 1 — get localized correct answer
 	realCorrectAnswer := task.CorrectAnswer
 	if userLang != "" && len(task.LocalizedCorrectAnswer) > 0 {
 		if localized := task.LocalizedCorrectAnswer[userLang]; localized != "" {
 			realCorrectAnswer = localized
-			log.Printf("🌍 Using localized correct answer: '%s'", realCorrectAnswer)
 		}
 	}
 
 	// Step 2 — compare
 	isCorrect = (userAnswer == realCorrectAnswer)
-	log.Printf("✅ Is correct: %v", isCorrect)
 
 	// Step 3 — if incorrect, try find text in ImageOptions
 	if !isCorrect && len(task.ImageOptions) > 0 {
-		log.Println("🖼️ Searching in ImageOptions...")
 		for _, option := range task.ImageOptions {
 			if option.ID == task.CorrectAnswer {
 				if userLang != "" {
 					if localizedText, ok := option.Text[userLang]; ok {
 						correctAnswerText = localizedText
-						log.Printf("📌 Correct answer from image option (localized): %s", correctAnswerText)
 						break
 					}
 				}
 				if defaultText, ok := option.Text["ru"]; ok {
 					correctAnswerText = defaultText
-					log.Printf("📌 Correct answer from image option (ru fallback): %s", correctAnswerText)
 				}
 				break
 			}
@@ -195,7 +187,6 @@ func (s *TaskService) CheckAnswer(taskID primitive.ObjectID, userAnswer, userLan
 	// Step 4 — fallback if still empty
 	if correctAnswerText == "" {
 		correctAnswerText = realCorrectAnswer
-		log.Printf("🔙 Fallback correct answer used: '%s'", correctAnswerText)
 	}
 
 	return isCorrect, correctAnswerText, nil
