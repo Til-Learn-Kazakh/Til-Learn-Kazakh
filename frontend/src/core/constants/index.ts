@@ -38,6 +38,8 @@ import natasha from '../../../public/icons/natasha.jpg'
 import parrot from '../../../public/icons/parrot.jpg'
 import profilestreak from '../../../public/icons/profilestreak.png'
 import russia from '../../../public/icons/russia.png'
+import russiaselect from '../../../public/icons/russiaselect.png'
+import selectlang from '../../../public/icons/selectlang.png'
 import sinisterstrange from '../../../public/icons/sinisterstrange.jpg'
 import sound from '../../../public/icons/sound.png'
 import soundbarys from '../../../public/icons/soundbarys.png'
@@ -48,18 +50,20 @@ import study from '../../../public/icons/study.png'
 import sunfire from '../../../public/icons/sunfire.png'
 import task from '../../../public/icons/task.png'
 import united_states from '../../../public/icons/united-states.png'
+import usaselect from '../../../public/icons/usaselect.png'
 import volume from '../../../public/icons/volume.png'
 import wanda from '../../../public/icons/wanda.jpg'
-import auth from '../../../public/images/auth/auth.png'
 import barys from '../../../public/images/auth/barys.mp4'
 import taskcompleted from '../../../public/images/taskcompleted.json'
 
 export const images = {
-	auth,
 	taskcompleted,
 }
 
 export const icons = {
+	selectlang,
+	russiaselect,
+	usaselect,
 	lessonDone,
 	lessonNotDone,
 	agathaharkness,

@@ -25,6 +25,8 @@ const queryClient = new QueryClient() // Создаем QueryClient здесь
 const Main: React.FC = () => {
 	const { data: currentUser, isPending } = useCurrentUser()
 	const [isI18nReady, setIsI18nReady] = useState(false)
+	const navigationRef = useRef<NavigationContainerRef<{}>>(null)
+
 	useEffect(() => {
 		const init = async () => {
 			await initI18n()
@@ -43,7 +45,6 @@ const Main: React.FC = () => {
 		loadCSRF()
 	}, [])
 
-	const navigationRef = useRef<NavigationContainerRef<{}>>(null)
 	if (isPending) {
 		return <LoadingUi />
 	}

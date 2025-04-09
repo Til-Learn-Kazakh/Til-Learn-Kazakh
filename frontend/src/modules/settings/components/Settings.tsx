@@ -11,17 +11,18 @@ import {
 } from 'react-native'
 
 import FeatherIcon from '@expo/vector-icons/Feather'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { LANGUAGES } from '../../../core/constants/languages'
+import { LoadingUi } from '../../../core/ui/LoadingUi'
 import { toast } from '../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY } from '../../auth/hooks/user-current-user.hook'
 import { authService } from '../../auth/services/auth.service'
 import { usePreferences } from '../hooks/preferences.context'
 import { Preferences } from '../hooks/preferences.storage'
 import { profileService } from '../services/settings.service'
-import { LoadingUi } from '../../../core/ui/LoadingUi'
 
 export default function SettingsScreen() {
 	const navigation = useNavigation<NavigationProp<any>>()
@@ -328,8 +329,9 @@ export default function SettingsScreen() {
 						</View>
 
 						<TouchableOpacity
-							onPress={() => {
-								deleteProfile()
+							onPress={async () => {
+								await deleteProfile()
+								await AsyncStorage.removeItem('hasSeenOnboarding')
 								// handle delete account
 							}}
 						>

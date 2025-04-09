@@ -16,9 +16,10 @@ var Ctx = context.Background()
 
 func InitRedis() {
 	_ = godotenv.Load() // Загрузка переменных из .env
+	password := os.Getenv("REDIS_PASSWORD")
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT")),
-		Password: os.Getenv("REDIS_PASSWORD"), // <-- добавили
+		Password: password, // <-- добавили
 		DB:       0,
 	})
 

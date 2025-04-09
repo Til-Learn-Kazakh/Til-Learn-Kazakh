@@ -4,11 +4,11 @@
     "slug": "Diploma",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/barys.png",
+    "icon": "./assets/barys1.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/barys.png",
+      "image": "./assets/barys1.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -23,14 +23,21 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/barys.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.bolatbek.Diploma"
     },
     "web": {
       "favicon": "./assets/barys.png"
     },
     "plugins": [
       "expo-secure-store",
-      "expo-localization"
-    ]
+      "expo-localization",
+      "expo-router"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1561143d-0fe8-4b2f-bc37-c866f7557d8f"
+      }
+    }
   }
 }
