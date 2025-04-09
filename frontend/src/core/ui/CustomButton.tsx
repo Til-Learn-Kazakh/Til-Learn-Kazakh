@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, TouchableOpacityProps, ViewStyle } from 'react-native'
+import { StyleProp, StyleSheet, Text, TouchableOpacity, TouchableOpacityProps, ViewStyle } from 'react-native'
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'success'
 
@@ -10,7 +10,9 @@ interface CustomButtonProps extends TouchableOpacityProps {
 	textVariant?: 'default' | 'primary' | 'secondary' | 'danger' | 'success'
 	IconLeft?: React.FC
 	IconRight?: React.FC
-	style?: ViewStyle
+  style?: StyleProp<ViewStyle>  // изменено с ViewStyle на StyleProp<ViewStyle>
+	disabled?: boolean;
+
 }
 
 const CustomButton: React.FC<CustomButtonProps> = ({
@@ -21,11 +23,13 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 	IconLeft,
 	IconRight,
 	style,
+	disabled,
 	...props
 }) => {
 	return (
 		<TouchableOpacity
 			onPress={onPress}
+			disabled={disabled}
 			style={[styles.base, styles[bgVariant], style]}
 			{...props}
 		>

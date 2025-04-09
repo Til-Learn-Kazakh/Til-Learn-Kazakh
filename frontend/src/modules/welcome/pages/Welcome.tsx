@@ -26,7 +26,7 @@ const Welcome: React.FC = () => {
 		<SafeAreaView style={styles.container}>
 			<TouchableOpacity
 				onPress={() => {
-					navigation.navigate('SignUp')
+					navigation.navigate('SelectLanguageScreen')
 				}}
 				style={styles.skipButton}
 			>
@@ -46,7 +46,7 @@ const Welcome: React.FC = () => {
 						style={styles.slide}
 					>
 						<Image
-							source={item.image} 
+							source={item.image}
 							style={styles.image}
 							resizeMode='contain'
 						/>
@@ -59,7 +59,7 @@ const Welcome: React.FC = () => {
 			<CustomButton
 				title={isLastSlide ? t('GET_STARTED') : t('NEXT')}
 				onPress={() =>
-					isLastSlide ? navigation.navigate('SignUp') : swiperRef.current?.scrollBy(1)
+					isLastSlide ? navigation.navigate('SelectLanguageScreen') : swiperRef.current?.scrollBy(1)
 				}
 				style={styles.button}
 			/>
