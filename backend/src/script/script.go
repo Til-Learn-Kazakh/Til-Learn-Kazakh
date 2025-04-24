@@ -71,7 +71,7 @@ func main() {
 	// ----------------------------------------------------
 	// 1) Подключаемся к MongoDB (укажи свой connection string)
 	// ----------------------------------------------------
-	uri := "mongodb+srv://bolatbek:Aa03031976@cluster1.sjd07v4.mongodb.net/Diploma?retryWrites=true&w=majority"
+	uri := "mongodb+srv://4zamat:XaakEVb8iD7S@cluster0.yke2ewi.mongodb.net/Diploma4?retryWrites=true&w=majority"
 	clientOpts := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(ctx, clientOpts)
 	if err != nil {
@@ -79,7 +79,7 @@ func main() {
 	}
 	defer client.Disconnect(ctx)
 
-	db := client.Database("Diploma") // Можно указать другое, если нужно
+	db := client.Database("Diploma4") // Можно указать другое, если нужно
 
 	unitsColl := db.Collection("Unit")
 	tasksColl := db.Collection("Task")
@@ -87,7 +87,7 @@ func main() {
 	// ----------------------------------------------------
 	// 2) Считываем JSON-файл (Lesson1.json)
 	// ----------------------------------------------------
-	filePath := "src/script/Lesson1.json"
+	filePath := "src/script/Lesson2.json"
 	jsonBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		log.Fatalf("Failed to read JSON file %s: %v", filePath, err)

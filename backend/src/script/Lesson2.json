@@ -1,0 +1,217 @@
+{
+	"unit": {
+		"_id": { "$oid": "640000000000000000000001" },
+		"title": "Урок 2: Күн уақытына байланысты амандасулар",
+		"level_id": { "$oid": "678c841d59457d74f9332384" },
+		"descriptions": {
+			"kk": "Бұл сабақта тәулік уақытына байланысты амандасуларды үйренеміз.",
+			"ru": "В этом уроке изучим приветствия по времени суток.",
+			"en": "In this lesson, we’ll learn time-of-day greetings."
+		},
+		"tasks": [],
+		"completed": [],
+		"progress": 0,
+		"created_at": "2025-04-18T00:00:00.000Z",
+		"updated_at": "2025-04-18T00:00:00.000Z"
+	},
+	"tasks": [
+		{
+			"_id": { "$oid": "640000000000000000000200" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы услышали?",
+				"en": "What did you hear?"
+			},
+			"correct_answer": "Қайырлы таң!",
+			"hints": ["Қайырлы таң!", "Қайырлы кеш!", "Қайырлы түн!"],
+			"audio_path": "/src/public/voice/lesson_2/kayirly_tan.mp3",
+			"order": 1
+		},
+		{
+			"_id": { "$oid": "640000000000000000000201" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "read_respond",
+			"question": {
+				"ru": "Что означает «Қайырлы таң»?",
+				"en": "What does 'Қайырлы таң' mean?"
+			},
+			"localized_correct_answer": {
+				"ru": "Доброе утро",
+				"en": "Good morning"
+			},
+			"localized_hints": {
+				"ru": ["Добрый вечер","Доброе утро", "Спокойной ночи"],
+				"en": [ "Good evening","Good morning", "Good night"]
+			},
+			"description": {
+				"ru": "Используется утром при встрече.",
+				"en": "Used in the morning when greeting someone."
+			},
+			"highlighted_word": {
+				"ru": "Қайырлы таң",
+				"en": "Қайырлы таң"
+			},
+			"order": 2
+		},
+		{
+			"_id": { "$oid": "640000000000000000000202" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести «Қайырлы кеш»?",
+				"en": "How do you translate 'Қайырлы кеш'?"
+			},
+			"localized_correct_answer": {
+				"ru": "Добрый вечер",
+				"en": "Good evening"
+			},
+			"localized_hints": {
+				"ru": ["Добрый день", "Доброй ночи","Добрый вечер"],
+				"en": ["Good day", "Good night","Good evening"]
+			},
+			"image_path": "/src/public/tasks/lesson_2/evening.png",
+			"order": 3
+		},
+		{
+			"_id": { "$oid": "640000000000000000000203" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы услышали?",
+				"en": "What did you hear?"
+			},
+			"correct_answer": "Қайырлы күн!",
+			"hints": ["Қайырлы таң!", "Қайырлы күн!", "Қайырлы кеш!"],
+			"audio_path": "/src/public/voice/lesson_2/kayirly_kun.mp3",
+			"order": 4
+		},
+		{
+			"_id": { "$oid": "640000000000000000000204" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "choose_correct_image",
+			"question": {
+				"ru": "Выберите изображение для «Қайырлы таң!»",
+				"en": "Choose the image for 'Қайырлы таң!'"
+			},
+			"image_options": [
+				{
+					"id": "1",
+					"text": { "ru": "Утро", "en": "Morning" },
+					"image": "/src/public/tasks/lesson_2/morning.png"
+				},
+				{
+					"id": "2",
+					"text": { "ru": "Вечер", "en": "Evening" },
+					"image": "/src/public/tasks/lesson_2/evening.png"
+				},
+				{
+					"id": "3",
+					"text": { "ru": "Ночь", "en": "Night" },
+					"image": "/src/public/tasks/lesson_2/night.png"
+				}
+			],
+			"correct_answer": "1",
+			"order": 5
+		},
+		{
+			"_id": { "$oid": "640000000000000000000205" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "tap_audio",
+			"question": {
+				"ru": "Соберите фразу по порядку",
+				"en": "Tap to arrange the phrase"
+			},
+			"hints": ["Қайырлы", "кеш!"],
+			"correct_answer": "Қайырлы кеш!",
+			"audio_path": "/src/public/voice/lesson_2/kayirly_kesh.mp3",
+			"order": 6
+		},
+		{
+			"_id": { "$oid": "640000000000000000000206" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_audio",
+			"question": {
+				"ru": "Слушайте и переведите: «Қайырлы түн!»",
+				"en": "Listen and translate: 'Қайырлы түн!'"
+			},
+			"audio_path": "/src/public/voice/lesson_2/kayirly_tun.mp3",
+			"localized_correct_answer": {
+				"ru": "Спокойной ночи",
+				"en": "Good night"
+			},
+			"localized_hints": {
+				"ru": ["Добрый вечер", "Спокойной ночи", "Добрый день"],
+				"en": ["Good evening", "Good night", "Good day"]
+			},
+			"order": 7
+		},
+		{
+			"_id": { "$oid": "640000000000000000000207" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "fill_blank",
+			"question": {
+				"ru": "Заполните пропуск: «Қайырлы ___!»",
+				"en": "Fill in the blank: 'Қайырлы ___!'"
+			},
+			"sentence": ["Қайырлы", "__", "!"],
+			"hints": ["таң", "кеш", "күн", "түн"],
+			"correct_answer": "түн",
+			"image_path": "/src/public/tasks/lesson_2/night.png",
+			"order": 8
+		},
+		{
+			"_id": { "$oid": "640000000000000000000208" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Что значит «Кеш»?",
+				"en": "What does 'Кеш' mean?"
+			},
+			"localized_correct_answer": {
+				"ru": "Вечер",
+				"en": "Evening"
+			},
+			"localized_hints": {
+				"ru": ["Утро", "Вечер", "День"],
+				"en": ["Morning", "Evening", "Day"]
+			},
+			"image_path": "/src/public/tasks/lesson_2/evening.png",
+			"order": 9
+		},
+		{
+			"_id": { "$oid": "640000000000000000000209" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "read_respond",
+			"question": {
+				"ru": "Прочитайте: «Ол маған «Қайырлы түн!» деді.»\nЧто это значит?",
+				"en": "Read: 'Ол маған «Қайырлы түн!» деді.'\nWhat does this mean?"
+			},
+			"localized_correct_answer": {
+				"ru": "Он пожелал мне спокойной ночи",
+				"en": "He said good night to me"
+			},
+			"localized_hints": {
+				"ru": [
+					"Он сказал доброе утро",
+					"Он пожелал мне спокойной ночи",
+					"Он попрощался"
+				],
+				"en": [
+					"He said good morning",
+					"He said good night to me",
+					"He said goodbye"
+				]
+			},
+			"description": {
+				"ru": "Определите значение фразы в реальном контексте.",
+				"en": "Identify the meaning of the phrase in context."
+			},
+			"highlighted_word": {
+				"ru": "Қайырлы түн",
+				"en": "Қайырлы түн"
+			},
+			"order": 10
+		}
+	]
+}
