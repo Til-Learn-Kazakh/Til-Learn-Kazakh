@@ -31,7 +31,7 @@
 				"ru": ["Привет", "Пока", "Спасибо"],
 				"en": ["Hi", "Bye", "Thanks"]
 			},
-			"image_path": "/src/public/tasks/hello.png",
+			"image_path": "/src/public/tasks/lesson_1/hello.png",
 			"order": 1
 		},
 		{

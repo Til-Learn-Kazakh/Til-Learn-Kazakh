@@ -1,0 +1,183 @@
+{
+	"unit": {
+		"_id": { "$oid": "640000000000000000000001" },
+		"title": "Урок 1: Сәлемдесу",
+		"level_id": { "$oid": "678c841d59457d74f9332384" },
+		"descriptions": {
+			"kk": "Бұл сабақта ресми және бейресми сәлемдесуді үйренеміз.",
+			"ru": "В этом уроке изучим формальное и неформальное приветствие.",
+			"en": "In this lesson, we’ll learn formal and informal greetings."
+		},
+		"tasks": [],
+		"completed": [],
+		"progress": 0,
+		"created_at": "2025-04-17T00:00:00.000Z",
+		"updated_at": "2025-04-17T00:00:00.000Z"
+	},
+	"tasks": [
+		{
+			"_id": { "$oid": "640000000000000000000101" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "read_respond",
+			"question": {
+				"ru": "Что значит «Сәлеметсіз бе?»?",
+				"en": "What does 'Сәлеметсіз бе?' mean?"
+			},
+			"localized_correct_answer": {
+				"ru": "Здравствуйте",
+				"en": "Hello (formal)"
+			},
+			"localized_hints": {
+				"ru": ["Здравствуйте", "Привет", "Пока"],
+				"en": ["Hello (formal)", "Hi", "Bye"]
+			},
+			"description": {
+				"ru": "Фраза 'Сәлеметсіз бе?' используется для вежливого формального приветствия.",
+				"en": "The phrase 'Сәлеметсіз бе?' is used as a formal greeting."
+			},
+			"highlighted_word": {
+				"ru": "Сәлеметсіз бе?",
+				"en": "Сәлеметсіз бе?"
+			},
+			"order": 1
+		},
+		{
+			"_id": { "$oid": "640000000000000000000102" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы услышали?",
+				"en": "What did you hear?"
+			},
+			"correct_answer": "Сәлем!",
+			"hints": ["Сәлем!", "Сәлеметсіз бе?", "Қайырлы таң!"],
+			"audio_path": "/src/public/voice/lesson_1/salem.mp3",
+			"order": 2
+		},
+		{
+			"_id": { "$oid": "640000000000000000000103" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести «Сәлем»?",
+				"en": "How do you translate 'Сәлем'?"
+			},
+			"localized_correct_answer": {
+				"ru": "Привет",
+				"en": "Hi"
+			},
+			"localized_hints": {
+				"ru": ["Привет", "Пока", "Спасибо"],
+				"en": ["Hi", "Bye", "Thanks"]
+			},
+			"image_path": "/src/public/tasks/lesson_1/hello.png",
+			"order": 3
+		},
+		{
+			"_id": { "$oid": "640000000000000000000104" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "tap_audio",
+			"question": {
+				"ru": "Послушайте и расставьте слова в порядке звучания:",
+				"en": "Listen and tap the words in the correct order:"
+			},
+			"hints": ["Сәлеметсіз", "бе?"],
+			"correct_answer": "Сәлеметсіз бе?",
+			"audio_path": "/src/public/voice/lesson_1/salemetsizbe.mp3",
+			"order": 4
+		},
+		{
+			"_id": { "$oid": "640000000000000000000105" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "choose_correct_image",
+			"question": {
+				"ru": "Какая картинка соответствует «Сәлем!»?",
+				"en": "Which image shows 'Сәлем!'?"
+			},
+			"image_options": [
+				{
+					"id": "1",
+					"text": { "ru": "Машущая рука", "en": "Waving hand" },
+					"image": "/src/public/tasks/lesson_1/person_waving.png"
+				},
+				{
+					"id": "2",
+					"text": { "ru": "Рукопожатие", "en": "Handshake" },
+					"image": "/src/public/tasks/lesson_1/handshake.png"
+				},
+				{
+					"id": "3",
+					"text": { "ru": "Поклон", "en": "Bow" },
+					"image": "/src/public/tasks/lesson_1/person_bowing.png"
+				}
+			],
+			"correct_answer": "1",
+			"order": 5
+		},
+		{
+			"_id": { "$oid": "640000000000000000000106" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы услышали? Выберите вариант.",
+				"en": "What do you hear? Choose the correct option."
+			},
+			"correct_answer": "Сәлем!",
+			"hints": ["Сәлем!", "Сау бол!", "Сәлеметсіз бе?"],
+			"audio_path": "/src/public/voice/lesson_1/salem.mp3",
+			"order": 6
+		},
+		{
+			"_id": { "$oid": "640000000000000000000107" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_audio",
+			"question": {
+				"ru": "Слушайте и переведите: «Сәлеметсіз бе?»",
+				"en": "Listen and translate: 'Сәлеметсіз бе?'"
+			},
+			"localized_hints": {
+				"ru": ["Здравствуйте", "Привет", "Пока"],
+				"en": ["Hello (formal)", "Hi", "Bye"]
+			},
+			"localized_correct_answer": {
+				"ru": "Здравствуйте",
+				"en": "Hello (formal)"
+			},
+			"audio_path": "/src/public/voice/lesson_1/salemetsizbe.mp3",
+			"order": 7
+		},
+		{
+			"_id": { "$oid": "640000000000000000000108" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести «Сәлеметсіз бе?» и «Сәлем»?",
+				"en": "How do you translate 'Сәлеметсіз бе?' and 'Сәлем'?"
+			},
+			"localized_correct_answer": {
+				"ru": "Здравствуйте и Привет",
+				"en": "Hello (formal) and Hi"
+			},
+			"localized_hints": {
+				"ru": ["Здравствуйте и Привет", "Пока и Спасибо", "Привет и Пока"],
+				"en": ["Hello (formal) and Hi", "Bye and Thanks", "Hi and Bye"]
+			},
+			"image_path": "/src/public/tasks/lesson_1/hello_formal_vs_informal.png",
+			"order": 8
+		},
+		{
+			"_id": { "$oid": "640000000000000000000109" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "fill_blank",
+			"question": {
+				"ru": "Заполните пропуск: «Сәлеметсіз ___!»",
+				"en": "Fill in the blank: 'Сәлеметсіз ___!'"
+			},
+			"hints": ["бе", "сіз", "сау"],
+			"correct_answer": "бе",
+			"sentence": ["Сәлеметсіз", "__", "!"],
+			"image_path": "/src/public/tasks/fillblank.png",
+			"order": 9
+		}
+	]
+}

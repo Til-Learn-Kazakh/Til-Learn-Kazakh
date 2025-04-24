@@ -1,0 +1,196 @@
+{
+  "unit": {
+    "_id": { "$oid": "640000000000000000000001" },
+    "title": "Урок 3: Танысу",
+    "level_id": { "$oid": "678c841d59457d74f9332384" },
+    "descriptions": {
+      "kk": "Бұл сабақта өзіңізді таныстыруды және басқалармен танысуды үйренеміз.",
+      "ru": "В этом уроке мы научимся представляться и узнавать имя собеседника.",
+      "en": "In this lesson, we will learn how to introduce ourselves and ask someone’s name."
+    },
+    "tasks": [],
+    "completed": [],
+    "progress": 0,
+    "created_at": "2025-04-19T00:00:00.000Z",
+    "updated_at": "2025-04-19T00:00:00.000Z"
+  },
+  "tasks": [
+    {
+      "_id": { "$oid": "640000000000000000000301" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_word",
+      "question": {
+        "ru": "Как перевести 'Менің атым ...'?",
+        "en": "How do you translate 'Менің атым ...'?"
+      },
+      "localized_correct_answer": {
+        "ru": "Меня зовут ...",
+        "en": "My name is ..."
+      },
+      "localized_hints": {
+        "ru": ["Привет", "Как дела?", "Меня зовут ..."],
+        "en": ["Hi", "How are you?", "My name is ..."]
+      },
+      "image_path": "/src/public/tasks/lesson_3/my_name_is.png",
+      "order": 1
+    },
+    {
+      "_id": { "$oid": "640000000000000000000302" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "fill_blank",
+      "question": {
+        "ru": "Заполните: 'Менің атым ___.'",
+        "en": "Fill in: 'Менің атым ___.'"
+      },
+      "sentence": ["Менің атым", "__", "."],
+      "hints": ["Сау бол!", "Алия", "Кеш жарық"],
+      "correct_answer": "Алия",
+      "image_path": "/src/public/tasks/fillblank.png",
+      "order": 2
+    },
+    {
+      "_id": { "$oid": "640000000000000000000303" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "audio",
+      "question": {
+        "ru": "Что вы услышали?",
+        "en": "What did you hear?"
+      },
+      "correct_answer": "Танысқаныма қуаныштымын",
+      "hints": ["Сәлем!", "Сау бол!", "Танысқаныма қуаныштымын"],
+      "audio_path": "/src/public/voice/lesson_3/tanyskanyma_kuaanyshtymyn.mp3",
+      "order": 3
+    },
+    {
+      "_id": { "$oid": "640000000000000000000304" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "read_respond",
+      "question": {
+        "ru": "Что означает 'Сізбен танысқаныма қуаныштымын'?",
+        "en": "What does 'Сізбен танысқаныма қуаныштымын' mean?"
+      },
+      "localized_correct_answer": {
+        "ru": "Приятно познакомиться (вежл.)",
+        "en": "Nice to meet you (formal)"
+      },
+      "localized_hints": {
+        "ru": ["Здравствуйте", "Приятно познакомиться (вежл.)", "Спасибо"],
+        "en": ["Hello", "Nice to meet you (formal)", "Thanks"]
+      },
+      "description": {
+        "ru": "Фраза используется при официальном знакомстве.",
+        "en": "Used during formal introductions."
+      },
+      "highlighted_word": {
+        "ru": "Сізбен танысқаныма қуаныштымын",
+        "en": "Сізбен танысқаныма қуаныштымын"
+      },
+      "order": 4
+    },
+    {
+      "_id": { "$oid": "640000000000000000000305" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "choose_correct_image",
+      "question": {
+        "ru": "Какая картинка соответствует 'Танысқаныма қуаныштымын'?",
+        "en": "Which image matches 'Танысқаныма қуаныштымын'?"
+      },
+      "correct_answer": "1",
+      "image_options": [
+        {
+          "id": "1",
+          "text": { "ru": "Знакомство", "en": "Introduction" },
+          "image": "/src/public/tasks/lesson_3/handshake.png"
+        },
+        {
+          "id": "2",
+          "text": { "ru": "Прощание", "en": "Farewell" },
+          "image": "/src/public/tasks/lesson_3/farewell.png"
+        },
+        {
+          "id": "3",
+          "text": { "ru": "Сон", "en": "Sleep" },
+          "image": "/src/public/tasks/lesson_3/sleep.png"
+        }
+      ],
+      "order": 5
+    },
+    {
+      "_id": { "$oid": "640000000000000000000306" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "tap_audio",
+      "question": {
+        "ru": "Расположите слова в правильном порядке:",
+        "en": "Arrange the words in correct order:"
+      },
+      "hints": ["танысқаныма", "Сізбен", "қуаныштымын"],
+      "correct_answer": "Сізбен танысқаныма қуаныштымын",
+      "audio_path": "/src/public/voice/lesson_3/sizben_tanyskanyma.mp3",
+      "order": 6
+    },
+    {
+      "_id": { "$oid": "640000000000000000000307" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_audio",
+      "question": {
+        "ru": "Слушайте и переведите: 'Атыңыз кім?'",
+        "en": "Listen and translate: 'Атыңыз кім?'"
+      },
+      "audio_path": "/src/public/voice/lesson_3/atyngyz_kim.mp3",
+      "localized_correct_answer": {
+        "ru": "Как вас зовут?",
+        "en": "What’s your name? (formal)"
+      },
+      "localized_hints": {
+        "ru": ["Здравствуйте", "Как вас зовут?", "Спасибо"],
+        "en": ["Hello", "What’s your name?", "Thanks"]
+      },
+      "order": 7
+    },
+    {
+      "_id": { "$oid": "640000000000000000000308" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "read_respond",
+      "question": {
+        "ru": "Прочитайте диалог: A: 'Сәлем! Атың кім?' B:\n'Менің атым Айжан.' Что сказал B?",
+        "en": "Read the dialogue: A: 'Сәлем! Атың кім?' B:\n'Менің атым Айжан.' What did B say?"
+      },
+      "localized_correct_answer": {
+        "ru": "Меня зовут Айжан",
+        "en": "My name is Aizhan"
+      },
+      "localized_hints": {
+        "ru": ["Доброй ночи", "Привет", "Меня зовут Айжан"],
+        "en": ["Good night", "Hi", "My name is Aizhan"]
+      },
+      "description": {
+        "ru": "Простой диалог знакомства.",
+        "en": "Simple introduction dialogue."
+      },
+      "highlighted_word": {
+        "ru": "Менің атым Айжан",
+        "en": "Менің атым Айжан"
+      },
+      "order": 8
+    },
+    {
+      "_id": { "$oid": "640000000000000000000309" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_word",
+      "question": {
+        "ru": "Как перевести 'Сіздің атыңыз кім?'",
+        "en": "How do you translate 'Сіздің атыңыз кім?'"
+      },
+      "localized_correct_answer": {
+        "ru": "Как вас зовут?",
+        "en": "What is your name? (formal)"
+      },
+      "localized_hints": {
+        "ru": ["Здравствуйте", "Как вас зовут?", "Как дела?"],
+        "en": ["Hello", "What is your name? (formal)", "How are you?"]
+      },
+      "image_path": "/src/public/tasks/lesson_3/question.png",
+      "order": 9
+    }
+  ]
+}

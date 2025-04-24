@@ -1,0 +1,189 @@
+{
+  "unit": {
+    "_id": { "$oid": "640000000000000000000001" },
+    "title": "Урок 5: Жауаптар 'Қалайсың?' сұрағына",
+    "level_id": { "$oid": "678c841d59457d74f9332384" },
+    "descriptions": {
+      "kk": "Бұл сабақта 'Қалайсың?' сұрағына жауап беруді үйренеміз.",
+      "ru": "В этом уроке мы научимся отвечать на вопрос 'Как дела?'.",
+      "en": "In this lesson, we’ll learn how to respond to 'How are you?'."
+    },
+    "tasks": [],
+    "completed": [],
+    "progress": 0,
+    "created_at": "2025-04-24T00:00:00.000Z",
+    "updated_at": "2025-04-24T00:00:00.000Z"
+  },
+  "tasks": [
+    {
+      "_id": { "$oid": "640000000000000000000501" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_word",
+      "question": {
+        "ru": "Как перевести 'Жақсы'?",
+        "en": "How do you translate 'Жақсы'?"
+      },
+      "localized_correct_answer": {
+        "ru": "Хорошо",
+        "en": "Good"
+      },
+      "localized_hints": {
+        "ru": ["Хорошо", "Плохо", "Спасибо"],
+        "en": ["Good", "Bad", "Thanks"]
+      },
+      "image_path": "/src/public/tasks/lesson_5/zhaksy.png",
+      "order": 1
+    },
+    {
+      "_id": { "$oid": "640000000000000000000502" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_word",
+      "question": {
+        "ru": "Что значит 'Аман‑есен'?",
+        "en": "What does 'Аман‑есен' mean?"
+      },
+      "localized_correct_answer": {
+        "ru": "В порядке / Жив-здоров",
+        "en": "Safe and well"
+      },
+      "localized_hints": {
+        "ru": ["Добрый вечер", "В порядке / Жив-здоров", "Спасибо"],
+        "en": ["Good evening", "Safe and well", "Thanks"]
+      },
+      "image_path": "/src/public/tasks/lesson_5/aman_esen.png",
+      "order": 2
+    },
+    {
+      "_id": { "$oid": "640000000000000000000503" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_audio",
+      "question": {
+        "ru": "Прослушайте и переведите: 'Жақсы, рақмет.'",
+        "en": "Listen and translate: 'Жақсы, рақмет.'"
+      },
+      "audio_path": "/src/public/voice/lesson_5/zhaksy_rakhmet.mp3",
+      "localized_correct_answer": {
+        "ru": "Хорошо, спасибо",
+        "en": "Good, thanks"
+      },
+      "localized_hints": {
+        "ru": ["Привет", "Хорошо, спасибо", "До свидания"],
+        "en": ["Hi", "Good, thanks", "Bye"]
+      },
+      "order": 3
+    },
+    {
+      "_id": { "$oid": "640000000000000000000504" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "tap_audio",
+      "question": {
+        "ru": "Расположите слова в порядке:",
+        "en": "Arrange the words in correct order:"
+      },
+      "hints": ["рақмет.", "Жақсы,"],
+      "correct_answer": "Жақсы, рақмет.",
+      "audio_path": "/src/public/voice/lesson_5/zhaksy_rakhmet.mp3",
+      "order": 4
+    },
+    {
+      "_id": { "$oid": "640000000000000000000505" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "choose_correct_image",
+      "question": {
+        "ru": "Какая картинка подходит к 'Жақсы, рақмет.'?",
+        "en": "Which image matches 'Жақсы, рақмет.'?"
+      },
+      "correct_answer": "2",
+      "image_options": [
+        {
+          "id": "1",
+          "text": { "ru": "Печаль", "en": "Sadness" },
+          "image": "/src/public/tasks/lesson_5/sad.png"
+        },
+        {
+          "id": "2",
+          "text": { "ru": "Улыбка", "en": "Smile" },
+          "image": "/src/public/tasks/lesson_5/smile.png"
+        },
+        {
+          "id": "3",
+          "text": { "ru": "Сон", "en": "Sleep" },
+          "image": "/src/public/tasks/lesson_4/sleep.png"
+        }
+      ],
+      "order": 5
+    },
+    {
+      "_id": { "$oid": "640000000000000000000506" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "fill_blank",
+      "question": {
+        "ru": "Заполните: 'Жақсы, ___.'",
+        "en": "Fill in: 'Жақсы, ___.'"
+      },
+      "sentence": ["Жақсы,", "__", "."],
+      "hints": ["кеш", "рахмет", "көріскенше"],
+      "correct_answer": "рахмет",
+      "image_path": "/src/public/tasks/fillblank.png",
+      "order": 6
+    },
+    {
+      "_id": { "$oid": "640000000000000000000507" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "read_respond",
+      "question": {
+        "ru": "Что значит 'Аман‑сау'?",
+        "en": "What does 'Аман‑сау' mean?"
+      },
+      "localized_correct_answer": {
+        "ru": "Цел и невредим",
+        "en": "Healthy and safe"
+      },
+      "localized_hints": {
+        "ru": ["До встречи", "Цел и невредим", "Доброй ночи"],
+        "en": ["See you", "Healthy and safe", "Good night"]
+      },
+      "description": {
+        "ru": "Устойчивое выражение, означающее 'в порядке'.",
+        "en": "Set expression meaning 'I'm fine / in good health'."
+      },
+      "highlighted_word": {
+        "ru": "Аман‑сау",
+        "en": "Аман‑сау"
+      },
+      "order": 7
+    },
+    {
+      "_id": { "$oid": "640000000000000000000508" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_audio",
+      "question": {
+        "ru": "Прослушайте и переведите: 'Аман‑есен'",
+        "en": "Listen and translate: 'Аман‑есен'"
+      },
+      "audio_path": "/src/public/voice/lesson_5/aman_esen.mp3",
+      "localized_correct_answer": {
+        "ru": "В порядке / Жив-здоров",
+        "en": "Safe and well"
+      },
+      "localized_hints": {
+        "ru": ["Привет", "До свидания", "В порядке / Жив-здоров"],
+        "en": ["Hi", "Goodbye", "Safe and well"]
+      },
+      "order": 8
+    },
+    {
+      "_id": { "$oid": "640000000000000000000509" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "audio",
+      "question": {
+        "ru": "Что вы услышали?",
+        "en": "What did you hear?"
+      },
+      "correct_answer": "Аман‑сау",
+      "hints": ["Сау бол!", "Аман‑сау", "Кеш жарық"],
+      "audio_path": "/src/public/voice/lesson_5/aman_sau.mp3",
+      "order": 9
+    }
+  ]
+}

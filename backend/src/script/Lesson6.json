@@ -1,0 +1,183 @@
+{
+  "unit": {
+    "_id": { "$oid": "640000000000000000000006" },
+    "title": "Урок 6: Қоштасу",
+    "level_id": { "$oid": "678c841d59457d74f9332384" },
+    "descriptions": {
+      "kk": "Бұл сабақта қоштасу сөздерін үйренеміз.",
+      "ru": "В этом уроке мы изучим прощальные фразы.",
+      "en": "In this lesson, we’ll learn farewell phrases."
+    },
+    "tasks": [],
+    "completed": [],
+    "progress": 0,
+    "created_at": "2025-04-24T00:00:00.000Z",
+    "updated_at": "2025-04-24T00:00:00.000Z"
+  },
+  "tasks": [
+    {
+      "_id": { "$oid": "640000000000000000000601" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_word",
+      "question": {
+        "ru": "Как перевести 'Сау бол!'?",
+        "en": "How do you translate 'Сау бол!'?"
+      },
+      "localized_correct_answer": {
+        "ru": "Пока",
+        "en": "Bye"
+      },
+      "localized_hints": {
+        "ru": ["Пока", "Привет", "Спасибо"],
+        "en": ["Bye", "Hi", "Thanks"]
+      },
+      "image_path": "/src/public/tasks/lesson_1/person_waving.png",
+      "order": 1
+    },
+    {
+      "_id": { "$oid": "640000000000000000000602" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_word",
+      "question": {
+        "ru": "Как перевести 'Сау болыңыз!'?",
+        "en": "How do you translate 'Сау болыңыз!'?"
+      },
+      "localized_correct_answer": {
+        "ru": "До свидания (вежл.)",
+        "en": "Goodbye (formal)"
+      },
+      "localized_hints": {
+        "ru": ["До свидания (вежл.)", "Доброй ночи", "Как дела?"],
+        "en": ["Goodbye (formal)", "Good night", "How are you?"]
+      },
+      "image_path": "/src/public/tasks/lesson_6/sau_bolyngyz.png",
+      "order": 2
+    },
+    {
+      "_id": { "$oid": "640000000000000000000603" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "audio",
+      "question": {
+        "ru": "Что вы услышали?",
+        "en": "What did you hear?"
+      },
+      "correct_answer": "Көріскенше!",
+      "hints": ["Сау бол!", "Көріскенше!", "Қайырлы таң!"],
+      "audio_path": "/src/public/voice/lesson_6/koriskenshe.mp3",
+      "order": 3
+    },
+    {
+      "_id": { "$oid": "640000000000000000000604" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "translation_audio",
+      "question": {
+        "ru": "Прослушайте и переведите: 'Тағы кездескенше!'",
+        "en": "Listen and translate: 'Тағы кездескенше!'"
+      },
+      "audio_path": "/src/public/voice/lesson_6/tagy_kedeskenshe.mp3",
+      "localized_correct_answer": {
+        "ru": "До следующей встречи",
+        "en": "Until we meet again"
+      },
+      "localized_hints": {
+        "ru": ["Пока", "До следующей встречи", "Спасибо"],
+        "en": ["Bye", "Until we meet again", "Thanks"]
+      },
+      "order": 4
+    },
+    {
+      "_id": { "$oid": "640000000000000000000605" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "tap_audio",
+      "question": {
+        "ru": "Расположите в правильном порядке:",
+        "en": "Arrange the in the correct order:"
+      },
+      "hints": ["кенше", "Көріс"],
+      "correct_answer": "Көріс кенше",
+      "audio_path": "/src/public/voice/lesson_6/koriskenshe.mp3",
+      "order": 5
+    },
+    {
+      "_id": { "$oid": "640000000000000000000606" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "choose_correct_image",
+      "question": {
+        "ru": "Выберите изображение, которое означает 'Тағы кездескенше!'",
+        "en": "Choose the image that means 'Тағы кездескенше!'"
+      },
+      "correct_answer": "3",
+      "image_options": [
+        {
+          "id": "1",
+          "text": { "ru": "Сон", "en": "Sleep" },
+          "image": "/src/public/tasks/lesson_3/sleep.png"
+        },
+        {
+          "id": "2",
+          "text": { "ru": "Приветствие", "en": "Greeting" },
+          "image": "/src/public/tasks/lesson_1/hello.png"
+        },
+        {
+          "id": "3",
+          "text": { "ru": "Прощание", "en": "Farewell" },
+          "image": "/src/public/tasks/lesson_4/farewell.png"
+        }
+      ],
+      "order": 6
+    },
+    {
+      "_id": { "$oid": "640000000000000000000607" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "fill_blank",
+      "question": {
+        "ru": "Заполните: '___ кездескенше!'",
+        "en": "Fill in: '___ кездескенше!'"
+      },
+      "sentence": ["__", "кездескенше!"],
+      "hints": ["Қайырлы", "Тағы", "Кеш"],
+      "correct_answer": "Тағы",
+      "image_path": "/src/public/tasks/fillblank.png",
+      "order": 7
+    },
+    {
+      "_id": { "$oid": "640000000000000000000608" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "read_respond",
+      "question": {
+        "ru": "Что значит 'Көріскенше'?",
+        "en": "What does 'Көріскенше' mean?"
+      },
+      "localized_correct_answer": {
+        "ru": "Увидимся",
+        "en": "See you"
+      },
+      "localized_hints": {
+        "ru": ["Добрый вечер", "Увидимся", "До свидания"],
+        "en": ["Good evening", "See you", "Goodbye"]
+      },
+      "description": {
+        "ru": "Краткое прощание с надеждой на новую встречу.",
+        "en": "A short farewell implying you’ll meet again."
+      },
+      "highlighted_word": {
+        "ru": "Көріскенше",
+        "en": "Көріскенше"
+      },
+      "order": 8
+    },
+    {
+      "_id": { "$oid": "640000000000000000000609" },
+      "unit_id": { "$oid": "640000000000000000000001" },
+      "type": "audio",
+      "question": {
+        "ru": "Что вы услышали?",
+        "en": "What did you hear?"
+      },
+      "correct_answer": "Сау бол!",
+      "hints": ["Сау бол!", "Қайырлы таң!", "Жақсы, рақмет."],
+      "audio_path": "/src/public/voice/lesson_6/sau_bol.mp3",
+      "order": 9
+    }
+  ]
+}

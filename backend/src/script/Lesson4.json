@@ -1,0 +1,186 @@
+{
+	"unit": {
+		"_id": { "$oid": "640000000000000000000001" },
+		"title": "Урок 4: Қал-жағдай сұрау",
+		"level_id": { "$oid": "678c841d59457d74f9332384" },
+		"descriptions": {
+			"kk": "Бұл сабақта 'Қал-жағдай сұрау' яғни 'қалайсың' және 'қалыңыз қалай' деген сұрауларды үйренеміз.",
+			"ru": "В этом уроке мы изучим, как спрашивать 'Как дела?': 'Қалайсың?' и 'Қалыңыз қалай?'.",
+			"en": "In this lesson, we’ll learn how to ask 'How are you?': 'Қалайсың?' and 'Қалыңыз қалай?'."
+		},
+		"tasks": [],
+		"completed": [],
+		"progress": 0,
+		"created_at": "2025-04-19T00:00:00.000Z",
+		"updated_at": "2025-04-19T00:00:00.000Z"
+	},
+	"tasks": [
+		{
+			"_id": { "$oid": "640000000000000000000401" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести 'Қалайсың?'",
+				"en": "How do you translate 'Қалайсың?'"
+			},
+			"localized_correct_answer": {
+				"ru": "Как дела? (неформ.)",
+				"en": "How are you? (informal)"
+			},
+			"localized_hints": {
+				"ru": ["Привет", "Как дела? (неформ.)", "Доброй ночи"],
+				"en": ["Hi", "How are you? (informal)", "Good night"]
+			},
+			"image_path": "/src/public/tasks/lesson_4/qalaisyn.png",
+			"order": 1
+		},
+		{
+			"_id": { "$oid": "640000000000000000000402" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_word",
+			"question": {
+				"ru": "Как перевести 'Қалыңыз қалай?'",
+				"en": "How do you translate 'Қалыңыз қалай?'"
+			},
+			"localized_correct_answer": {
+				"ru": "Как ваши дела?",
+				"en": "How are you? (formal)"
+			},
+			"localized_hints": {
+				"ru": ["Добрый вечер", "Как ваши дела?", "До свидания"],
+				"en": ["Good evening", "How are you? (formal)", "Goodbye"]
+			},
+			"image_path": "/src/public/tasks/lesson_4/qalaisyn.png",
+			"order": 2
+		},
+		{
+			"_id": { "$oid": "640000000000000000000403" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы услышали?",
+				"en": "What did you hear?"
+			},
+			"correct_answer": "Қалайсың?",
+			"hints": ["Сәлеметсіз бе?", "Қалайсың?", "Қайырлы таң!"],
+			"audio_path": "/src/public/voice/lesson_4/qalaisyn.mp3",
+			"order": 3
+		},
+		{
+			"_id": { "$oid": "640000000000000000000404" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "audio",
+			"question": {
+				"ru": "Что вы услышали?",
+				"en": "What did you hear?"
+			},
+			"correct_answer": "Қалыңыз қалай?",
+			"hints": ["Қалыңыз қалай?", "Сәлем!", "Сау бол!"],
+			"audio_path": "/src/public/voice/lesson_4/qalyngyz_kalai.mp3",
+			"order": 4
+		},
+		{
+			"_id": { "$oid": "640000000000000000000405" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "choose_correct_image",
+			"question": {
+				"ru": "Где изображено, как кто-то спрашивает 'Қалайсың?'",
+				"en": "Which image shows someone saying 'Қалайсың?'"
+			},
+			"correct_answer": "2",
+			"image_options": [
+				{
+					"id": "1",
+					"text": { "ru": "Прощание", "en": "Farewell" },
+					"image": "/src/public/tasks/lesson_4/farewell.png"
+				},
+				{
+					"id": "2",
+					"text": {
+						"ru": "Вопрос о самочувствии",
+						"en": "Asking how someone is"
+					},
+					"image": "/src/public/tasks/lesson_4/how_are_you.png"
+				},
+				{
+					"id": "3",
+					"text": { "ru": "Спокойной ночи", "en": "Good night" },
+					"image": "/src/public/tasks/lesson_4/sleep.png"
+				}
+			],
+			"order": 5
+		},
+		{
+			"_id": { "$oid": "640000000000000000000406" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "fill_blank",
+			"question": {
+				"ru": "Заполните: «Қалыңыз ___?»",
+				"en": "Fill in: 'Қалыңыз ___?'"
+			},
+			"sentence": ["Қалыңыз", "__", "?"],
+			"hints": ["таң", "рахмет", "қалай"],
+			"correct_answer": "қалай",
+			"image_path": "/src/public/tasks/fillblank.png",
+			"order": 6
+		},
+		{
+			"_id": { "$oid": "640000000000000000000407" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "tap_audio",
+			"question": {
+				"ru": "Расположите по порядку: 'Қалайсың?'",
+				"en": "Tap to arrange: 'Қалайсың?'"
+			},
+			"hints": ["Талай", "сың?", "Қалай"],
+			"correct_answer": "Қалай сың?",
+			"audio_path": "/src/public/voice/lesson_4/qalaisyn.mp3",
+			"order": 7
+		},
+		{
+			"_id": { "$oid": "640000000000000000000408" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "translation_audio",
+			"question": {
+				"ru": "Слушайте и переведите: «Қалыңыз қалай?»",
+				"en": "Listen and translate: 'Қалыңыз қалай?'"
+			},
+			"audio_path": "/src/public/voice/lesson_4/qalyngyz_kalai.mp3",
+			"localized_correct_answer": {
+				"ru": "Как ваши дела?",
+				"en": "How are you? (formal)"
+			},
+			"localized_hints": {
+				"ru": ["Как ваши дела?", "Как дела?", "Добрый день"],
+				"en": ["How are you? (formal)", "How are you?", "Good afternoon"]
+			},
+			"order": 8
+		},
+		{
+			"_id": { "$oid": "640000000000000000000409" },
+			"unit_id": { "$oid": "640000000000000000000001" },
+			"type": "read_respond",
+			"question": {
+				"ru": "Что означает 'Қалайсың?' в неформальном общении?",
+				"en": "What does 'Қалайсың?' mean in informal conversation?"
+			},
+			"localized_correct_answer": {
+				"ru": "Как дела?",
+				"en": "How are you?"
+			},
+			"localized_hints": {
+				"ru": ["Спасибо", "Добрый вечер", "Как дела?"],
+				"en": ["Thanks", "Good evening", "How are you?"]
+			},
+			"description": {
+				"ru": "Используется в неформальной обстановке между друзьями и ровесниками.",
+				"en": "Used in informal settings with friends and peers."
+			},
+			"highlighted_word": {
+				"ru": "Қалайсың?",
+				"en": "Қалайсың?"
+			},
+			"order": 9
+		}
+	]
+}
