@@ -12,35 +12,51 @@ import {
 import Svg, { Path } from 'react-native-svg'
 
 import { Ionicons } from '@expo/vector-icons'
-// пример
-
 import { NavigationProp, useNavigation } from '@react-navigation/native'
 
 import { icons } from '../../../core/constants'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
 import { useCurrentUser } from '../../auth/hooks/user-current-user.hook'
-import { avatars } from '../../profile/components/AvatarPickerPage'
 import {
 	useAllTimeLeaderboard,
 	useMonthlyLeaderboard,
 	useWeeklyLeaderboard,
 } from '../hooks/leaderboard.hooks'
 
+const avatarMap: Record<string, any> = {
+	'1': icons.agathaharkness,
+	'2': icons.aquaman,
+	'3': icons.blueman,
+	'4': icons.cat,
+	'5': icons.deadpool,
+	'6': icons.logan,
+	'7': icons.moonknight,
+	'8': icons.natasha,
+	'9': icons.parrot,
+	'10': icons.sinisterstrange,
+	'11': icons.spiderman,
+	'12': icons.starlord,
+	'13': icons.wanda,
+}
+
+const getAvatar = (value: unknown) => {
+	const key = (value ?? '').toString()
+	return avatarMap[key] ?? icons.parrot
+}
+
 export default function LeaderboardScreen() {
 	const { t } = useTranslation()
 	const [activeTab, setActiveTab] = useState<'week' | 'month' | 'All Time'>('week')
 	const navigation = useNavigation<NavigationProp<any>>()
+
 	const { data: currentUser } = useCurrentUser()
-	const selectedAvatar = avatars.find(a => a.id === currentUser?.avatar)
-	const { data: weeklyData, isLoading: isLoadingWeek, error: weekError } = useWeeklyLeaderboard()
+	const currentUserId = currentUser?.id
 
-	const {
-		data: monthlyData,
-		isLoading: isLoadingMonth,
-		error: monthError,
-	} = useMonthlyLeaderboard()
+	const selectedAvatar = getAvatar(currentUser?.avatar)
 
-	const { data: allTimeData, isLoading: isLoadingAll, error: allError } = useAllTimeLeaderboard()
+	const { data: weeklyData, isLoading: isWeek, error: weekErr } = useWeeklyLeaderboard()
+	const { data: monthlyData, isLoading: isMonth, error: monthErr } = useMonthlyLeaderboard()
+	const { data: allTimeData, isLoading: isAll, error: allErr } = useAllTimeLeaderboard()
 
 	let rawData: any[] = []
 	let isLoading = false
@@ -48,52 +64,57 @@ export default function LeaderboardScreen() {
 
 	if (activeTab === 'week') {
 		rawData = weeklyData || []
-		isLoading = isLoadingWeek
-		error = weekError
+		isLoading = isWeek
+		error = weekErr
 	} else if (activeTab === 'month') {
 		rawData = monthlyData || []
-		isLoading = isLoadingMonth
-		error = monthError
+		isLoading = isMonth
+		error = monthErr
 	} else {
 		rawData = allTimeData || []
-		isLoading = isLoadingAll
-		error = allError
+		isLoading = isAll
+		error = allErr
 	}
 
-	const mappedData = rawData.map((user, idx) => {
-		const rank = idx + 1
-		const matchedAvatar = avatars.find(a => a.id === user?.avatar) ?? null
+	const mappedData = rawData.map((user: any, idx: number) => ({
+		id: user._id,
+		name: user.first_name || 'Unknown',
+		stars:
+			activeTab === 'week' ? user.weekly_xp : activeTab === 'month' ? user.monthly_xp : user.xp,
+		avatar: getAvatar(user.avatar),
+		position: idx + 1,
+	}))
 
-		return {
-			id: user._id,
-			name: user.first_name || 'Unknown',
-			stars:
-				activeTab === 'week' ? user.weekly_xp : activeTab === 'month' ? user.monthly_xp : user.xp, // all-time
-			avatar: matchedAvatar ? matchedAvatar.img : icons.parrot,
-			position: rank,
-		}
-	})
 	const topThree = mappedData.slice(0, 3)
 	const rest = mappedData.slice(3)
-	const [userVisible, setUserVisible] = useState(false)
-	const currentUserId = currentUser?.id
 
+	const [userVisible, setUserVisible] = useState(false)
 	const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
 		if (!currentUserId) return
-		const isUserInView = viewableItems.some(({ item }: any) => item.id === currentUserId)
-		setUserVisible(isUserInView)
+		const visible = viewableItems.some(({ item }: any) => item.id === currentUserId)
+		setUserVisible(visible)
 	}).current
-
 	const viewabilityConfig = { itemVisiblePercentThreshold: 50 }
 
-	if (isLoading) {
-		return <LoadingUi />
-	}
+
+	if (isLoading) return <LoadingUi />
 
 	if (error) {
 		return (
 			<SafeAreaView style={styles.safeArea}>
-				<Text>{t('LEADERBOARD.ERROR_LOADING', { tab: activeTab })}</Text>
+				<Text style={{ color: 'white', textAlign: 'center', marginTop: 20 }}>
+					{t('LEADERBOARD.ERROR_LOADING', { tab: activeTab })}
+				</Text>
+			</SafeAreaView>
+		)
+	}
+
+	if (!mappedData.length) {
+		return (
+			<SafeAreaView style={styles.safeArea}>
+				<Text style={{ color: 'white', textAlign: 'center', marginTop: 40 }}>
+					No leaderboard data available for "{activeTab}"
+				</Text>
 			</SafeAreaView>
 		)
 	}
@@ -105,9 +126,7 @@ export default function LeaderboardScreen() {
 					<Text style={styles.headerTitle}>{t('LEADERBOARD.HEADER_TITLE')}</Text>
 					<TouchableOpacity
 						style={styles.rightButton}
-						onPress={() => {
-							navigation.navigate('InfoLeaderboardPage')
-						}}
+						onPress={() => navigation.navigate('InfoLeaderboardPage')}
 					>
 						<Ionicons
 							name='information-circle-outline'
@@ -118,33 +137,19 @@ export default function LeaderboardScreen() {
 				</View>
 
 				<View style={styles.tabsContainer}>
-					<TouchableOpacity
-						onPress={() => setActiveTab('week')}
-						style={[styles.tabButton, activeTab === 'week' && styles.tabButtonActive]}
-					>
-						<Text style={[styles.tabText, activeTab === 'week' && styles.tabTextActive]}>
-							{t('LEADERBOARD.TABS.WEEK')}
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => setActiveTab('month')}
-						style={[styles.tabButton, activeTab === 'month' && styles.tabButtonActive]}
-					>
-						<Text style={[styles.tabText, activeTab === 'month' && styles.tabTextActive]}>
-							{t('LEADERBOARD.TABS.MONTH')}
-						</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => setActiveTab('All Time')}
-						style={[styles.tabButton, activeTab === 'All Time' && styles.tabButtonActive]}
-					>
-						<Text style={[styles.tabText, activeTab === 'All Time' && styles.tabTextActive]}>
-							{t('LEADERBOARD.TABS.ALL_TIME')}
-						</Text>
-					</TouchableOpacity>
+					{['week', 'month', 'All Time'].map(tab => (
+						<TouchableOpacity
+							key={tab}
+							onPress={() => setActiveTab(tab as any)}
+							style={[styles.tabButton, activeTab === tab && styles.tabButtonActive]}
+						>
+							<Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+								{t(`LEADERBOARD.TABS.${tab.toUpperCase().replace(' ', '_')}`)}
+							</Text>
+						</TouchableOpacity>
+					))}
 				</View>
 
-				{/* Волна + Top-3 */}
 				<View style={styles.waveContainer}>
 					<Svg
 						width='100%'
@@ -157,71 +162,42 @@ export default function LeaderboardScreen() {
 							d='M0,96L30,85.3C60,75,120,53,180,64C240,75,300,117,360,144C420,171,480,181,540,170.7C600,160,660,128,720,138.7C780,149,840,203,900,213.3C960,224,1020,192,1080,192C1140,192,1200,224,1260,208C1320,192,1380,128,1410,96L1440,64L1440,320L0,320Z'
 						/>
 					</Svg>
+
 					<View style={styles.topThreeWrapper}>
-						{/* #2 */}
-						{topThree[1] ? (
-							<View style={styles.topItem}>
-								<Image
-									source={topThree[1].avatar}
-									style={styles.topAvatarSm}
-								/>
-								<Text style={styles.topPosition}>2</Text>
-								<Text style={styles.topName}>{topThree[1].name}</Text>
-								<Text style={styles.topStars}>⭐ {topThree[1].stars}</Text>
-							</View>
-						) : (
-							<View style={styles.topItem}>
-								<Text style={styles.topPosition}>--</Text>
-								<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
-							</View>
-						)}
-
-						{/* #1 */}
-						{topThree[0] ? (
-							<View style={styles.topItemCenter}>
-								<Text style={styles.crownIcon}>👑</Text>
-								<Image
-									source={topThree[0].avatar}
-									style={styles.topAvatarLg}
-								/>
-								<Text style={styles.topPosition}>1</Text>
-								<Text style={styles.topName}>{topThree[0].name}</Text>
-								<Text style={styles.topStars}>⭐ {topThree[0].stars}</Text>
-							</View>
-						) : (
-							<View style={styles.topItemCenter}>
-								<Text style={styles.topPosition}>--</Text>
-								<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
-							</View>
-						)}
-
-						{/* #3 */}
-						{topThree[2] ? (
-							<View style={styles.topItem}>
-								<Image
-									source={topThree[2].avatar}
-									style={styles.topAvatarSm}
-								/>
-								<Text style={styles.topPosition}>3</Text>
-								<Text style={styles.topName}>{topThree[2].name}</Text>
-								<Text style={styles.topStars}>⭐ {topThree[2].stars}</Text>
-							</View>
-						) : (
-							<View style={styles.topItem}>
-								<Text style={styles.topPosition}>--</Text>
-								<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
-							</View>
+						{[1, 0, 2].map(i =>
+							topThree[i] ? (
+								<View
+									key={topThree[i].id}
+									style={i === 0 ? styles.topItemCenter : styles.topItem}
+								>
+									{i === 0 && <Text style={styles.crownIcon}>👑</Text>}
+									<Image
+										source={topThree[i].avatar}
+										style={i === 0 ? styles.topAvatarLg : styles.topAvatarSm}
+									/>
+									<Text style={styles.topPosition}>{i + 1}</Text>
+									<Text style={styles.topName}>{topThree[i].name}</Text>
+									<Text style={styles.topStars}>⭐ {topThree[i].stars}</Text>
+								</View>
+							) : (
+								<View
+									key={i}
+									style={i === 0 ? styles.topItemCenter : styles.topItem}
+								>
+									<Text style={styles.topPosition}>--</Text>
+									<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
+								</View>
+							)
 						)}
 					</View>
 				</View>
 
-				{/* Остальные */}
 				<View style={styles.restContainer}>
 					<FlatList
 						data={rest}
-						keyExtractor={item => item.id}
+						keyExtractor={item => item.id?.toString()}
 						renderItem={({ item }) => {
-							const isMe = currentUserId ? item.id === currentUserId : false
+							const isMe = currentUserId === item.id
 							return (
 								<View style={[styles.listItem, isMe && styles.meRow]}>
 									<Text style={styles.listPosition}>{item.position}</Text>
@@ -240,20 +216,19 @@ export default function LeaderboardScreen() {
 					/>
 				</View>
 
-				{currentUser && !userVisible && !topThree.some(user => user.id === currentUserId) && (
+				{currentUser && !userVisible && !topThree.some(u => u.id === currentUserId) && (
 					<View style={styles.stickyFooter}>
 						<View style={[styles.listItem, styles.meRow]}>
-							{/* Находим его позицию */}
 							<Text style={styles.listPosition}>
 								{mappedData.findIndex(u => u.id === currentUserId) + 1 || '--'}
 							</Text>
 							<Image
-								source={selectedAvatar?.img || icons.parrot}
+								source={selectedAvatar}
 								style={styles.listAvatar}
 							/>
 							<Text style={styles.listName}>{currentUser.first_name}</Text>
 							<Text style={styles.listStars}>
-								⭐{' '}
+								⭐
 								{activeTab === 'week'
 									? currentUser.weekly_xp
 									: activeTab === 'month'
@@ -268,7 +243,6 @@ export default function LeaderboardScreen() {
 	)
 }
 
-// ----- Стили из вашего примера (без изменений) ------
 const styles = StyleSheet.create({
 	safeArea: {
 		flex: 1,
@@ -281,7 +255,7 @@ const styles = StyleSheet.create({
 	headerContainer: {
 		flexDirection: 'row',
 		alignItems: 'center',
-		justifyContent: 'space-between', // чтобы текст по центру, иконки с краёв
+		justifyContent: 'space-between',
 		paddingHorizontal: 16,
 		paddingVertical: 8,
 		marginTop: 10,
@@ -291,8 +265,8 @@ const styles = StyleSheet.create({
 		alignItems: 'flex-end',
 	},
 	headerTitle: {
-		flex: 1, // позволяет занять всю оставшуюся ширину
-		textAlign: 'center', // выравниваем текст по центру
+		flex: 1,
+		textAlign: 'center',
 		color: '#fff',
 		fontSize: 22,
 		fontWeight: 'bold',
@@ -331,12 +305,8 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-around',
 	},
-	topItem: {
-		alignItems: 'center',
-	},
-	topItemCenter: {
-		alignItems: 'center',
-	},
+	topItem: { alignItems: 'center' },
+	topItemCenter: { alignItems: 'center' },
 	crownIcon: {
 		position: 'absolute',
 		top: -24,
@@ -379,7 +349,6 @@ const styles = StyleSheet.create({
 		borderTopRightRadius: 20,
 		paddingTop: 8,
 	},
-
 	listItem: {
 		backgroundColor: '#fff',
 		marginHorizontal: 16,
@@ -417,9 +386,7 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: '#697CFF',
 	},
-	meRow: {
-		backgroundColor: '#dceeff',
-	},
+	meRow: { backgroundColor: '#dceeff' },
 	stickyFooter: {
 		position: 'absolute',
 		left: 0,
