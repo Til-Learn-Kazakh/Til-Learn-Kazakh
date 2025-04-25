@@ -1,11 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
+	Linking,
+	Modal,
 	SafeAreaView,
 	ScrollView,
 	StyleSheet,
 	Switch,
 	Text,
+	TextInput,
 	TouchableOpacity,
 	View,
 } from 'react-native'
@@ -27,6 +30,19 @@ import { profileService } from '../services/settings.service'
 export default function SettingsScreen() {
 	const navigation = useNavigation<NavigationProp<any>>()
 	const queryClient = useQueryClient()
+	const [showConfirmModal, setShowConfirmModal] = useState(false)
+	const [mathInput, setMathInput] = useState('')
+	const [mathProblem, setMathProblem] = useState({ question: '', answer: '' })
+	const [showLogoutModal, setShowLogoutModal] = useState(false)
+
+	const generateMathProblem = () => {
+		const a = Math.floor(Math.random() * 10) + 1
+		const b = Math.floor(Math.random() * 10) + 1
+		setMathProblem({ question: `${a} + ${b}`, answer: (a + b).toString() })
+		setMathInput('')
+		setShowConfirmModal(true)
+	}
+
 	const { t, i18n } = useTranslation()
 	const currentLanguageCode = i18n.language
 
@@ -50,7 +66,19 @@ export default function SettingsScreen() {
 		},
 	})
 
-	if (isPending) {
+	const { mutate: logout, isPending: isLoggingOut } = useMutation({
+		mutationFn: () => authService.logout(),
+		onSuccess: () => {
+			queryClient.setQueryData([CURRENT_USER_QUERY_KEY], null)
+			setShowLogoutModal(false)
+		},
+		onError: () => {
+			toast.error('Logout failed. Try again.')
+			setShowLogoutModal(false)
+		},
+	})
+
+	if (isPending || isLoggingOut) {
 		return <LoadingUi />
 	}
 
@@ -203,9 +231,7 @@ export default function SettingsScreen() {
 							<View style={[styles.rowWrapper, styles.rowFirst]}>
 								<TouchableOpacity
 									style={styles.row}
-									onPress={() => {
-										/* link to Discord */
-									}}
+									onPress={() => Linking.openURL('https://discord.gg/Pn9CpZ9W')}
 								>
 									<View style={[styles.rowIcon, { backgroundColor: '#5865F2' }]}>
 										<FeatherIcon
@@ -228,9 +254,11 @@ export default function SettingsScreen() {
 							<View style={styles.rowWrapper}>
 								<TouchableOpacity
 									style={styles.row}
-									onPress={() => {
-										/* link to Instagram */
-									}}
+									onPress={() =>
+										Linking.openURL(
+											'https://www.instagram.com/qazaqtil.app?igsh=MWZ2NGIxOHU3Mm9obg%3D%3D&utm_source=qr'
+										)
+									}
 								>
 									<View style={[styles.rowIcon, { backgroundColor: '#E1306C' }]}>
 										<FeatherIcon
@@ -253,9 +281,7 @@ export default function SettingsScreen() {
 							<View style={styles.rowWrapper}>
 								<TouchableOpacity
 									style={styles.row}
-									onPress={() => {
-										/* link to Telegram */
-									}}
+									onPress={() => Linking.openURL('https://t.me/qazaqti1')}
 								>
 									<View style={[styles.rowIcon, { backgroundColor: '#0088CC' }]}>
 										<FeatherIcon
@@ -306,38 +332,104 @@ export default function SettingsScreen() {
 						</View>
 					</View>
 
-					{/* ============ Низ экрана: условия + Выйти + Удалить аккаунт ============ */}
 					<View style={{ marginTop: 40, alignItems: 'center' }}>
 						<TouchableOpacity
 							style={styles.logoutButton}
-							onPress={async () => {
-								await authService.logout()
-								queryClient.setQueryData([CURRENT_USER_QUERY_KEY], null)
-							}}
+							onPress={() => setShowLogoutModal(true)}
 						>
 							<Text style={styles.logoutButtonText}>{t('SETTINGS.LOGOUT')}</Text>
 						</TouchableOpacity>
 
 						<View style={styles.legalLinksContainer}>
-							<TouchableOpacity onPress={() => console.log('Переход на Terms')}>
-								<Text style={styles.legalLink}>{t('SETTINGS.TERMS')}</Text>
-							</TouchableOpacity>
-							<Text style={styles.legalDivider}>{t('SETTINGS.AND')}</Text>
-							<TouchableOpacity onPress={() => console.log('Переход на Privacy')}>
-								<Text style={styles.legalLink}>{t('SETTINGS.PRIVACY')}</Text>
+							<TouchableOpacity
+								onPress={() =>
+									Linking.openURL(
+										'https://www.termsfeed.com/live/1def3276-b263-4795-9f29-89898206ae03'
+									)
+								}
+							>
+								<Text style={styles.legalLink}>
+									{t('SETTINGS.TERMS')} {t('SETTINGS.AND')} {t('SETTINGS.PRIVACY')}
+								</Text>
 							</TouchableOpacity>
 						</View>
 
-						<TouchableOpacity
-							onPress={async () => {
-								await deleteProfile()
-								await AsyncStorage.removeItem('hasSeenOnboarding')
-								// handle delete account
-							}}
-						>
+						<TouchableOpacity onPress={generateMathProblem}>
 							<Text style={styles.deleteAccountText}>{t('SETTINGS.DELETE_ACCOUNT')}</Text>
 						</TouchableOpacity>
+						<Text style={styles.developedBy}>Developed by Bolatbek Ermekov</Text>
 					</View>
+					<Modal
+						transparent
+						visible={showConfirmModal}
+						animationType='fade'
+						onRequestClose={() => setShowConfirmModal(false)}
+					>
+						<View style={styles.modalOverlay}>
+							<View style={styles.modalContent}>
+								<Text style={styles.modalTitle}>😇 Just one step!</Text>
+								<Text style={styles.modalText}>Please solve this to confirm:</Text>
+								<Text style={styles.modalMath}>{mathProblem.question} = ?</Text>
+								<TextInput
+									style={styles.modalInput}
+									value={mathInput}
+									onChangeText={setMathInput}
+									keyboardType='numeric'
+									placeholder='Your answer'
+								/>
+								<View style={styles.modalButtons}>
+									<TouchableOpacity
+										style={styles.modalButtonCancel}
+										onPress={() => setShowConfirmModal(false)}
+									>
+										<Text style={{ color: '#555' }}>Cancel</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={styles.modalButtonConfirm}
+										onPress={async () => {
+											if (mathInput.trim() === mathProblem.answer) {
+												await deleteProfile()
+												await AsyncStorage.removeItem('hasSeenOnboarding')
+												setShowConfirmModal(false)
+											} else {
+												toast.error('Wrong answer 😢')
+											}
+										}}
+									>
+										<Text style={{ color: '#fff' }}>Confirm</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</View>
+					</Modal>
+
+					<Modal
+						transparent
+						visible={showLogoutModal}
+						animationType='fade'
+						onRequestClose={() => setShowLogoutModal(false)}
+					>
+						<View style={styles.logoutModalOverlay}>
+							<View style={styles.logoutModalContent}>
+								<Text style={styles.logoutModalTitle}>🚪 Log out</Text>
+								<Text style={styles.logoutModalText}>Are you sure you want to log out?</Text>
+								<View style={styles.logoutModalButtons}>
+									<TouchableOpacity
+										style={styles.logoutModalButtonCancel}
+										onPress={() => setShowLogoutModal(false)}
+									>
+										<Text style={styles.logoutModalCancelText}>Cancel</Text>
+									</TouchableOpacity>
+									<TouchableOpacity
+										style={styles.logoutModalButtonConfirm}
+										onPress={() => logout()}
+									>
+										<Text style={styles.logoutModalConfirmText}>Log out</Text>
+									</TouchableOpacity>
+								</View>
+							</View>
+						</View>
+					</Modal>
 				</ScrollView>
 			</View>
 		</SafeAreaView>
@@ -484,5 +576,125 @@ const styles = StyleSheet.create({
 		color: '#FF3B30',
 		fontWeight: '500',
 		marginTop: 10,
+	},
+	developedBy: {
+		fontSize: 13,
+		color: '#A0A0A0',
+		textAlign: 'center',
+		marginTop: 16,
+		fontStyle: 'italic',
+	},
+
+	modalOverlay: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	},
+	modalContent: {
+		backgroundColor: '#fff',
+		width: '80%',
+		borderRadius: 10,
+		padding: 20,
+		alignItems: 'center',
+	},
+	modalTitle: {
+		fontSize: 18,
+		fontWeight: '700',
+		marginBottom: 10,
+	},
+	modalText: {
+		fontSize: 14,
+		color: '#444',
+	},
+	modalMath: {
+		fontSize: 20,
+		fontWeight: '600',
+		marginVertical: 10,
+	},
+	modalInput: {
+		borderWidth: 1,
+		borderColor: '#ccc',
+		width: '100%',
+		padding: 10,
+		borderRadius: 6,
+		textAlign: 'center',
+		marginBottom: 15,
+	},
+	modalButtons: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: '100%',
+	},
+	modalButtonCancel: {
+		padding: 10,
+		borderRadius: 6,
+		backgroundColor: '#eee',
+		flex: 1,
+		marginRight: 5,
+		alignItems: 'center',
+	},
+	modalButtonConfirm: {
+		padding: 10,
+		borderRadius: 6,
+		backgroundColor: '#3B82F6',
+		flex: 1,
+		marginLeft: 5,
+		alignItems: 'center',
+	},
+	logoutModalOverlay: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		backgroundColor: 'rgba(0, 0, 0, 0.5)',
+	},
+	logoutModalContent: {
+		backgroundColor: '#fff',
+		width: '85%',
+		borderRadius: 12,
+		padding: 24,
+		alignItems: 'center',
+	},
+	logoutModalTitle: {
+		fontSize: 20,
+		fontWeight: '700',
+		marginBottom: 12,
+	},
+	logoutModalText: {
+		fontSize: 15,
+		color: '#444',
+		textAlign: 'center',
+		marginBottom: 20,
+	},
+	logoutModalButtons: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		width: '100%',
+	},
+	logoutModalButtonCancel: {
+		flex: 1,
+		backgroundColor: '#F3F4F6',
+		paddingVertical: 12,
+		borderRadius: 6,
+		marginRight: 6,
+		alignItems: 'center',
+	},
+	logoutModalButtonConfirm: {
+		flex: 1,
+		backgroundColor: '#3B82F6',
+		paddingVertical: 12,
+		borderRadius: 6,
+		marginLeft: 6,
+		alignItems: 'center',
+	},
+	logoutModalCancelText: {
+		color: '#374151',
+		fontSize: 16,
+		fontWeight: '500',
+	},
+	logoutModalConfirmText: {
+		color: '#fff',
+		fontSize: 16,
+		fontWeight: '600',
 	},
 })
