@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -112,6 +113,15 @@ func (s *AnalyticsService) UpdateStats(userID, dateStr string, correct, attempts
 
 	monthly := stats.MonthlyStats[monthID]
 	s.updateMonthlyStats(&monthly, correct, attempts, mistakes, committedTime, lessons, xp)
+
+	// Подсчёт количества streak-дней за месяц
+	streakCount := 0
+	for dateKey := range stats.DailyStats {
+		if strings.HasPrefix(dateKey, parsedDate.Format("2006-01")) {
+			streakCount++
+		}
+	}
+	monthly.Streak = streakCount
 	stats.MonthlyStats[monthID] = monthly
 
 	yearly := stats.YearlyStats[yearID]
