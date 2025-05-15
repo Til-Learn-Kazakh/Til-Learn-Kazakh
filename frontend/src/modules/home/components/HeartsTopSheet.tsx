@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
 		marginHorizontal: 7,
 	},
 	topSheetText: {
-		fontSize: 25,
+		fontSize: 22,
 		marginBottom: 16,
 		fontWeight: 'bold',
 		color: '#222D39',

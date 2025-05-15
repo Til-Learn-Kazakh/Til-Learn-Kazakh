@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
@@ -52,7 +53,7 @@ const Home = ({ route }: { route: any }) => {
 	}
 
 	return (
-		<View style={styles.container}>
+		<SafeAreaView style={styles.container}>
 			{/* Шапка */}
 			<View style={styles.header}>
 				<View style={styles.headerRow}>
@@ -110,7 +111,10 @@ const Home = ({ route }: { route: any }) => {
 			)}
 
 			{/* Список уровней и уроков */}
-			<ScrollView contentContainerStyle={styles.scrollViewContainer}>
+			<ScrollView
+				contentContainerStyle={styles.scrollViewContainer}
+				style={{ flex: 1 }}
+			>
 				{levels?.map((level: any) => (
 					<View key={level.id}>
 						{/* Карточка секции (уровня) */}
@@ -166,7 +170,7 @@ const Home = ({ route }: { route: any }) => {
 			</ScrollView>
 
 			<RefillBottomSheet bottomSheetRef={refillBottomSheetRef} />
-		</View>
+		</SafeAreaView>
 	)
 }
 
@@ -183,7 +187,7 @@ const styles = StyleSheet.create({
 		borderBottomLeftRadius: 16,
 		borderBottomRightRadius: 16,
 		alignItems: 'center',
-		paddingTop: 60,
+		paddingTop: 30,
 	},
 	headerRow: {
 		flexDirection: 'row',
@@ -209,6 +213,7 @@ const styles = StyleSheet.create({
 	scrollViewContainer: {
 		paddingVertical: 20,
 		paddingHorizontal: 16,
+		paddingBottom: 60,
 	},
 	sectionCard: {
 		backgroundColor: '#f5f5f5',

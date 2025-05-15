@@ -1,8 +1,8 @@
 {
 	"expo": {
 		"name": "Diploma",
-		"slug": "Diploma",
 		"version": "1.0.0",
+		"sdkVersion": "53.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/barys1.png",
 		"userInterfaceStyle": "light",

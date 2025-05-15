@@ -3,7 +3,6 @@ import { I18nextProvider } from 'react-i18next'
 import { StatusBar } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { createNotifications } from 'react-native-notificated'
-import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -20,13 +19,17 @@ import { PreferencesProvider } from './src/modules/settings/hooks/preferences.co
 
 const Stack = createNativeStackNavigator()
 const { NotificationsProvider } = createNotifications()
-const queryClient = new QueryClient() // Создаем QueryClient здесь
 
 const Main: React.FC = () => {
 	const { data: currentUser, isPending } = useCurrentUser()
+
+
 	const [isI18nReady, setIsI18nReady] = useState(false)
 	const navigationRef = useRef<NavigationContainerRef<{}>>(null)
 
+	useEffect(() => {
+		console.log('CURRENT USER:', currentUser)
+	}, [currentUser])
 	useEffect(() => {
 		const init = async () => {
 			await initI18n()
@@ -53,39 +56,37 @@ const Main: React.FC = () => {
 			<I18nextProvider i18n={i18n}>
 				<NotificationsProvider>
 					<PreferencesProvider>
-						<QueryClientProvider client={queryClient}>
-							<NavigationContainer ref={navigationRef}>
-								<StatusBar
-									barStyle='dark-content'
-									backgroundColor='#fff'
-								/>
-								<BottomSheetProvider>
-									<Stack.Navigator
-										screenOptions={{
-											headerShown: false,
-										}}
-									>
-										{currentUser ? (
-											<Stack.Screen
-												name='AppStack'
-												component={BottomTabNavigation}
-												options={{ headerShown: false }}
-												initialParams={{ currentUser }}
-											/>
-										) : (
-											// Если пользователя нет, показываем AuthStack
-											<Stack.Screen
-												name='AuthStack'
-												component={AuthStackScreen}
-												options={{ headerShown: false }}
-											/>
-										)}
-									</Stack.Navigator>
-								</BottomSheetProvider>
+						<NavigationContainer ref={navigationRef}>
+							<StatusBar
+								barStyle='dark-content'
+								backgroundColor='#fff'
+							/>
+							<BottomSheetProvider>
+								<Stack.Navigator
+									screenOptions={{
+										headerShown: false,
+									}}
+								>
+									{currentUser ? (
+										<Stack.Screen
+											name='AppStack'
+											component={BottomTabNavigation}
+											options={{ headerShown: false }}
+											initialParams={{ currentUser }}
+										/>
+									) : (
+										// Если пользователя нет, показываем AuthStack
+										<Stack.Screen
+											name='AuthStack'
+											component={AuthStackScreen}
+											options={{ headerShown: false }}
+										/>
+									)}
+								</Stack.Navigator>
+							</BottomSheetProvider>
 
-								{/* <Toast position='top' /> */}
-							</NavigationContainer>
-						</QueryClientProvider>
+							{/* <Toast position='top' /> */}
+						</NavigationContainer>
 					</PreferencesProvider>
 				</NotificationsProvider>
 			</I18nextProvider>
