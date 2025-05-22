@@ -8,6 +8,7 @@ import (
 	"diploma/src/modules/auth"
 	"diploma/src/modules/streak"
 	"diploma/src/utils"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math"
@@ -137,6 +138,13 @@ func (s *UserService) DeleteUser(userID string) error {
 		return err
 	}
 
+	_ = database.RedisClient.Del(
+		context.Background(),
+		"leaderboard:xp",
+		"leaderboard:weekly_xp",
+		"leaderboard:monthly_xp",
+	)
+
 	return nil
 }
 
@@ -201,13 +209,11 @@ func (s *UserService) UpdateUserAvatar(ctx context.Context, userID, avatar strin
 	filter := bson.M{"_id": objectID}
 	update := bson.M{
 		"$set": bson.M{
-			"avatar": avatar, // сохраняем строку
+			"avatar": avatar,
 		},
 	}
 
-	opts := options.FindOneAndUpdate().
-		SetReturnDocument(options.After)
-
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
 	result := s.Collection.FindOneAndUpdate(ctx, filter, update, opts)
 	if result.Err() != nil {
 		return nil, result.Err()
@@ -216,6 +222,36 @@ func (s *UserService) UpdateUserAvatar(ctx context.Context, userID, avatar strin
 	var updatedUser auth.User
 	if err := result.Decode(&updatedUser); err != nil {
 		return nil, err
+	}
+
+	cacheKeys := []string{"leaderboard:xp", "leaderboard:weekly_xp", "leaderboard:monthly_xp"}
+
+	for _, key := range cacheKeys {
+		cached, err := database.RedisClient.Get(ctx, key).Result()
+		if err != nil {
+			continue
+		}
+
+		var leaderboard []bson.M
+		if err := json.Unmarshal([]byte(cached), &leaderboard); err != nil {
+			continue
+		}
+
+		// Обновляем аватар пользователя
+		updated := false
+		for _, entry := range leaderboard {
+			if entry["_id"] == userID {
+				entry["avatar"] = avatar
+				updated = true
+				break
+			}
+		}
+
+		// Перезаписываем в Redis
+		if updated {
+			newData, _ := json.Marshal(leaderboard)
+			_ = database.RedisClient.Set(ctx, key, newData, 5*time.Minute).Err()
+		}
 	}
 
 	return &updatedUser, nil
@@ -504,6 +540,43 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 
 	cacheKey := fmt.Sprintf("user:achievements_progress:%s", user.ID.Hex())
 	_ = database.RedisClient.Del(context.Background(), cacheKey)
+
+	leaderboardKeys := []string{
+		"leaderboard:xp",
+		"leaderboard:weekly_xp",
+		"leaderboard:monthly_xp",
+	}
+
+	for _, key := range leaderboardKeys {
+		cached, err := database.RedisClient.Get(context.Background(), key).Result()
+		if err != nil {
+			continue
+		}
+
+		var leaderboard []bson.M
+		if err := json.Unmarshal([]byte(cached), &leaderboard); err != nil {
+			continue
+		}
+
+		updated := false
+		for _, entry := range leaderboard {
+			if entry["_id"] == user.ID.Hex() {
+				// Обновляем XP поля
+				entry["xp"] = user.XP
+				entry["weekly_xp"] = user.WeeklyXP
+				entry["monthly_xp"] = user.MonthlyXP
+				entry["avatar"] = user.Avatar
+				entry["first_name"] = user.FirstName
+				updated = true
+				break
+			}
+		}
+
+		if updated {
+			newData, _ := json.Marshal(leaderboard)
+			_ = database.RedisClient.Set(context.Background(), key, newData, 5*time.Minute).Err()
+		}
+	}
 
 	return user, unitXP, accuracy, nil
 }

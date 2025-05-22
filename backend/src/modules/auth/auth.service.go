@@ -134,6 +134,13 @@ func (s *AuthService) SignUp(dto SignUpDTO) (*User, error) {
 			return nil, err
 		}
 
+		_ = database.RedisClient.Del(
+			context.Background(),
+			"leaderboard:xp",
+			"leaderboard:weekly_xp",
+			"leaderboard:monthly_xp",
+		)
+
 		return newUser, nil
 	}
 
