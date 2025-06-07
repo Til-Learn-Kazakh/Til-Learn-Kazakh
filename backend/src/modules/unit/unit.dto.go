@@ -7,5 +7,6 @@ type CreateUnitDTO struct {
 }
 
 type UpdateUnitDTO struct {
-	Title string `json:"title,omitempty" validate:"omitempty"` // Обновленное название блока
+	Title        string               `json:"title,omitempty" validate:"omitempty"` // Обновленное название блока
+	Descriptions LocalizedDescription `json:"descriptions,omitempty"`
 }

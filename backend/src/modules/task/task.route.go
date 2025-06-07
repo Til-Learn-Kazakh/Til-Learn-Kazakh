@@ -6,6 +6,7 @@ func TaskRoutes(router *gin.RouterGroup, controller *TaskController) {
 	taskGroup := router.Group("/tasks")
 
 	taskGroup.POST("", controller.CreateTask)                        // Создание задачи
+	taskGroup.GET("", controller.GetAllTasks)                       // 🚀 Новый эндпоинт
 	taskGroup.GET("/unit/:unitID", controller.GetTasksByUnitID)      // Получение задач по UnitID
 	taskGroup.GET("/unit/:unitID/next-task", controller.GetNextTask) // Получение следующего задания
 	taskGroup.POST("/:taskID/check-answer", controller.CheckAnswer)  // Проверка ответа

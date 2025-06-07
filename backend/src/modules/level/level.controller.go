@@ -1,6 +1,7 @@
 package level
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,24 @@ func (ctrl *LevelController) CreateLevel(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, level)
+}
+func (ctrl *LevelController) UpdateLevel(c *gin.Context) {
+	levelID := c.Param("id")
+
+	var dto UpdateLevelDTO
+	if err := c.ShouldBindJSON(&dto); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	updatedLevel, err := ctrl.Service.UpdateLevel(levelID, dto)
+	if err != nil {
+		log.Println("UpdateLevel error:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update level"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updatedLevel)
 }
 
 func (ctrl *LevelController) GetAllLevels(c *gin.Context) {

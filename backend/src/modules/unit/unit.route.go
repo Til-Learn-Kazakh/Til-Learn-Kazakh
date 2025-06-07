@@ -5,8 +5,9 @@ import "github.com/gin-gonic/gin"
 func UnitRoutes(router *gin.RouterGroup, controller *UnitController) {
 	unitGroup := router.Group("/units")
 
-	unitGroup.POST("/", controller.CreateUnit)                        // Создание нового блока
+	unitGroup.POST("", controller.CreateUnit)                         // Создание нового блока
 	unitGroup.GET("/by-level/:levelID", controller.GetUnitsByLevelID) // Получение всех блоков по LevelID
 	unitGroup.PUT("/:unitID", controller.UpdateUnit)                  // Обновление блока
+	unitGroup.GET("", controller.GetAllUnits)                         // Получение всех блоков
 	unitGroup.DELETE("/:unitID", controller.DeleteUnit)               // Удаление блока
 }

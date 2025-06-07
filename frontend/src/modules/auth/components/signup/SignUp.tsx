@@ -16,7 +16,6 @@ import { toast } from '../../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY } from '../../hooks/user-current-user.hook'
 import { SignupDTO } from '../../models/auth-dto.types'
 import { authService } from '../../services/auth.service'
-import OAuth from '../OAuth/OAuth'
 
 import { SignupFormData, signupFormSchema } from './signup-form-types'
 
@@ -111,7 +110,7 @@ const SignUp = () => {
 						style={styles.signUpButton}
 						disabled={isPending}
 					/>
-					<OAuth />
+					{/* <OAuth /> */}
 					<TouchableOpacity
 						onPress={() => navigation.navigate('Login')}
 						style={styles.link}
@@ -122,7 +121,11 @@ const SignUp = () => {
 						</Text>
 					</TouchableOpacity>
 				</View>
-				<ReactNativeModal isVisible={showSuccessModal}>
+				<ReactNativeModal
+					isVisible={showSuccessModal}
+					testID='success-modal'
+					useNativeDriver={false}
+				>
 					<View style={styles.modal}>
 						<LottieView
 							style={{ height: 200, width: 300 }}
@@ -148,6 +151,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: '#fff',
+		paddingTop: 30,
 	},
 	innerContainer: {
 		flex: 1,

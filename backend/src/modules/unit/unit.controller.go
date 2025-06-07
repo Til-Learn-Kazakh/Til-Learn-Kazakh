@@ -53,6 +53,14 @@ func (ctrl *UnitController) GetUnitsByLevelID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, units)
 }
+func (uc *UnitController) GetAllUnits(c *gin.Context) {
+	units, err := uc.Service.GetAllUnits()
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, units)
+}
 
 func (ctrl *UnitController) UpdateUnit(c *gin.Context) {
 	unitIDHex := c.Param("unitID")

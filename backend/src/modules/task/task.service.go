@@ -45,11 +45,15 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO, imageFile multipart.File, i
 
 	var imagePath string
 	if imageFile != nil && imageHeader != nil {
+		log.Println("Saving image:", imageHeader.Filename)
 		imageService := services.NewImageService()
 		imagePath, err = imageService.SaveImage("tasks", imageFile, imageHeader)
 		if err != nil {
 			return nil, fmt.Errorf("failed to save image: %w", err)
 		}
+		log.Println("Saved image path:", imagePath)
+	} else {
+		log.Println("imageFile or imageHeader is nil, skipping image save")
 	}
 
 	var savedImageOptions []ImageOption
@@ -93,6 +97,7 @@ func (s *TaskService) CreateTask(dto *CreateTaskDTO, imageFile multipart.File, i
 		CreatedAt:              time.Now(),
 		UpdatedAt:              time.Now(),
 	}
+	log.Println("Final image path to store:", task.ImagePath)
 
 	_, err = s.Collection.InsertOne(context.Background(), task)
 	if err != nil {
@@ -222,6 +227,20 @@ func (s *TaskService) GetTaskByID(taskID primitive.ObjectID) (*Task, error) {
 	}
 
 	return &task, nil
+}
+
+func (s *TaskService) GetAllTasks() ([]Task, error) {
+	cursor, err := s.Collection.Find(context.Background(), bson.M{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch tasks: %w", err)
+	}
+	defer cursor.Close(context.Background())
+
+	var tasks []Task
+	if err := cursor.All(context.Background(), &tasks); err != nil {
+		return nil, fmt.Errorf("failed to parse tasks: %w", err)
+	}
+	return tasks, nil
 }
 
 func (s *TaskService) DeleteTask(taskID primitive.ObjectID) error {

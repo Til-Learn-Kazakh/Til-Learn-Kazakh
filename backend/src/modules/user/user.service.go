@@ -36,6 +36,23 @@ func NewUserService() *UserService {
 	}
 }
 
+func (s *UserService) GetAllUsers() ([]auth.User, error) {
+	ctx := context.Background()
+
+	cursor, err := s.Collection.Find(ctx, bson.M{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to find users: %w", err)
+	}
+	defer cursor.Close(ctx)
+
+	var users []auth.User
+	if err := cursor.All(ctx, &users); err != nil {
+		return nil, fmt.Errorf("failed to decode users: %w", err)
+	}
+
+	return users, nil
+}
+
 func (s *UserService) GetUserByID(userID string) (*auth.User, error) {
 	objectID, err := primitive.ObjectIDFromHex(userID)
 	if err != nil {

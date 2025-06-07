@@ -20,15 +20,11 @@ const ProfileScreen = () => {
 	const navigation = useNavigation<NavigationProp<any>>()
 
 	const { data: currentUser } = useCurrentUser()
-	const [selectedYearKey, setSelectedYearKey] = useState(() => new Date().getFullYear().toString())
+	const [selectedYearKey] = useState(() => new Date().getFullYear().toString())
 	const selectedAvatar = avatars.find(a => a.id === currentUser?.avatar)
 
 	// Данные по достижениям
-	const {
-		data: achievements,
-		isLoading: isLoadingAchievements,
-		isError: isAchievementsError,
-	} = useAchievementsProgress()
+	const { data: achievements, isLoading: isLoadingAchievements } = useAchievementsProgress()
 
 	// Данные по статистике
 	const { data: yearlyData } = useYearlyStats(selectedYearKey)
@@ -71,7 +67,7 @@ const ProfileScreen = () => {
 	// Подготовим первые 3 достижения, чтобы отобразить их иконки
 	const firstThree = achievements?.slice(0, 3) || []
 	// Сколько *осталось* вне первых трёх
-	const remainCount = achievements?.length || 0
+	const remainCount = achievements?.length - 3 || 0
 
 	// Для удобства
 	const topLeft = firstThree[0]
@@ -214,7 +210,7 @@ const ProfileScreen = () => {
 										<Text style={styles.moreText}>+{remainCount}</Text>
 									</View>
 								) : (
-									<View style={styles.placeholder} />
+									<></>
 								)}
 							</View>
 						</View>

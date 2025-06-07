@@ -14,7 +14,6 @@ import { toast } from '../../../../core/ui/toast'
 import { CURRENT_USER_QUERY_KEY } from '../../hooks/user-current-user.hook'
 import { LoginDTO } from '../../models/auth-dto.types'
 import { authService } from '../../services/auth.service'
-import OAuth from '../OAuth/OAuth'
 
 import { LoginFormData, loginFormSchema } from './login-form-types'
 
@@ -91,7 +90,7 @@ const Login = () => {
 						style={styles.loginButton}
 						disabled={isSubmitting}
 					/>
-					<OAuth />
+					{/* <OAuth /> */}
 					<TouchableOpacity
 						onPress={() => {
 							navigation.navigate('SignUp')
@@ -110,9 +109,20 @@ const Login = () => {
 }
 
 const styles = StyleSheet.create({
-	container: { flex: 1, backgroundColor: '#fff' },
-	innerContainer: { flex: 1, backgroundColor: '#fff' },
-	imageWrapper: { position: 'relative', width: '100%', height: 150 },
+	container: {
+		flex: 1,
+		backgroundColor: '#fff',
+		paddingTop: 30,
+	},
+	innerContainer: {
+		flex: 1,
+		backgroundColor: '#fff',
+	},
+	imageWrapper: {
+		position: 'relative',
+		width: '100%',
+		height: 150,
+	},
 	title: {
 		textAlign: 'center',
 		fontSize: 32,

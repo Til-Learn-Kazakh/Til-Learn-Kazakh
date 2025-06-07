@@ -10,6 +10,7 @@ export const useWeeklyLeaderboard = () => {
 	return useQuery({
 		queryKey: [WEEKLY_LEADERBOARD_QUERY_KEY],
 		queryFn: () => leaderboardService.getWeeklyLeaderboard(),
+		refetchOnMount: true,
 	})
 }
 
@@ -17,6 +18,7 @@ export const useMonthlyLeaderboard = () => {
 	return useQuery({
 		queryKey: [MONTHLY_LEADERBOARD_QUERY_KEY],
 		queryFn: () => leaderboardService.getMonthlyLeaderboard(),
+		refetchOnMount: true,
 	})
 }
 
@@ -24,5 +26,6 @@ export const useAllTimeLeaderboard = () => {
 	return useQuery({
 		queryKey: [ALL_TIME_LEADERBOARD_QUERY_KEY],
 		queryFn: () => leaderboardService.getAllTimeLeaderboard(),
+		refetchOnMount: true,
 	})
 }

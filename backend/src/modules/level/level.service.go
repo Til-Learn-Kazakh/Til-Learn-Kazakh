@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type LevelService struct {
@@ -40,6 +41,35 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 	}
 
 	return &level, nil
+}
+
+// Обновление уровня по ID
+func (s *LevelService) UpdateLevel(id string, dto UpdateLevelDTO) (*Level, error) {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid level ID: %w", err)
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"name":       dto.Name,
+			"updated_at": time.Now(),
+		},
+	}
+
+	result := s.Collection.FindOneAndUpdate(
+		context.Background(),
+		bson.M{"_id": objID},
+		update,
+		options.FindOneAndUpdate().SetReturnDocument(options.After),
+	)
+
+	var updated Level
+	if err := result.Decode(&updated); err != nil {
+		return nil, fmt.Errorf("failed to decode updated level: %w", err)
+	}
+
+	return &updated, nil
 }
 
 func (s *LevelService) GetAllLevels() ([]Level, error) {

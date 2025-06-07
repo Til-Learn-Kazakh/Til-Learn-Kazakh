@@ -53,58 +53,60 @@ export default function AchievementModalScreen() {
 
 	return (
 		<SafeAreaView style={styles.safeArea}>
-			{/* Modal Title */}
-			<Text style={styles.topLabel}>{t('ACHIEVEMENTS.MODAL.TITLE')}</Text>
+			<View style={{ flex: 1, paddingBottom: 80 }}>
+				{/* Modal Title */}
+				<Text style={styles.topLabel}>{t('ACHIEVEMENTS.MODAL.TITLE')}</Text>
 
-			{/* Content Container */}
-			<View style={styles.contentContainer}>
-				<Image
-					source={{ uri: `${imageserver}${image}` }}
-					style={styles.achievementImage}
-				/>
-				<Text style={styles.achievementTitle}>
-					{achievementMap[title]
-						? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[title]}.TITLE`)
-						: title}
-				</Text>
-				<Text style={styles.achievementDescription}>
-					{' '}
-					{achievementMap[description]
-						? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[description]}.DESCRIPTION`)
-						: description}
-				</Text>
-			</View>
+				{/* Content Container */}
+				<View style={styles.contentContainer}>
+					<Image
+						source={{ uri: `${imageserver}${image}` }}
+						style={styles.achievementImage}
+					/>
+					<Text style={styles.achievementTitle}>
+						{achievementMap[title]
+							? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[title]}.TITLE`)
+							: title}
+					</Text>
+					<Text style={styles.achievementDescription}>
+						{' '}
+						{achievementMap[description]
+							? t(`ACHIEVEMENTS.SCREEN.LIST.${achievementMap[description]}.DESCRIPTION`)
+							: description}
+					</Text>
+				</View>
 
-			{/* Footer */}
-			<View style={styles.footer}>
-				{rewardPending ? (
-					<TouchableOpacity
-						style={[styles.button, styles.claimButton]}
-						onPress={onClaim}
-						disabled={isClaiming}
-					>
-						<View style={styles.iconRow}>
-							<MaterialCommunityIcons
-								name='diamond-stone'
-								size={20}
-								color='#fff'
-								style={{ marginRight: 6 }}
-							/>
-							<Text style={styles.buttonText}>
-								{isClaiming
-									? t('ACHIEVEMENTS.MODAL.CLAIMING')
-									: t('ACHIEVEMENTS.MODAL.CLAIM', { reward: rewardPending.reward })}
-							</Text>
-						</View>
-					</TouchableOpacity>
-				) : (
-					<TouchableOpacity
-						style={styles.button}
-						onPress={onClose}
-					>
-						<Text style={styles.buttonText}>{t('ACHIEVEMENTS.MODAL.CLOSE')}</Text>
-					</TouchableOpacity>
-				)}
+				{/* Footer */}
+				<View style={styles.footer}>
+					{rewardPending ? (
+						<TouchableOpacity
+							style={[styles.button, styles.claimButton]}
+							onPress={onClaim}
+							disabled={isClaiming}
+						>
+							<View style={styles.iconRow}>
+								<MaterialCommunityIcons
+									name='diamond-stone'
+									size={20}
+									color='#fff'
+									style={{ marginRight: 6 }}
+								/>
+								<Text style={styles.buttonText}>
+									{isClaiming
+										? t('ACHIEVEMENTS.MODAL.CLAIMING')
+										: t('ACHIEVEMENTS.MODAL.CLAIM', { reward: rewardPending.reward })}
+								</Text>
+							</View>
+						</TouchableOpacity>
+					) : (
+						<TouchableOpacity
+							style={styles.button}
+							onPress={onClose}
+						>
+							<Text style={styles.buttonText}>{t('ACHIEVEMENTS.MODAL.CLOSE')}</Text>
+						</TouchableOpacity>
+					)}
+				</View>
 			</View>
 		</SafeAreaView>
 	)
@@ -148,9 +150,15 @@ const styles = StyleSheet.create({
 		marginBottom: 20,
 	},
 	footer: {
+		position: 'relative',
+		bottom: 0,
+		left: 0,
+		right: 0,
 		paddingHorizontal: 16,
-		paddingBottom: 20,
+		paddingBottom: 24,
+		backgroundColor: '#fff',
 	},
+
 	button: {
 		backgroundColor: '#007BFF',
 		borderRadius: 12,

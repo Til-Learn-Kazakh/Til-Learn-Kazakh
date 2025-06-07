@@ -2,6 +2,7 @@ package user
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,17 @@ func NewUserController(service *UserService) *UserController {
 	return &UserController{
 		Service: service,
 	}
+}
+
+func (ctrl *UserController) GetAllUsers(c *gin.Context) {
+	users, err := ctrl.Service.GetAllUsers()
+	if err != nil {
+		log.Println("Error fetching users:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
 }
 
 func (ctrl *UserController) GetCurrentUser(c *gin.Context) {

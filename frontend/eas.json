@@ -1,15 +1,19 @@
 {
-  "build": {
-    "preview": {
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    "production": {
-      "android": {
-        "buildType": "app-bundle",
-        "distribution": "store"
-      }
-    }
-  }
+	"cli": {
+		"version": ">= 3.13.0",
+		"appVersionSource": "local"
+	},
+	"build": {
+		"preview": {
+			"android": {
+				"buildType": "apk"
+			}
+		},
+		"production": {
+			"android": {
+				"buildType": "app-bundle",
+				"distribution": "store"
+			}
+		}
+	}
 }

@@ -29,21 +29,47 @@ class AuthService {
 	}
 
 	async signup(dto: SignupDTO, config?: AxiosRequestConfig) {
-		await fetchAndSetCSRFToken()
-		return axiosBase
-			.post<{ access_token: string; refresh_token: string }>(`${this.url}/register`, dto, config)
-			.then(async resp => {
-				const { access_token, refresh_token } = resp.data
+		try {
+			console.log('[signup] Начало регистрации')
+			console.log('[signup] DTO:', dto)
 
-				if (access_token) await SecureStore.setItemAsync('token', access_token)
-				if (refresh_token) await SecureStore.setItemAsync('refresh_token', refresh_token)
+			await fetchAndSetCSRFToken()
+			console.log('[signup] CSRF токен успешно установлен')
 
-				return resp.data
-			})
-			.catch(e => {
-				console.error('Ошибка при регистрации:', e)
-				throw e
-			})
+			const response = await axiosBase.post<{ access_token: string; refresh_token: string }>(
+				`${this.url}/register`,
+				dto,
+				config
+			)
+
+			console.log('[signup] Ответ от сервера:', response.status, response.data)
+
+			const { access_token, refresh_token } = response.data
+
+			if (access_token) {
+				await SecureStore.setItemAsync('token', access_token)
+				console.log('[signup] access_token сохранён в SecureStore')
+			}
+
+			if (refresh_token) {
+				await SecureStore.setItemAsync('refresh_token', refresh_token)
+				console.log('[signup] refresh_token сохранён в SecureStore')
+			}
+
+			return response.data
+		} catch (e: any) {
+			if (e.response) {
+				// Ответ от сервера с ошибкой
+				console.error('[signup] Ошибка от сервера:', e.response.status, e.response.data)
+			} else if (e.request) {
+				// Запрос был отправлен, но ответ не получен
+				console.error('[signup] Запрос был отправлен, но ответ не получен:', e.request)
+			} else {
+				// Ошибка при настройке запроса
+				console.error('[signup] Ошибка при настройке запроса:', e.message)
+			}
+			throw e
+		}
 	}
 
 	async logout() {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
 	FlatList,
@@ -12,7 +12,8 @@ import {
 import Svg, { Path } from 'react-native-svg'
 
 import { Ionicons } from '@expo/vector-icons'
-import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { icons } from '../../../core/constants'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
@@ -48,6 +49,8 @@ export default function LeaderboardScreen() {
 	const { t } = useTranslation()
 	const [activeTab, setActiveTab] = useState<'week' | 'month' | 'All Time'>('week')
 	const navigation = useNavigation<NavigationProp<any>>()
+	const queryClient = useQueryClient()
+	const [isRefreshing, setIsRefreshing] = useState(false)
 
 	const { data: currentUser } = useCurrentUser()
 	const currentUserId = currentUser?.id
@@ -57,6 +60,21 @@ export default function LeaderboardScreen() {
 	const { data: weeklyData, isLoading: isWeek, error: weekErr } = useWeeklyLeaderboard()
 	const { data: monthlyData, isLoading: isMonth, error: monthErr } = useMonthlyLeaderboard()
 	const { data: allTimeData, isLoading: isAll, error: allErr } = useAllTimeLeaderboard()
+
+	useFocusEffect(
+		useCallback(() => {
+			queryClient.invalidateQueries({ queryKey: ['weeklyLeaderboard'] })
+			queryClient.invalidateQueries({ queryKey: ['monthlyLeaderboard'] })
+			queryClient.invalidateQueries({ queryKey: ['allTimeLeaderboard'] })
+		}, [])
+	)
+	const handleRefresh = async () => {
+		setIsRefreshing(true)
+		await queryClient.invalidateQueries({ queryKey: ['weeklyLeaderboard'] })
+		await queryClient.invalidateQueries({ queryKey: ['monthlyLeaderboard'] })
+		await queryClient.invalidateQueries({ queryKey: ['allTimeLeaderboard'] })
+		setIsRefreshing(false)
+	}
 
 	let rawData: any[] = []
 	let isLoading = false
@@ -95,7 +113,6 @@ export default function LeaderboardScreen() {
 		setUserVisible(visible)
 	}).current
 	const viewabilityConfig = { itemVisiblePercentThreshold: 50 }
-
 
 	if (isLoading) return <LoadingUi />
 
@@ -150,6 +167,34 @@ export default function LeaderboardScreen() {
 					))}
 				</View>
 
+				<View style={styles.topThreeWrapper}>
+					{[1, 0, 2].map(i =>
+						topThree[i] ? (
+							<View
+								key={topThree[i].id}
+								style={i === 0 ? styles.topItemCenter : styles.topItem}
+							>
+								{i === 0 && <Text style={styles.crownIcon}>👑</Text>}
+								<Image
+									source={topThree[i].avatar}
+									style={i === 0 ? styles.topAvatarLg : styles.topAvatarSm}
+								/>
+								<Text style={styles.topPosition}>{i + 1}</Text>
+								<Text style={styles.topName}>{topThree[i].name}</Text>
+								<Text style={styles.topStars}>⭐ {topThree[i].stars}</Text>
+							</View>
+						) : (
+							<View
+								key={i}
+								style={i === 0 ? styles.topItemCenter : styles.topItem}
+							>
+								<Text style={styles.topPosition}>--</Text>
+								<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
+							</View>
+						)
+					)}
+				</View>
+
 				<View style={styles.waveContainer}>
 					<Svg
 						width='100%'
@@ -162,40 +207,14 @@ export default function LeaderboardScreen() {
 							d='M0,96L30,85.3C60,75,120,53,180,64C240,75,300,117,360,144C420,171,480,181,540,170.7C600,160,660,128,720,138.7C780,149,840,203,900,213.3C960,224,1020,192,1080,192C1140,192,1200,224,1260,208C1320,192,1380,128,1410,96L1440,64L1440,320L0,320Z'
 						/>
 					</Svg>
-
-					<View style={styles.topThreeWrapper}>
-						{[1, 0, 2].map(i =>
-							topThree[i] ? (
-								<View
-									key={topThree[i].id}
-									style={i === 0 ? styles.topItemCenter : styles.topItem}
-								>
-									{i === 0 && <Text style={styles.crownIcon}>👑</Text>}
-									<Image
-										source={topThree[i].avatar}
-										style={i === 0 ? styles.topAvatarLg : styles.topAvatarSm}
-									/>
-									<Text style={styles.topPosition}>{i + 1}</Text>
-									<Text style={styles.topName}>{topThree[i].name}</Text>
-									<Text style={styles.topStars}>⭐ {topThree[i].stars}</Text>
-								</View>
-							) : (
-								<View
-									key={i}
-									style={i === 0 ? styles.topItemCenter : styles.topItem}
-								>
-									<Text style={styles.topPosition}>--</Text>
-									<Text style={styles.topName}>{t('LEADERBOARD.NO_USER')}</Text>
-								</View>
-							)
-						)}
-					</View>
 				</View>
 
 				<View style={styles.restContainer}>
 					<FlatList
 						data={rest}
 						keyExtractor={item => item.id?.toString()}
+						refreshing={isRefreshing}
+						onRefresh={handleRefresh}
 						renderItem={({ item }) => {
 							const isMe = currentUserId === item.id
 							return (
@@ -274,37 +293,44 @@ const styles = StyleSheet.create({
 	},
 	tabsContainer: {
 		flexDirection: 'row',
-		justifyContent: 'center',
+		justifyContent: 'space-around',
+		marginTop: 12,
+		paddingHorizontal: 16,
 	},
+
 	tabButton: {
+		flex: 1,
+		alignItems: 'center',
 		borderRadius: 20,
 		borderWidth: 1,
 		borderColor: '#fff',
 		paddingVertical: 6,
-		paddingHorizontal: 16,
 		marginHorizontal: 4,
 	},
+
 	tabButtonActive: {
 		backgroundColor: '#fff',
 	},
+
 	tabText: {
 		color: '#fff',
 		fontWeight: '600',
 	},
+
 	tabTextActive: {
 		color: '#697CFF',
 	},
-	waveContainer: {
-		width: '100%',
-		height: 120,
-	},
+
 	topThreeWrapper: {
-		position: 'absolute',
-		bottom: -40,
-		width: '100%',
 		flexDirection: 'row',
 		justifyContent: 'space-around',
+		marginTop: 36,
 	},
+
+	waveContainer: {
+		width: '100%',
+	},
+
 	topItem: { alignItems: 'center' },
 	topItemCenter: { alignItems: 'center' },
 	crownIcon: {

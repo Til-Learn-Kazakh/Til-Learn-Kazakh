@@ -11,6 +11,7 @@ func UserRoutes(router *gin.RouterGroup, controller *UserController) {
 	userGroup.GET("/current", controller.GetCurrentUser)
 	userGroup.POST("/refill-hearts", controller.RefillHearts)
 	userGroup.POST("/refill-hearts-with-crystals", controller.RefillHeartsWithCrystals)
+	routerGroup.GET("/all", controller.GetAllUsers)
 	routerGroup.POST("/calculate-xp", controller.UpdateXP)
 	routerGroup.PUT("/update", controller.UpdateUserProfileHandler)
 	routerGroup.PUT("/change-password", controller.ChangePasswordHandler)

@@ -25,8 +25,8 @@ type RateLimiter struct {
 func NewRateLimiter() *RateLimiter {
 	rl := &RateLimiter{
 		visitors: make(map[string]*visitor),
-		rate:     15,
-		burst:    5,
+		rate:     5,
+		burst:    3,
 	}
 	go rl.cleanupVisitors()
 	return rl

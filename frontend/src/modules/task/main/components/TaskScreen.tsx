@@ -4,9 +4,10 @@ import { Text, View } from 'react-native'
 
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { LoadingUi } from '../../../../core/ui/LoadingUi'
-import { useCurrentUser } from '../../../auth/hooks/user-current-user.hook'
+import { CURRENT_USER_QUERY_KEY, useCurrentUser } from '../../../auth/hooks/user-current-user.hook'
 import { useLevels } from '../../../home/hooks/home.hooks'
 import FillBlank from '../../fill-blank/components/FillBlank'
 import ReadRespond from '../../read-respond/components/ReadRespond'
@@ -27,6 +28,7 @@ const TaskScreen = ({ route }: any) => {
 	const navigation = useNavigation<NavigationProp<any>>()
 	const { data: currentUser } = useCurrentUser()
 	const hearts = currentUser?.hearts || 0
+	const queryClient = useQueryClient()
 
 	const [isFinished, setIsFinished] = useState(false)
 	const { t, i18n } = useTranslation()
@@ -83,6 +85,10 @@ const TaskScreen = ({ route }: any) => {
 					mistakes,
 					maxCombo
 				)
+				await queryClient.invalidateQueries({ queryKey: ['weeklyLeaderboard'] })
+				await queryClient.invalidateQueries({ queryKey: ['monthlyLeaderboard'] })
+				await queryClient.invalidateQueries({ queryKey: ['allTimeLeaderboard'] })
+				await queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
 
 				navigation.reset({
 					index: 0,

@@ -13,6 +13,9 @@ const App: React.FC = () => {
 			new QueryClient({
 				defaultOptions: {
 					queries: {
+						staleTime: 0, 
+						refetchOnMount: true, 
+						refetchOnReconnect: true,
 						refetchOnWindowFocus: false,
 						retry: false,
 					},
@@ -20,6 +23,7 @@ const App: React.FC = () => {
 			}),
 		[]
 	)
+
 	return (
 		<QueryClientProvider client={queryClient}>
 			<ApplicationProvider

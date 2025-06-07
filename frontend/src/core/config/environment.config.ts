@@ -2,8 +2,8 @@
 // apiUrl: 'http://172.20.10.2:4000/api/v1',
 
 const config = {
-	apiUrl: 'http://192.168.0.15:4000/api/v1',
-	baseUrl: 'http://192.168.0.15:4000',
+	apiUrl: 'http://192.168.0.17:4000/api/v1',
+	baseUrl: 'http://192.168.0.17:4000',
 }
 
 // const config = {

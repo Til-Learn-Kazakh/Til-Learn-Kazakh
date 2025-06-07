@@ -32,6 +32,7 @@ func main() {
 	}
 
 	CORS_ORIGIN := os.Getenv("CORS_ORIGIN")
+	CORS_WEB := os.Getenv("CORS_WEB")
 
 	port := os.Getenv("PORT")
 
@@ -76,7 +77,7 @@ func main() {
 
 	router := gin.New()
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{CORS_ORIGIN, "http://192.168.0.12:19000"},
+		AllowOrigins:     []string{CORS_ORIGIN, CORS_WEB},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Content-Type", "Authorization", "X-CSRF-Token"},
 		AllowCredentials: true,
@@ -90,7 +91,6 @@ func main() {
 
 	router.Use(middlewares.SecureHeaders())
 
-	//ratelimit
 	// rateLimiter := middlewares.NewRateLimiter()
 	// router.Use(middlewares.RateLimitMiddleware(rateLimiter))
 

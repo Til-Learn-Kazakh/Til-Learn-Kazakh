@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
 import { taskService } from '../services/task.service'
 
@@ -11,5 +11,3 @@ export const useTask = (unitId: string, currentOrder: number) => {
 		enabled: !!unitId, // Запрос выполняется только если unitId задан
 	})
 }
-
-

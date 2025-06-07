@@ -473,6 +473,7 @@ const styles = StyleSheet.create({
 		fontWeight: '500',
 		marginHorizontal: 4,
 		textDecorationLine: 'underline',
+		textAlign: 'center',
 	},
 
 	legalDivider: {

@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
 	FlatList,
 	Image,
@@ -12,7 +13,6 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useTranslation } from 'react-i18next'
 
 import { icons } from '../../../core/constants'
 import { LoadingUi } from '../../../core/ui/LoadingUi'
@@ -120,6 +120,9 @@ export default function AvatarPickerPage() {
 		mutationFn: (avatar: string) => profileService.updateAvatar(avatar),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [CURRENT_USER_QUERY_KEY] })
+			queryClient.invalidateQueries({ queryKey: ['weeklyLeaderboard'] })
+			queryClient.invalidateQueries({ queryKey: ['monthlyLeaderboard'] })
+			queryClient.invalidateQueries({ queryKey: ['allTimeLeaderboard'] })
 			toast.success(t('PROFILE.AVATAR_CHANGE.AVATAR_UPDATED_SUCCESS'))
 		},
 		onError: err => {

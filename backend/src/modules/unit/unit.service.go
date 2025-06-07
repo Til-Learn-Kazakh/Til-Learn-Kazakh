@@ -25,11 +25,15 @@ func NewUnitService() *UnitService {
 }
 
 func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
+	fmt.Printf("Received LevelID: %s\n", dto.LevelID)
+
 	levelID, err := primitive.ObjectIDFromHex(dto.LevelID)
 	if err != nil {
+		fmt.Printf("Invalid LevelID: %s, error: %v\n", dto.LevelID, err)
 		return nil, fmt.Errorf("invalid level ID: %w", err)
 	}
 
+	// Проверяем, существует ли уровень
 	var level bson.M
 	err = s.LevelCollection.FindOne(context.Background(), bson.M{"_id": levelID}).Decode(&level)
 	if err != nil {
@@ -39,6 +43,7 @@ func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
 		return nil, fmt.Errorf("failed to check level existence: %w", err)
 	}
 
+	// Создаем новый unit
 	unit := Unit{
 		ID:           primitive.NewObjectID(),
 		Title:        dto.Title,
@@ -55,17 +60,32 @@ func (s *UnitService) CreateUnit(dto *CreateUnitDTO) (*Unit, error) {
 		return nil, fmt.Errorf("failed to create unit: %w", err)
 	}
 
-	// Обновляем Level, добавляя созданный Unit
-	_, err = s.LevelCollection.UpdateOne(
-		context.Background(),
-		bson.M{"_id": levelID},
-		bson.M{"$push": bson.M{"units": unit.ID}},
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to update level with new unit: %w", err)
-	}
+	// 🔥 Не трогаем level.units вообще
 
 	return &unit, nil
+}
+
+func (s *UnitService) GetAllUnits() ([]Unit, error) {
+	var units []Unit
+	cursor, err := s.Collection.Find(context.Background(), bson.M{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to find units: %w", err)
+	}
+	defer cursor.Close(context.Background())
+
+	for cursor.Next(context.Background()) {
+		var unit Unit
+		if err := cursor.Decode(&unit); err != nil {
+			return nil, fmt.Errorf("failed to decode unit: %w", err)
+		}
+		units = append(units, unit)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, fmt.Errorf("cursor error: %w", err)
+	}
+
+	return units, nil
 }
 
 func (s *UnitService) GetUnitsByLevelID(levelID primitive.ObjectID) ([]Unit, error) {
@@ -84,16 +104,23 @@ func (s *UnitService) GetUnitsByLevelID(levelID primitive.ObjectID) ([]Unit, err
 }
 
 func (s *UnitService) UpdateUnit(unitID primitive.ObjectID, dto UpdateUnitDTO) (*Unit, error) {
-	update := bson.M{
-		"$set": bson.M{
-			"title":      dto.Title,
-			"updated_at": time.Now(),
-		},
+	updateData := bson.M{
+		"updated_at": time.Now(),
 	}
+
+	if dto.Title != "" {
+		updateData["title"] = dto.Title
+	}
+
+	if (dto.Descriptions != LocalizedDescription{}) {
+		updateData["descriptions"] = dto.Descriptions
+	}
+
+	update := bson.M{"$set": updateData}
 
 	_, err := s.Collection.UpdateOne(context.Background(), bson.M{"_id": unitID}, update)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update unit: %w", err)
 	}
 
 	return s.GetUnitByID(unitID)
