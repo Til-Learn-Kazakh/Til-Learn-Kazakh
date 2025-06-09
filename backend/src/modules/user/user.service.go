@@ -50,6 +50,19 @@ func (s *UserService) GetAllUsers() ([]auth.User, error) {
 		return nil, fmt.Errorf("failed to decode users: %w", err)
 	}
 
+	// Расшифровка email'ов
+	for i := range users {
+		if users[i].Email != "" {
+			decryptedEmail, err := utils.Decrypt(users[i].Email)
+			if err == nil {
+				users[i].Email = decryptedEmail
+			} else {
+				// Можешь логировать ошибку при расшифровке, если нужно
+				users[i].Email = "[decryption failed]"
+			}
+		}
+	}
+
 	return users, nil
 }
 
