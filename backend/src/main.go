@@ -98,7 +98,7 @@ func main() {
 
 	apiRoutes := router.Group("/api/v1")
 
-	router.GET("/csrf-token", func(c *gin.Context) {
+	router.GET("/api/csrf-token", func(c *gin.Context) {
 		token := csrf.GetToken(c)
 		c.JSON(200, gin.H{"csrfToken": token})
 	})
