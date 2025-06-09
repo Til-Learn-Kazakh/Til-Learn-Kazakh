@@ -1,22 +1,47 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { Ionicons } from '@expo/vector-icons'
 import { NavigationProp, useNavigation } from '@react-navigation/native'
+import { Audio } from 'expo-av'
 
 import { icons } from '../../../core/constants'
 
+// Example audio mapping for dialogues – adjust URIs accordingly
+const dialogueAudio = [
+	require('../../../../public/sound/dialogue0.mp3'),
+	require('../../../../public/sound/dialogue1.mp3'),
+	require('../../../../public/sound/dialogue2.mp3'),
+	require('../../../../public/sound/dialogue3.mp3'),
+	require('../../../../public/sound/dialogue4.mp3'),
+	require('../../../../public/sound/dialogue5.mp3'),
+]
+
 const TheoryScreen = () => {
 	const navigation = useNavigation<NavigationProp<any>>()
+	const { t } = useTranslation()
+
+	const playSound = async (soundSource: any) => {
+		try {
+			const { sound } = await Audio.Sound.createAsync(soundSource)
+			await sound.playAsync()
+		} catch (error) {
+			console.error('Error playing sound: ', error)
+		}
+	}
+
+	// Cast the output to an array of objects with SUBJECT and VERB properties
+	const table1Rows = t('THEORYSCREEN.SECTIONS.TIPVERBS.TABLE1.ROWS', {
+		returnObjects: true,
+	}) as Array<{ SUBJECT: string; VERB: string }>
 
 	return (
 		<View style={styles.container}>
 			{/* Sticky Header */}
 			<View style={styles.header}>
 				<TouchableOpacity
-					onPress={() => {
-						navigation.goBack()
-					}}
+					onPress={() => navigation.goBack()}
 					style={styles.backButton}
 				>
 					<Ionicons
@@ -24,7 +49,7 @@ const TheoryScreen = () => {
 						size={24}
 						color='#333'
 					/>
-					<Text style={styles.backText}>НАЗАД</Text>
+					<Text style={styles.backText}>{t('THEORYSCREEN.BACK')}</Text>
 				</TouchableOpacity>
 				<TouchableOpacity style={styles.helpButton}>
 					<Ionicons
@@ -37,116 +62,145 @@ const TheoryScreen = () => {
 
 			{/* Title Section */}
 			<View style={styles.titleContainer}>
-				<Text style={styles.titleText}>Уровень A1. Теория</Text>
+				<Text style={styles.titleText}>{t('THEORYSCREEN.TITLE')}</Text>
 			</View>
 
 			{/* Scrollable Content */}
-			<ScrollView contentContainerStyle={styles.content}>
+			<ScrollView contentContainerStyle={[styles.content, { paddingBottom: 85 }]}>
 				{/* --- SECTION 1: Key Phrases (Kazakh Introductions) --- */}
-				<Text style={styles.sectionTitle}>KEY PHRASES</Text>
-				<Text style={styles.sectionSubtitle}>Introduce yourself</Text>
+				<Text style={styles.sectionTitle}>{t('THEORYSCREEN.SECTIONS.KEYPHRASES.TITLE')}</Text>
+				<Text style={styles.sectionSubtitle}>{t('THEORYSCREEN.SECTIONS.KEYPHRASES.SUBTITLE')}</Text>
 
 				<View style={styles.conversationContainer}>
 					{/* Пример 1 */}
 					<View style={styles.messageBubble}>
-						<Image
-							source={icons.volume}
-							style={{ width: 28, height: 28 }}
-						/>
-						<Text style={styles.messageText}>Кешіріңіз, сіз қазақша сөйлейсіз бе?</Text>
-						<Text style={styles.translationText}>Простите, вы говорите по-казахски?</Text>
+						<TouchableOpacity
+							style={styles.audioButton}
+							onPress={() => playSound(dialogueAudio[0])}
+						>
+							<Image
+								source={icons.volume}
+								style={{ width: 28, height: 28 }}
+							/>
+						</TouchableOpacity>
+
+						<Text style={styles.messageText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.EXAMPLE1.QUESTION')}
+						</Text>
+						<Text style={styles.translationText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.EXAMPLE1.TRANSLATION')}
+						</Text>
 					</View>
 
 					{/* Пример ответа */}
 					<View style={[styles.messageBubble, styles.responseBubble]}>
-						<Image
-							source={icons.volume}
-							style={{ width: 28, height: 28 }}
-						/>
-						<Text style={styles.messageText}>Иә, мен қазақпын.</Text>
-						<Text style={styles.translationText}>Да, я казах(ка).</Text>
+						<TouchableOpacity
+							style={styles.audioButton}
+							onPress={() => playSound(dialogueAudio[1])}
+						>
+							<Image
+								source={icons.volume}
+								style={{ width: 28, height: 28 }}
+							/>
+						</TouchableOpacity>
+						<Text style={styles.messageText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.ANSWER1.TEXT')}
+						</Text>
+						<Text style={styles.translationText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.ANSWER1.TRANSLATION')}
+						</Text>
 					</View>
 
 					{/* Пример 2 */}
 					<View style={styles.messageBubble}>
-						<Image
-							source={icons.volume}
-							style={{ width: 28, height: 28 }}
-						/>
-						<Text style={styles.messageText}>Сенің атың кім?</Text>
-						<Text style={styles.translationText}>Как тебя зовут?</Text>
+						<TouchableOpacity
+							style={styles.audioButton}
+							onPress={() => playSound(dialogueAudio[2])}
+						>
+							<Image
+								source={icons.volume}
+								style={{ width: 28, height: 28 }}
+							/>
+						</TouchableOpacity>
+						<Text style={styles.messageText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.EXAMPLE2.QUESTION')}
+						</Text>
+						<Text style={styles.translationText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.EXAMPLE2.TRANSLATION')}
+						</Text>
 					</View>
 
 					{/* Пример ответа */}
 					<View style={[styles.messageBubble, styles.responseBubble]}>
-						<Image
-							source={icons.volume}
-							style={{ width: 28, height: 28 }}
-						/>
-						<Text style={styles.messageText}>Менің атым Жанна.</Text>
-						<Text style={styles.translationText}>Меня зовут Жанна.</Text>
+						<TouchableOpacity
+							style={styles.audioButton}
+							onPress={() => playSound(dialogueAudio[3])}
+						>
+							<Image
+								source={icons.volume}
+								style={{ width: 28, height: 28 }}
+							/>
+						</TouchableOpacity>
+						<Text style={styles.messageText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.ANSWER2.TEXT')}
+						</Text>
+						<Text style={styles.translationText}>
+							{t('THEORYSCREEN.SECTIONS.KEYPHRASES.ANSWER2.TRANSLATION')}
+						</Text>
 					</View>
 				</View>
 
 				<View style={styles.divider} />
 
 				{/* --- SECTION 2: Tip (Verbs) --- */}
-				<Text style={styles.sectionTitle}>TIP</Text>
-				<Text style={styles.sectionSubtitle}>Verbs</Text>
+				<Text style={styles.sectionTitle}>{t('THEORYSCREEN.SECTIONS.TIPVERBS.TITLE')}</Text>
+				<Text style={styles.sectionSubtitle}>{t('THEORYSCREEN.SECTIONS.TIPVERBS.SUBTITLE')}</Text>
 
 				<View style={styles.tipContainer}>
-					<Text style={styles.tipText}>
-						В казахском языке глаголы спрягаются по лицам и временам, поэтому формы могут заметно
-						меняться.
-					</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.TIPVERBS.TEXT')}</Text>
 
-					{/* Пример таблицы с глаголом "сөйлеу" (говорить) */}
+					{/* Table for verb "сөйлеу" */}
 					<View style={styles.tableContainer}>
 						<View style={styles.tableRow}>
-							<Text style={styles.tableHeader}>Лицо</Text>
-							<Text style={styles.tableHeader}>Глагол (сөйлеу)</Text>
-						</View>
-						<View style={styles.tableRow}>
-							<Text style={styles.tableCell}>Мен (я)</Text>
-							<Text style={styles.tableCell}>
-								сөйле
-								<Text style={{ fontWeight: 'bold' }}>ймін</Text>
+							<Text style={styles.tableHeader}>
+								{t('THEORYSCREEN.SECTIONS.TIPVERBS.TABLE1.HEADER1')}
+							</Text>
+							<Text style={styles.tableHeader}>
+								{t('THEORYSCREEN.SECTIONS.TIPVERBS.TABLE1.HEADER2')}
 							</Text>
 						</View>
-						<View style={styles.tableRow}>
-							<Text style={styles.tableCell}>Сен (ты)</Text>
-							<Text style={styles.tableCell}>
-								сөйле
-								<Text style={{ fontWeight: 'bold' }}>йсің</Text>
-							</Text>
-						</View>
-						<View style={styles.tableRow}>
-							<Text style={styles.tableCell}>Ол (он/она)</Text>
-							<Text style={styles.tableCell}>
-								сөйле
-								<Text style={{ fontWeight: 'bold' }}>йді</Text>
-							</Text>
-						</View>
+						{table1Rows.map((row, index) => (
+							<View
+								style={styles.tableRow}
+								key={index}
+							>
+								<Text style={styles.tableCell}>{row.SUBJECT}</Text>
+								<Text style={styles.tableCell}>{row.VERB}</Text>
+							</View>
+						))}
 					</View>
 
-					{/* Пример таблицы с глаголом "бару" (идти) */}
+					{/* Table for verb "бару" */}
 					<View style={styles.tableContainer}>
 						<View style={styles.tableRow}>
-							<Text style={styles.tableHeader}>Лицо</Text>
-							<Text style={styles.tableHeader}>Глагол (бару)</Text>
+							<Text style={styles.tableHeader}>
+								{t('THEORYSCREEN.SECTIONS.TIPVERBS.TABLE2.HEADER1')}
+							</Text>
+							<Text style={styles.tableHeader}>
+								{t('THEORYSCREEN.SECTIONS.TIPVERBS.TABLE2.HEADER2')}
+							</Text>
 						</View>
-						<View style={styles.tableRow}>
-							<Text style={styles.tableCell}>Мен</Text>
-							<Text style={styles.tableCell}>барамын</Text>
-						</View>
-						<View style={styles.tableRow}>
-							<Text style={styles.tableCell}>Сен</Text>
-							<Text style={styles.tableCell}>барасың</Text>
-						</View>
-						<View style={styles.tableRow}>
-							<Text style={styles.tableCell}>Ол</Text>
-							<Text style={styles.tableCell}>барады</Text>
-						</View>
+						{(
+							t('THEORYSCREEN.SECTIONS.TIPVERBS.TABLE2.ROWS', { returnObjects: true }) as any[]
+						).map((row, index) => (
+							<View
+								style={styles.tableRow}
+								key={index}
+							>
+								<Text style={styles.tableCell}>{row.SUBJECT}</Text>
+								<Text style={styles.tableCell}>{row.VERB}</Text>
+							</View>
+						))}
 					</View>
 				</View>
 
@@ -154,139 +208,128 @@ const TheoryScreen = () => {
 
 				{/* --- SECTION 3: Tip (Gender) --- */}
 				<View style={styles.tipSection}>
-					<Text style={styles.tipTitle}>TIP</Text>
-					<Text style={styles.tipHeading}>Gender</Text>
-					<Text style={styles.tipText}>
-						В казахском языке грамматического рода, как в русском или французском, нет. Но помните,
-						что для обращения к мужчине/женщине могут использоваться разные слова (ата/апа, аға/апке
-						и т.д.).
-					</Text>
+					<Text style={styles.tipTitle}>{t('THEORYSCREEN.SECTIONS.TIPGENDER.TITLE')}</Text>
+					<Text style={styles.tipHeading}>{t('THEORYSCREEN.SECTIONS.TIPGENDER.HEADING')}</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.TIPGENDER.TEXT')}</Text>
 
 					<View style={styles.dialogue}>
-						<TouchableOpacity style={styles.audioButton}>
+						<TouchableOpacity
+							style={styles.audioButton}
+							onPress={() => playSound(dialogueAudio[4])}
+						>
 							<Ionicons
 								name='volume-high-outline'
 								size={20}
 								color='#007AFF'
 							/>
 						</TouchableOpacity>
-						<Text style={styles.dialogueText}>Бұл кім? — Бұл менің ағам.</Text>
-						<Text style={styles.translation}>Кто это? — Это мой брат.</Text>
+						<View style={{ flex: 1 }}>
+							<Text style={styles.dialogueText}>
+								{t('THEORYSCREEN.SECTIONS.TIPGENDER.DIALOGUES.0.QUESTION')}
+							</Text>
+							<Text style={styles.translation}>
+								{t('THEORYSCREEN.SECTIONS.TIPGENDER.DIALOGUES.0.TRANSLATION')}
+							</Text>
+						</View>
 					</View>
 
 					<View style={styles.dialogue}>
-						<TouchableOpacity style={styles.audioButton}>
+						<TouchableOpacity
+							style={styles.audioButton}
+							onPress={() => playSound(dialogueAudio[5])}
+						>
 							<Ionicons
 								name='volume-high-outline'
 								size={20}
 								color='#007AFF'
 							/>
 						</TouchableOpacity>
-						<Text style={styles.dialogueText}>Бұл менің әпкем.</Text>
-						<Text style={styles.translation}>Это моя сестра.</Text>
+						<View style={{ flex: 1 }}>
+							<Text style={styles.dialogueText}>
+								{t('THEORYSCREEN.SECTIONS.TIPGENDER.DIALOGUES.1.QUESTION')}
+							</Text>
+							<Text style={styles.translation}>
+								{t('THEORYSCREEN.SECTIONS.TIPGENDER.DIALOGUES.1.TRANSLATION')}
+							</Text>
+						</View>
 					</View>
-
-					<Text style={styles.tipText}>
-						Здесь нет изменения формы при обращении к разным полам, но меняется само слово.
-					</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.TIPGENDER.ADDITIONAL_TEXT')}</Text>
 				</View>
 
 				<View style={styles.divider} />
 
 				{/* --- SECTION 4: Vocabulary (Greetings) --- */}
-				<Text style={styles.sectionTitle}>VOCABULARY</Text>
-				<Text style={styles.sectionSubtitle}>Greetings</Text>
-				<Text style={{ marginBottom: 10 }}>
-					Ниже — самые распространённые приветствия на казахском языке:
-				</Text>
+				<Text style={styles.sectionTitle}>{t('THEORYSCREEN.SECTIONS.VOCABULARY.TITLE')}</Text>
+				<Text style={styles.sectionSubtitle}>{t('THEORYSCREEN.SECTIONS.VOCABULARY.SUBTITLE')}</Text>
+				<Text style={{ marginBottom: 10 }}>{t('THEORYSCREEN.SECTIONS.VOCABULARY.INTRO')}</Text>
 				<View style={styles.tableContainer}>
 					<View style={styles.tableRow}>
-						<Text style={styles.tableHeader}>Фраза</Text>
-						<Text style={styles.tableHeader}>Перевод</Text>
+						<Text style={styles.tableHeader}>
+							{t('THEORYSCREEN.SECTIONS.VOCABULARY.ITEMS_HEADER')}
+						</Text>
+						<Text style={styles.tableHeader}>
+							{t('THEORYSCREEN.SECTIONS.VOCABULARY.TRANSLATION_HEADER')}
+						</Text>
 					</View>
-					<View style={styles.tableRow}>
-						<Text style={styles.tableCell}>Сәлем</Text>
-						<Text style={styles.tableCell}>Привет</Text>
-					</View>
-					<View style={styles.tableRow}>
-						<Text style={styles.tableCell}>Қайырлы күн</Text>
-						<Text style={styles.tableCell}>Добрый день</Text>
-					</View>
-					<View style={styles.tableRow}>
-						<Text style={styles.tableCell}>Қайырлы кеш</Text>
-						<Text style={styles.tableCell}>Добрый вечер</Text>
-					</View>
+					{(t('THEORYSCREEN.SECTIONS.VOCABULARY.ITEMS', { returnObjects: true }) as any[]).map(
+						(item, index) => (
+							<View
+								style={styles.tableRow}
+								key={index}
+							>
+								<Text style={styles.tableCell}>{item.PHRASE}</Text>
+								<Text style={styles.tableCell}>{item.TRANSLATION}</Text>
+							</View>
+						)
+					)}
 				</View>
 
 				<View style={styles.divider} />
 
 				{/* --- SECTION 5: Tip (Сен vs Сіз) --- */}
-				<Text style={styles.sectionTitle}>TIP</Text>
-				<Text style={styles.sectionSubtitle}>Сен vs. Сіз</Text>
+				<Text style={styles.sectionTitle}>{t('THEORYSCREEN.SECTIONS.TIPSENSIZ.TITLE')}</Text>
+				<Text style={styles.sectionSubtitle}>{t('THEORYSCREEN.SECTIONS.TIPSENSIZ.SUBTITLE')}</Text>
 
 				<View style={styles.tipContainer}>
 					<Text style={styles.tipText}>
-						В казахском языке для местоимения «ты/Вы» существуют два варианта:
-						<Text style={styles.boldText}> сен </Text> (неформальное) и
-						<Text style={styles.boldText}> сіз</Text> (формальное или вежливое).
-					</Text>
-					<Text style={styles.tipText}>
-						- <Text style={styles.boldText}>сен</Text> используется между друзьями, в кругу семьи.
-						{'\n'}- <Text style={styles.boldText}>сіз</Text> – более вежливое обращение, а также ко
-						взрослым или незнакомым людям.
+						{t('THEORYSCREEN.SECTIONS.TIPSENSIZ.TEXT')}
+						<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.TIPSENSIZ.DETAILS')}</Text>
 					</Text>
 				</View>
 
 				<View style={styles.divider} />
 
 				{/* --- SECTION 6: Practice (Quick Check) --- */}
-				<Text style={styles.sectionTitle}>PRACTICE</Text>
-				<Text style={styles.sectionSubtitle}>Quick Check</Text>
-				<Text style={{ marginBottom: 10 }}>Небольшая практика для закрепления материала:</Text>
+				<Text style={styles.sectionTitle}>{t('THEORYSCREEN.SECTIONS.PRACTICE.TITLE')}</Text>
+				<Text style={styles.sectionSubtitle}>{t('THEORYSCREEN.SECTIONS.PRACTICE.SUBTITLE')}</Text>
+				<Text style={{ marginBottom: 10 }}>{t('THEORYSCREEN.SECTIONS.PRACTICE.INTRO')}</Text>
 
 				<View style={styles.tipContainer}>
-					<Text style={styles.tipText}>
-						1) Выберите правильное приветствие для вечера:
-						<Text style={styles.boldText}> Сәлем / Қайырлы кеш</Text>?
-					</Text>
-					<Text style={styles.tipText}>2) Переведите на казахский: «Привет, как тебя зовут?»</Text>
-					<Text style={styles.tipText}>
-						3) В каком случае вы используете <Text style={styles.boldText}>сіз</Text>, а не{' '}
-						<Text style={styles.boldText}>сен</Text>?
-					</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.PRACTICE.STEPS.STEP1')}</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.PRACTICE.STEPS.STEP2')}</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.PRACTICE.STEPS.STEP3')}</Text>
 				</View>
 
 				<View style={styles.divider} />
 
 				{/* --- SECTION 7: Common Mistakes --- */}
-				<Text style={styles.sectionTitle}>COMMON MISTAKES</Text>
-				<Text style={styles.sectionSubtitle}>Частые ошибки</Text>
+				<Text style={styles.sectionTitle}>{t('THEORYSCREEN.SECTIONS.COMMONMISTAKES.TITLE')}</Text>
+
 				<View style={styles.tipContainer}>
-					<Text style={styles.tipText}>
-						1) Смешивание сен/сіз. Многие начинающие изучающие ошибаются, используя «сен» при
-						разговоре с незнакомцами.
-					</Text>
-					<Text style={styles.tipText}>
-						2) Неправильное окончание глаголов для разных лиц. Например, «Мен сөйлейсің» вместо «Мен
-						сөйлеймін».
-					</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.COMMONMISTAKES.POINTS.0')}</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.COMMONMISTAKES.POINTS.1')}</Text>
 				</View>
 
 				<View style={styles.divider} />
 
 				{/* --- SECTION 8: Pronunciation Tips --- */}
-				<Text style={styles.sectionTitle}>PRONUNCIATION TIPS</Text>
-				<Text style={styles.sectionSubtitle}>Советы по произношению</Text>
+				<Text style={styles.sectionTitle}>
+					{t('THEORYSCREEN.SECTIONS.PRONUNCIATIONTIPS.TITLE')}
+				</Text>
+
 				<View style={styles.tipContainer}>
-					<Text style={styles.tipText}>
-						В казахском языке важно правильно произносить буквы «қ», «ө», «ү», а также носовой звук
-						«ң». Например, «қ» более твёрдая, чем русское «к», а «ң» напоминает звук «н» в слове
-						«банк».
-					</Text>
-					<Text style={styles.tipText}>
-						Особое внимание обратите на различие «ы» и «і», так как неправильное произношение может
-						изменить значение слова.
-					</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.PRONUNCIATIONTIPS.TEXTS.0')}</Text>
+					<Text style={styles.tipText}>{t('THEORYSCREEN.SECTIONS.PRONUNCIATIONTIPS.TEXTS.1')}</Text>
 				</View>
 			</ScrollView>
 		</View>

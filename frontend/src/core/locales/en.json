@@ -323,5 +323,197 @@
 			"SUCCESS_FEEDBACK": "✔ Great job!",
 			"FAILURE_FEEDBACK": "Correct solution:"
 		}
+	},
+	"THEORYSCREEN": {
+		"BACK": "BACK",
+		"TITLE": "Level A1. Theory",
+		"SECTIONS": {
+			"KEYPHRASES": {
+				"TITLE": "KEY PHRASES",
+				"SUBTITLE": "Introduce yourself",
+				"EXAMPLE1": {
+					"QUESTION": "Кешіріңіз, сіз қазақша сөйлейсіз бе?",
+					"TRANSLATION": "Excuse me, do you speak Kazakh?"
+				},
+				"ANSWER1": {
+					"TEXT": "Иә, мен қазақпын.",
+					"TRANSLATION": "Yes, I am Kazakh."
+				},
+				"EXAMPLE2": {
+					"QUESTION": "Сенің атың кім?",
+					"TRANSLATION": "What’s your name?"
+				},
+				"ANSWER2": {
+					"TEXT": "Менің атым Жанна.",
+					"TRANSLATION": "My name is Zhanna."
+				}
+			},
+			"TIPVERBS": {
+				"TITLE": "TIP",
+				"SUBTITLE": "Verbs",
+				"TEXT": "In the Kazakh language, verbs conjugate according to person and tense, so the forms can change noticeably.",
+				"TABLE1": {
+					"HEADER1": "Subject",
+					"HEADER2": "Verb (сөйлеу)",
+					"ROWS": [
+						{
+							"SUBJECT": "I",
+							"VERB": "сөйлеймін"
+						},
+						{
+							"SUBJECT": "You",
+							"VERB": "сөйлейсің"
+						},
+						{
+							"SUBJECT": "He/She",
+							"VERB": "сөйлейді"
+						}
+					]
+				},
+				"TABLE2": {
+					"HEADER1": "Subject",
+					"HEADER2": "Verb (бару)",
+					"ROWS": [
+						{
+							"SUBJECT": "I",
+							"VERB": "барамын"
+						},
+						{
+							"SUBJECT": "You",
+							"VERB": "барасың"
+						},
+						{
+							"SUBJECT": "He/She",
+							"VERB": "барады"
+						}
+					]
+				}
+			},
+			"TIPGENDER": {
+				"TITLE": "TIP",
+				"HEADING": "Gender",
+				"TEXT": "Kazakh does not have grammatical gender like Russian or French, but remember, different words may be used to address a man or a woman.",
+				"DIALOGUES": [
+					{
+						"QUESTION": "Бұл кім? — Бұл менің ағам.",
+						"TRANSLATION": "Who is this? — This is my brother."
+					},
+					{
+						"QUESTION": "Бұл менің әпкем.",
+						"TRANSLATION": "This is my sister."
+					}
+				],
+				"ADDITIONAL_TEXT": "There is no change in form depending on gender, only the word changes."
+			},
+			"VOCABULARY": {
+				"TITLE": "VOCABULARY",
+				"SUBTITLE": "Greetings",
+				"INTRO": "Below are the most common Kazakh greetings:",
+				"ITEMS_HEADER": "Phrase",
+				"TRANSLATION_HEADER": "Translation",
+				"ITEMS": [
+					{
+						"PHRASE": "Сәлем!",
+						"TRANSLATION": "Hi"
+					},
+					{
+						"PHRASE": "Сәлеметсіз бе?",
+						"TRANSLATION": "Hello, formal"
+					},
+					{
+						"PHRASE": "Қайырлы таң!",
+						"TRANSLATION": "Good morning"
+					},
+					{
+						"PHRASE": "Қайырлы күн!",
+						"TRANSLATION": "Good day"
+					},
+					{
+						"PHRASE": "Қайырлы кеш!",
+						"TRANSLATION": "Good evening"
+					},
+					{
+						"PHRASE": "Қайырлы түн!",
+						"TRANSLATION": "Good night"
+					},
+					{
+						"PHRASE": "Менің атым …",
+						"TRANSLATION": "My name is …"
+					},
+					{
+						"PHRASE": "Танысқаныма қуаныштымын.",
+						"TRANSLATION": "Nice to meet you"
+					},
+					{
+						"PHRASE": "Сіз кімсіз?",
+						"TRANSLATION": "Who are you?"
+					},
+					{
+						"PHRASE": "Қалайсың?",
+						"TRANSLATION": "How are you? (informal)"
+					},
+					{
+						"PHRASE": "Қалыңыз қалай?",
+						"TRANSLATION": "How are you? (formal)"
+					},
+					{
+						"PHRASE": "Жақсы, рақмет.",
+						"TRANSLATION": "Good, thanks."
+					},
+					{
+						"PHRASE": "Аман‑сау.",
+						"TRANSLATION": "Safe and sound."
+					},
+					{
+						"PHRASE": "Сау бол!",
+						"TRANSLATION": "Bye!"
+					},
+					{
+						"PHRASE": "Сау болыңыз!",
+						"TRANSLATION": "Goodbye (formal)"
+					},
+					{
+						"PHRASE": "Көріскенше!",
+						"TRANSLATION": "See you!"
+					},
+					{
+						"PHRASE": "Тағы кездескенше!",
+						"TRANSLATION": "Until next time!"
+					}
+				]
+			},
+			"TIPSENSIZ": {
+				"TITLE": "TIP",
+				"SUBTITLE": "СЕН VS. СІЗ",
+				"TEXT": "In Kazakh, there are two variants for the pronoun 'you':",
+				"DETAILS": "\n- 'сен' is used among friends and family.\n- 'сіз' is a more polite form used for adults or strangers."
+			},
+			"PRACTICE": {
+				"TITLE": "PRACTICE",
+				"SUBTITLE": "Quick Check",
+				"INTRO": "A short exercise to reinforce the material:",
+				"STEPS": {
+					"STEP1": "1) Choose the correct greeting for the evening: Сәлем / Қайырлы кеш?",
+					"STEP2": "2) Translate into Kazakh: 'Hello, what is your name?'",
+					"STEP3": "3) In which case do you use сіз instead of сен?"
+				}
+			},
+			"COMMONMISTAKES": {
+				"TITLE": "COMMON MISTAKES",
+				"SUBTITLE": "Frequent mistakes",
+				"POINTS": [
+					"1) Mixing up сен/сіз. Many beginners mistakenly use 'сен' when addressing strangers.",
+					"2) Incorrect verb conjugation for different subjects. For example, 'Мен сөйлейсің' instead of 'Мен сөйлеймін'."
+				]
+			},
+			"PRONUNCIATIONTIPS": {
+				"TITLE": "PRONUNCIATION TIPS",
+				"SUBTITLE": "Tips on pronunciation",
+				"TEXTS": [
+					"Correct pronunciation of letters such as 'қ', 'ө', 'ү', and the nasal sound 'ң' is important in Kazakh.",
+					"Pay special attention to the distinction between 'ы' and 'і', as mispronunciation can change the meaning of words."
+				]
+			}
+		}
 	}
 }
