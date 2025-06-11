@@ -578,34 +578,7 @@ func (s *UserService) UpdateXP(userID, unitID string, correct, attempts, committ
 	}
 
 	for _, key := range leaderboardKeys {
-		cached, err := database.RedisClient.Get(context.Background(), key).Result()
-		if err != nil {
-			continue
-		}
-
-		var leaderboard []bson.M
-		if err := json.Unmarshal([]byte(cached), &leaderboard); err != nil {
-			continue
-		}
-
-		updated := false
-		for _, entry := range leaderboard {
-			if entry["_id"] == user.ID.Hex() {
-				// Обновляем XP поля
-				entry["xp"] = user.XP
-				entry["weekly_xp"] = user.WeeklyXP
-				entry["monthly_xp"] = user.MonthlyXP
-				entry["avatar"] = user.Avatar
-				entry["first_name"] = user.FirstName
-				updated = true
-				break
-			}
-		}
-
-		if updated {
-			newData, _ := json.Marshal(leaderboard)
-			_ = database.RedisClient.Set(context.Background(), key, newData, 5*time.Minute).Err()
-		}
+		_ = database.RedisClient.Del(context.Background(), key)
 	}
 
 	return user, unitXP, accuracy, nil

@@ -5,7 +5,7 @@ import { setCSRFToken } from './csrf'
 
 export const fetchAndSetCSRFToken = async () => {
 	try {
-		const res = await axiosBase.get<{ csrfToken: string }>(`${imageserver}/csrf-token`)
+		const res = await axiosBase.get<{ csrfToken: string }>(`${imageserver}/api/csrf-token`)
 		setCSRFToken(res.data.csrfToken)
 	} catch (err) {
 		console.error('❌ Не удалось получить CSRF-токен:', err)

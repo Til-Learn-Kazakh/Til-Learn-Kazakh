@@ -51,13 +51,6 @@ const TheoryScreen = () => {
 					/>
 					<Text style={styles.backText}>{t('THEORYSCREEN.BACK')}</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.helpButton}>
-					<Ionicons
-						name='help-circle-outline'
-						size={28}
-						color='#FF6F61'
-					/>
-				</TouchableOpacity>
 			</View>
 
 			{/* Title Section */}
@@ -355,6 +348,7 @@ const styles = StyleSheet.create({
 		borderBottomColor: '#ddd',
 	},
 	backButton: {
+		marginTop:10,
 		flexDirection: 'row',
 		alignItems: 'center',
 	},
