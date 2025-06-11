@@ -9,8 +9,8 @@ RUN go mod download
 # Копируем всё
 COPY . .
 
-# ❗ Статически линкуем и собираем под Linux
-RUN CGO_ENABLED=0 GOOS=linux go build -o main ./src
+# ❗ Статически линкуем и собираем под Linux, отключаем VCS stamping
+RUN CGO_ENABLED=0 GOOS=linux go build -buildvcs=false -o main ./src
 
 # Финальный образ
 FROM alpine:latest
