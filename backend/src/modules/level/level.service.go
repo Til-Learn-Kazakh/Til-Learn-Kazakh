@@ -40,6 +40,8 @@ func (s *LevelService) CreateLevel(dto CreateLevelDTO) (*Level, error) {
 		return nil, err
 	}
 
+	_ = database.RedisClient.Del(context.Background(), "levels:with_progress").Err()
+
 	return &level, nil
 }
 
